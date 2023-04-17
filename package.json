@@ -1,0 +1,32 @@
+{
+  "name": "simple-html5-rts-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "build": "WEBPACK_ENV=production webpack",
+    "serve": "WEBPACK_ENV=development webpack serve"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/howler": "^2.2.7",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.3",
+    "debug": "^4.3.4",
+    "eslint": "^8.37.0",
+    "eslint-config-standard-with-typescript": "^34.0.1",
+    "howler": "^2.2.3",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.5",
+    "pixi.js": "^7.2.4",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.3",
+    "webpack": "^5.78.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.2"
+  }
+}

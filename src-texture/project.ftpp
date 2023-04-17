@@ -1,0 +1,636 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture",
+  "images": [
+    {
+      "name": "chopper-blue-down-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-down-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-blue-up-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-up-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-down-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-down-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-green-up-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-green-up-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-down-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-down-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-left-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-left-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-left-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-left-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-left-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-left-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-left-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-left-3.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-right-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-right-0.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-right-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-right-1.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-right-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-right-2.png",
+      "folder": ""
+    },
+    {
+      "name": "chopper-shadow-up-right-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-shadow-up-right-3.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-down.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-blue-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-up.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-down.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-green-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-green-up.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-down.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "wraith-shadow-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-shadow-up.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "spritesheet",
+    "textureFormat": "png",
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "JSON (hash)",
+    "fileName": "pack-result",
+    "savePath": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": false,
+    "padding": 1,
+    "extrude": 0,
+    "allowRotation": false,
+    "allowTrim": true,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsPacker",
+    "packerMethod": "Smart"
+  }
+}

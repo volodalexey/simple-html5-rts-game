@@ -1,0 +1,40 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+canvas {
+  display: block;
+}
+
+.ellipsis {
+  margin-right: auto;
+}
+
+.hidden {
+  display: none;
+}
+
+.error-message,
+.error-stack {
+  color: red;
+  font-size: 2rem;
+}
+
+@keyframes ellipsis {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 9rem;
+  }
+}
+
+.ellipsis::after {
+  font-size: 4rem;
+  content: "......";
+  display: inline-block;
+  overflow: hidden;
+  animation: ellipsis 2s linear infinite;
+}
