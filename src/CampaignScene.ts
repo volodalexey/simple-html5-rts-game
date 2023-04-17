@@ -1,28 +1,25 @@
 import { type Application, Container } from 'pixi.js'
 import { type IScene } from './SceneManager'
 import { Game } from './Game'
-import { type IMapSettings } from './MapSettings'
 
-interface ISinglePlayerSceneOptions {
+interface ICampaignSceneOptions {
   app: Application
   viewWidth: number
   viewHeight: number
-  levelSettings: IMapSettings
 }
 
-export class SinglePlayerScene extends Container implements IScene {
-  public gravity = 0.7
+export class CampaignScene extends Container implements IScene {
   public gameEnded = false
 
   public game!: Game
 
-  constructor (options: ISinglePlayerSceneOptions) {
+  constructor (options: ICampaignSceneOptions) {
     super()
 
     this.setup(options)
   }
 
-  setup ({ viewWidth, viewHeight }: ISinglePlayerSceneOptions): void {
+  setup ({ viewWidth, viewHeight }: ICampaignSceneOptions): void {
     const game = new Game({
       viewWidth,
       viewHeight

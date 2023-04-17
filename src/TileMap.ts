@@ -35,7 +35,7 @@ export class TileMap extends Container {
     this.addChild(this.hitboxes)
   }
 
-  async idleLoad (): Promise<void> {
+  static async idleLoad (): Promise<void> {
     await Assets.loadBundle(manifest.bundles
       .map(b => b.name)
       .filter((_, idx) => {

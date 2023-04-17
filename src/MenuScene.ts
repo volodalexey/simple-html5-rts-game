@@ -1,6 +1,9 @@
 import { type Application, Container, Sprite, type Texture } from 'pixi.js'
-import { type IScene } from './SceneManager'
+import { SceneManager, type IScene } from './SceneManager'
 import { logLayout } from './logger'
+import { Button } from './Button'
+import { TileMap } from './TileMap'
+import { CampaignScene } from './CampaignScene'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -14,17 +17,59 @@ export class MenuScene extends Container implements IScene {
   public gameEnded = false
 
   public background!: Sprite
+  public choices = new Container()
+
+  static options = {
+    choices: {
+      offset: {
+        x: 50,
+        y: 320
+      }
+    }
+  }
 
   constructor (options: IMenuSceneSceneOptions) {
     super()
 
     this.setup(options)
+
+    setTimeout(() => {
+      void TileMap.idleLoad().catch(console.error)
+    }, 1000)
   }
 
   setup ({ menuTexture }: IMenuSceneSceneOptions): void {
     const background = new Sprite(menuTexture)
     this.addChild(background)
     this.background = background
+
+    this.addChild(this.choices)
+    const { offset } = MenuScene.options.choices
+    this.choices.position.set(offset.x, offset.y)
+
+    const style = {
+      fontSize: 48,
+      textColor: 0xffffff,
+      textColorHover: 0xffff00,
+      shadowTextColor: 0x800080,
+      shadowThickness: 2,
+      buttonIdleAlpha: 0,
+      buttonHoverAlpha: 0
+    }
+    const campaignButton = new Button({
+      text: 'Campaign',
+      onClick: this.goToCampaignScene,
+      ...style
+    })
+    this.choices.addChild(campaignButton)
+
+    const multiplayerButton = new Button({
+      text: 'Multiplayer',
+      onClick: this.goToMultiplayerScene,
+      ...style
+    })
+    this.choices.addChild(multiplayerButton)
+    multiplayerButton.position.set(0, campaignButton.height)
   }
 
   handleResize ({ viewWidth, viewHeight }: {
@@ -67,5 +112,17 @@ export class MenuScene extends Container implements IScene {
   }
 
   handleUpdate (deltaMS: number): void {
+  }
+
+  goToCampaignScene = (): void => {
+    SceneManager.changeScene(new CampaignScene({
+      app: SceneManager.app,
+      viewWidth: SceneManager.width,
+      viewHeight: SceneManager.height
+    })).catch(console.error)
+  }
+
+  goToMultiplayerScene = (): void => {
+
   }
 }
