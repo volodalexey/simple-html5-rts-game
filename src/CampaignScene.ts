@@ -2,8 +2,9 @@ import { type Application, Container, Assets, type Spritesheet } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
 import { Game } from './Game'
 import { EVectorDirection } from './Vector'
-import { Base } from './Building'
+import { Base } from './buildings/Building'
 import { Team } from './common'
+import { HeavyTank } from './vehicles/HeavyTank'
 
 interface IMissionItem {
   type: string
@@ -207,6 +208,8 @@ export class CampaignScene extends Container implements IScene {
     mission.items.forEach(item => {
       if (item.type === 'buildings' && item.name === 'base') {
         this.game.tileMap.addBaseBuilding(item)
+      } else if (item.type === 'vehicles' && item.name === 'heavy-tank') {
+        this.game.tileMap.addHeavyTankVehicle(item)
       }
     })
   }
@@ -228,6 +231,29 @@ export class CampaignScene extends Container implements IScene {
         healthyTextures: animations['base-green-healthy'],
         damagedTextures: [textures['base-green-damaged.png']],
         constructingTextures: animations['base-green-contructing']
+      }
+    })
+
+    HeavyTank.prepareTextures({
+      blueTextures: {
+        upTextures: [textures['heavy-tank-blue-up.png']],
+        upRightTextures: [textures['heavy-tank-blue-up-right.png']],
+        rightTextures: [textures['heavy-tank-blue-right.png']],
+        downRightTextures: [textures['heavy-tank-blue-down-right.png']],
+        downTextures: [textures['heavy-tank-blue-down.png']],
+        downLeftTextures: [textures['heavy-tank-blue-down-left.png']],
+        leftTextures: [textures['heavy-tank-blue-left.png']],
+        upLeftTextures: [textures['heavy-tank-blue-up-left.png']]
+      },
+      greenTextures: {
+        upTextures: [textures['heavy-tank-green-up.png']],
+        upRightTextures: [textures['heavy-tank-green-up-right.png']],
+        rightTextures: [textures['heavy-tank-green-right.png']],
+        downRightTextures: [textures['heavy-tank-green-down-right.png']],
+        downTextures: [textures['heavy-tank-green-down.png']],
+        downLeftTextures: [textures['heavy-tank-green-down-left.png']],
+        leftTextures: [textures['heavy-tank-green-left.png']],
+        upLeftTextures: [textures['heavy-tank-green-up-left.png']]
       }
     })
   }

@@ -1,10 +1,10 @@
 {
   "frames": {
-    "base-green-contructing-2.png": {
+    "base-green-contructing-1.png": {
       "frame": {
         "x": 1,
         "y": 1,
-        "w": 53,
+        "w": 59,
         "h": 60
       },
       "rotated": false,
@@ -12,7 +12,7 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 53,
+        "w": 59,
         "h": 60
       },
       "sourceSize": {
@@ -24,11 +24,11 @@
         "y": 0.5
       }
     },
-    "base-green-contructing-1.png": {
+    "base-green-contructing-2.png": {
       "frame": {
-        "x": 56,
+        "x": 62,
         "y": 1,
-        "w": 59,
+        "w": 53,
         "h": 60
       },
       "rotated": false,
@@ -36,7 +36,7 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 59,
+        "w": 53,
         "h": 60
       },
       "sourceSize": {
@@ -384,20 +384,20 @@
         "y": 0.5
       }
     },
-    "chopper-shadow-up-left-3.png": {
+    "chopper-blue-right-1.png": {
       "frame": {
         "x": 247,
         "y": 62,
         "w": 40,
-        "h": 38
+        "h": 30
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
-        "y": 1,
+        "y": 6,
         "w": 40,
-        "h": 38
+        "h": 30
       },
       "sourceSize": {
         "w": 40,
@@ -408,20 +408,20 @@
         "y": 0.5
       }
     },
-    "chopper-shadow-up-left-2.png": {
+    "chopper-blue-right-2.png": {
       "frame": {
         "x": 247,
-        "y": 102,
+        "y": 94,
         "w": 40,
-        "h": 38
+        "h": 30
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
-        "y": 1,
+        "y": 6,
         "w": 40,
-        "h": 38
+        "h": 30
       },
       "sourceSize": {
         "w": 40,
@@ -432,20 +432,20 @@
         "y": 0.5
       }
     },
-    "chopper-shadow-up-left-1.png": {
+    "chopper-blue-right-3.png": {
       "frame": {
         "x": 247,
-        "y": 142,
+        "y": 126,
         "w": 40,
-        "h": 38
+        "h": 30
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
-        "y": 1,
+        "y": 6,
         "w": 40,
-        "h": 38
+        "h": 30
       },
       "sourceSize": {
         "w": 40,
@@ -456,7 +456,7 @@
         "y": 0.5
       }
     },
-    "chopper-shadow-up-3.png": {
+    "chopper-blue-up-0.png": {
       "frame": {
         "x": 187,
         "y": 62,
@@ -480,418 +480,10 @@
         "y": 0.5
       }
     },
-    "chopper-shadow-up-2.png": {
-      "frame": {
-        "x": 247,
-        "y": 182,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-up-1.png": {
-      "frame": {
-        "x": 1,
-        "y": 248,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-up-0.png": {
-      "frame": {
-        "x": 36,
-        "y": 248,
-        "w": 34,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 3,
-        "y": 0,
-        "w": 34,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-right-3.png": {
-      "frame": {
-        "x": 72,
-        "y": 247,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-right-2.png": {
-      "frame": {
-        "x": 114,
-        "y": 248,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-right-1.png": {
-      "frame": {
-        "x": 156,
-        "y": 248,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-right-0.png": {
-      "frame": {
-        "x": 198,
-        "y": 247,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-left-3.png": {
-      "frame": {
-        "x": 240,
-        "y": 247,
-        "w": 40,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 40,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-left-2.png": {
-      "frame": {
-        "x": 72,
-        "y": 279,
-        "w": 40,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 40,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-left-1.png": {
-      "frame": {
-        "x": 198,
-        "y": 279,
-        "w": 40,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 40,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-3.png": {
-      "frame": {
-        "x": 240,
-        "y": 287,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-2.png": {
-      "frame": {
-        "x": 114,
-        "y": 280,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-right-0.png": {
-      "frame": {
-        "x": 149,
-        "y": 280,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-right-1.png": {
-      "frame": {
-        "x": 1,
-        "y": 290,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-right-2.png": {
-      "frame": {
-        "x": 302,
-        "y": 1,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-right-3.png": {
-      "frame": {
-        "x": 302,
-        "y": 33,
-        "w": 40,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 6,
-        "w": 40,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-up-0.png": {
-      "frame": {
-        "x": 275,
-        "y": 287,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "chopper-blue-up-1.png": {
       "frame": {
-        "x": 289,
-        "y": 65,
+        "x": 247,
+        "y": 158,
         "w": 33,
         "h": 40
       },
@@ -914,8 +506,8 @@
     },
     "chopper-blue-up-2.png": {
       "frame": {
-        "x": 289,
-        "y": 107,
+        "x": 247,
+        "y": 200,
         "w": 33,
         "h": 40
       },
@@ -938,32 +530,8 @@
     },
     "chopper-blue-up-3.png": {
       "frame": {
-        "x": 289,
-        "y": 149,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-1.png": {
-      "frame": {
-        "x": 282,
-        "y": 191,
+        "x": 1,
+        "y": 248,
         "w": 33,
         "h": 40
       },
@@ -986,8 +554,8 @@
     },
     "chopper-blue-up-left-1.png": {
       "frame": {
-        "x": 282,
-        "y": 233,
+        "x": 36,
+        "y": 248,
         "w": 40,
         "h": 38
       },
@@ -1008,82 +576,10 @@
         "y": 0.5
       }
     },
-    "chopper-blue-up-left-2.png": {
+    "chopper-shadow-right-3.png": {
       "frame": {
-        "x": 1,
-        "y": 329,
-        "w": 40,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 40,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-up-left-3.png": {
-      "frame": {
-        "x": 43,
-        "y": 329,
-        "w": 40,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 40,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-0.png": {
-      "frame": {
-        "x": 85,
-        "y": 322,
-        "w": 33,
-        "h": 40
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 33,
-        "h": 40
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-right-3.png": {
-      "frame": {
-        "x": 149,
-        "y": 312,
+        "x": 78,
+        "y": 247,
         "w": 40,
         "h": 30
       },
@@ -1104,10 +600,106 @@
         "y": 0.5
       }
     },
-    "chopper-green-right-2.png": {
+    "chopper-blue-up-left-3.png": {
       "frame": {
-        "x": 191,
-        "y": 319,
+        "x": 120,
+        "y": 248,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-left-3.png": {
+      "frame": {
+        "x": 162,
+        "y": 248,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-left-2.png": {
+      "frame": {
+        "x": 204,
+        "y": 247,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-left-1.png": {
+      "frame": {
+        "x": 246,
+        "y": 247,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-right-0.png": {
+      "frame": {
+        "x": 78,
+        "y": 279,
         "w": 40,
         "h": 30
       },
@@ -1130,8 +722,8 @@
     },
     "chopper-green-right-1.png": {
       "frame": {
-        "x": 233,
-        "y": 329,
+        "x": 36,
+        "y": 288,
         "w": 40,
         "h": 30
       },
@@ -1152,10 +744,10 @@
         "y": 0.5
       }
     },
-    "chopper-green-right-0.png": {
+    "chopper-green-right-2.png": {
       "frame": {
-        "x": 275,
-        "y": 329,
+        "x": 120,
+        "y": 288,
         "w": 40,
         "h": 30
       },
@@ -1176,9 +768,465 @@
         "y": 0.5
       }
     },
-    "chopper-green-up-right-1.png": {
+    "chopper-green-right-3.png": {
       "frame": {
-        "x": 344,
+        "x": 162,
+        "y": 288,
+        "w": 40,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 6,
+        "w": 40,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-0.png": {
+      "frame": {
+        "x": 302,
+        "y": 1,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-1.png": {
+      "frame": {
+        "x": 302,
+        "y": 43,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-2.png": {
+      "frame": {
+        "x": 289,
+        "y": 85,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-3.png": {
+      "frame": {
+        "x": 289,
+        "y": 127,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-left-1.png": {
+      "frame": {
+        "x": 288,
+        "y": 169,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-left-2.png": {
+      "frame": {
+        "x": 288,
+        "y": 209,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-left-3.png": {
+      "frame": {
+        "x": 288,
+        "y": 249,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-right-0.png": {
+      "frame": {
+        "x": 204,
+        "y": 289,
+        "w": 40,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 6,
+        "w": 40,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-3.png": {
+      "frame": {
+        "x": 1,
+        "y": 290,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-2.png": {
+      "frame": {
+        "x": 36,
+        "y": 321,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-1.png": {
+      "frame": {
+        "x": 71,
+        "y": 321,
+        "w": 33,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 33,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-0.png": {
+      "frame": {
+        "x": 106,
+        "y": 321,
+        "w": 34,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 0,
+        "w": 34,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-right-0.png": {
+      "frame": {
+        "x": 246,
+        "y": 287,
+        "w": 40,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 6,
+        "w": 40,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-right-1.png": {
+      "frame": {
+        "x": 288,
+        "y": 289,
+        "w": 40,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 6,
+        "w": 40,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-right-2.png": {
+      "frame": {
+        "x": 246,
+        "y": 319,
+        "w": 40,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 6,
+        "w": 40,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-up-left-2.png": {
+      "frame": {
+        "x": 142,
+        "y": 321,
+        "w": 40,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 40,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-right-3.png": {
+      "frame": {
+        "x": 288,
+        "y": 321,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-left-0.png": {
+      "frame": {
+        "x": 184,
+        "y": 321,
+        "w": 39,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 6,
+        "w": 39,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-left-0.png": {
+      "frame": {
+        "x": 337,
         "y": 1,
         "w": 39,
         "h": 38
@@ -1200,20 +1248,20 @@
         "y": 0.5
       }
     },
-    "chopper-shadow-left-0.png": {
+    "chopper-green-down-left-0.png": {
       "frame": {
-        "x": 344,
+        "x": 337,
         "y": 41,
         "w": 39,
-        "h": 30
+        "h": 34
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 1,
-        "y": 6,
+        "y": 3,
         "w": 39,
-        "h": 30
+        "h": 34
       },
       "sourceSize": {
         "w": 40,
@@ -1226,8 +1274,8 @@
     },
     "chopper-green-down-left-1.png": {
       "frame": {
-        "x": 317,
-        "y": 191,
+        "x": 337,
+        "y": 77,
         "w": 39,
         "h": 34
       },
@@ -1250,8 +1298,8 @@
     },
     "chopper-green-down-left-2.png": {
       "frame": {
-        "x": 310,
-        "y": 273,
+        "x": 329,
+        "y": 321,
         "w": 39,
         "h": 34
       },
@@ -1274,8 +1322,8 @@
     },
     "chopper-green-down-left-3.png": {
       "frame": {
-        "x": 324,
-        "y": 227,
+        "x": 330,
+        "y": 113,
         "w": 39,
         "h": 34
       },
@@ -1298,8 +1346,8 @@
     },
     "chopper-green-down-right-0.png": {
       "frame": {
-        "x": 324,
-        "y": 73,
+        "x": 330,
+        "y": 149,
         "w": 39,
         "h": 34
       },
@@ -1322,8 +1370,8 @@
     },
     "chopper-green-down-right-1.png": {
       "frame": {
-        "x": 324,
-        "y": 109,
+        "x": 330,
+        "y": 185,
         "w": 39,
         "h": 34
       },
@@ -1346,8 +1394,8 @@
     },
     "chopper-green-down-right-2.png": {
       "frame": {
-        "x": 324,
-        "y": 145,
+        "x": 330,
+        "y": 221,
         "w": 39,
         "h": 34
       },
@@ -1370,8 +1418,8 @@
     },
     "chopper-green-down-right-3.png": {
       "frame": {
-        "x": 317,
-        "y": 309,
+        "x": 330,
+        "y": 257,
         "w": 39,
         "h": 34
       },
@@ -1395,7 +1443,7 @@
     "chopper-green-left-0.png": {
       "frame": {
         "x": 1,
-        "y": 369,
+        "y": 363,
         "w": 39,
         "h": 30
       },
@@ -1419,7 +1467,7 @@
     "chopper-green-left-1.png": {
       "frame": {
         "x": 42,
-        "y": 369,
+        "y": 363,
         "w": 39,
         "h": 30
       },
@@ -1443,7 +1491,7 @@
     "chopper-green-left-2.png": {
       "frame": {
         "x": 83,
-        "y": 369,
+        "y": 363,
         "w": 39,
         "h": 30
       },
@@ -1467,7 +1515,7 @@
     "chopper-green-left-3.png": {
       "frame": {
         "x": 124,
-        "y": 361,
+        "y": 363,
         "w": 39,
         "h": 30
       },
@@ -1488,130 +1536,10 @@
         "y": 0.5
       }
     },
-    "chopper-blue-up-right-3.png": {
+    "chopper-blue-left-1.png": {
       "frame": {
         "x": 165,
         "y": 361,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-up-right-2.png": {
-      "frame": {
-        "x": 206,
-        "y": 361,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-up-right-1.png": {
-      "frame": {
-        "x": 247,
-        "y": 361,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-up-right-0.png": {
-      "frame": {
-        "x": 288,
-        "y": 361,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-up-left-0.png": {
-      "frame": {
-        "x": 329,
-        "y": 345,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-left-3.png": {
-      "frame": {
-        "x": 385,
-        "y": 1,
         "w": 39,
         "h": 30
       },
@@ -1634,8 +1562,8 @@
     },
     "chopper-blue-left-2.png": {
       "frame": {
-        "x": 385,
-        "y": 33,
+        "x": 206,
+        "y": 357,
         "w": 39,
         "h": 30
       },
@@ -1656,34 +1584,10 @@
         "y": 0.5
       }
     },
-    "chopper-green-up-left-0.png": {
+    "chopper-blue-left-3.png": {
       "frame": {
-        "x": 385,
-        "y": 65,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-left-1.png": {
-      "frame": {
-        "x": 358,
-        "y": 181,
+        "x": 247,
+        "y": 351,
         "w": 39,
         "h": 30
       },
@@ -1694,54 +1598,6 @@
         "y": 6,
         "w": 39,
         "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-left-0.png": {
-      "frame": {
-        "x": 351,
-        "y": 263,
-        "w": 39,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 6,
-        "w": 39,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-right-3.png": {
-      "frame": {
-        "x": 358,
-        "y": 295,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
       },
       "sourceSize": {
         "w": 40,
@@ -1754,608 +1610,8 @@
     },
     "chopper-green-up-right-0.png": {
       "frame": {
-        "x": 365,
-        "y": 213,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
+        "x": 378,
         "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-down-left-0.png": {
-      "frame": {
-        "x": 370,
-        "y": 331,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-right-2.png": {
-      "frame": {
-        "x": 365,
-        "y": 105,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-green-up-right-3.png": {
-      "frame": {
-        "x": 124,
-        "y": 393,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-left-0.png": {
-      "frame": {
-        "x": 365,
-        "y": 145,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-left-1.png": {
-      "frame": {
-        "x": 1,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-left-2.png": {
-      "frame": {
-        "x": 165,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-left-3.png": {
-      "frame": {
-        "x": 42,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-right-0.png": {
-      "frame": {
-        "x": 83,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-right-1.png": {
-      "frame": {
-        "x": 206,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-right-2.png": {
-      "frame": {
-        "x": 247,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-right-3.png": {
-      "frame": {
-        "x": 288,
-        "y": 401,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-left-1.png": {
-      "frame": {
-        "x": 370,
-        "y": 367,
-        "w": 39,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 6,
-        "w": 39,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-left-2.png": {
-      "frame": {
-        "x": 329,
-        "y": 385,
-        "w": 39,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 6,
-        "w": 39,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-left-3.png": {
-      "frame": {
-        "x": 370,
-        "y": 399,
-        "w": 39,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 6,
-        "w": 39,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-right-2.png": {
-      "frame": {
-        "x": 426,
-        "y": 1,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-right-1.png": {
-      "frame": {
-        "x": 426,
-        "y": 37,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-right-0.png": {
-      "frame": {
-        "x": 426,
-        "y": 73,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-left-3.png": {
-      "frame": {
-        "x": 392,
-        "y": 253,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-left-2.png": {
-      "frame": {
-        "x": 399,
-        "y": 289,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-left-1.png": {
-      "frame": {
-        "x": 411,
-        "y": 325,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-left-0.png": {
-      "frame": {
-        "x": 411,
-        "y": 361,
-        "w": 39,
-        "h": 34
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 3,
-        "w": 39,
-        "h": 34
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-up-left-0.png": {
-      "frame": {
-        "x": 411,
-        "y": 397,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-up-right-0.png": {
-      "frame": {
-        "x": 406,
-        "y": 109,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-up-right-1.png": {
-      "frame": {
-        "x": 406,
-        "y": 149,
-        "w": 39,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
-        "y": 1,
-        "w": 39,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-up-right-2.png": {
-      "frame": {
-        "x": 406,
-        "y": 189,
         "w": 39,
         "h": 38
       },
@@ -2378,8 +1634,8 @@
     },
     "chopper-shadow-up-right-3.png": {
       "frame": {
-        "x": 124,
-        "y": 433,
+        "x": 378,
+        "y": 41,
         "w": 39,
         "h": 38
       },
@@ -2400,19 +1656,19 @@
         "y": 0.5
       }
     },
-    "chopper-green-down-2.png": {
+    "chopper-shadow-up-right-2.png": {
       "frame": {
-        "x": 1,
-        "y": 437,
-        "w": 33,
+        "x": 378,
+        "y": 81,
+        "w": 39,
         "h": 38
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
-        "x": 4,
+        "x": 1,
         "y": 1,
-        "w": 33,
+        "w": 39,
         "h": 38
       },
       "sourceSize": {
@@ -2424,20 +1680,716 @@
         "y": 0.5
       }
     },
-    "chopper-green-down-3.png": {
+    "chopper-shadow-up-right-1.png": {
+      "frame": {
+        "x": 371,
+        "y": 121,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-up-right-0.png": {
+      "frame": {
+        "x": 371,
+        "y": 161,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-left-0.png": {
+      "frame": {
+        "x": 371,
+        "y": 201,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-left-0.png": {
+      "frame": {
+        "x": 288,
+        "y": 357,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-left-1.png": {
+      "frame": {
+        "x": 329,
+        "y": 357,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-left-2.png": {
+      "frame": {
+        "x": 371,
+        "y": 241,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-up-left-0.png": {
+      "frame": {
+        "x": 371,
+        "y": 277,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-right-1.png": {
+      "frame": {
+        "x": 370,
+        "y": 317,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-right-2.png": {
+      "frame": {
+        "x": 247,
+        "y": 383,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-green-up-right-3.png": {
+      "frame": {
+        "x": 206,
+        "y": 389,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-left-3.png": {
       "frame": {
         "x": 165,
-        "y": 437,
-        "w": 33,
+        "y": 393,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-right-0.png": {
+      "frame": {
+        "x": 1,
+        "y": 395,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-right-1.png": {
+      "frame": {
+        "x": 42,
+        "y": 395,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-up-right-0.png": {
+      "frame": {
+        "x": 83,
+        "y": 395,
+        "w": 39,
         "h": 38
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
-        "x": 4,
+        "x": 1,
         "y": 1,
-        "w": 33,
+        "w": 39,
         "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-left-0.png": {
+      "frame": {
+        "x": 124,
+        "y": 395,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-left-1.png": {
+      "frame": {
+        "x": 288,
+        "y": 393,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-left-2.png": {
+      "frame": {
+        "x": 329,
+        "y": 393,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-left-3.png": {
+      "frame": {
+        "x": 370,
+        "y": 357,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-right-0.png": {
+      "frame": {
+        "x": 370,
+        "y": 393,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-right-1.png": {
+      "frame": {
+        "x": 419,
+        "y": 1,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-right-2.png": {
+      "frame": {
+        "x": 419,
+        "y": 37,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-right-3.png": {
+      "frame": {
+        "x": 419,
+        "y": 73,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-left-0.png": {
+      "frame": {
+        "x": 419,
+        "y": 109,
+        "w": 39,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 6,
+        "w": 39,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-left-1.png": {
+      "frame": {
+        "x": 412,
+        "y": 141,
+        "w": 39,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 6,
+        "w": 39,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-left-2.png": {
+      "frame": {
+        "x": 412,
+        "y": 173,
+        "w": 39,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 6,
+        "w": 39,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-left-3.png": {
+      "frame": {
+        "x": 412,
+        "y": 205,
+        "w": 39,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 6,
+        "w": 39,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-up-right-1.png": {
+      "frame": {
+        "x": 412,
+        "y": 237,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-up-right-2.png": {
+      "frame": {
+        "x": 412,
+        "y": 277,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-up-right-3.png": {
+      "frame": {
+        "x": 411,
+        "y": 317,
+        "w": 39,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 1,
+        "w": 39,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-right-2.png": {
+      "frame": {
+        "x": 411,
+        "y": 357,
+        "w": 39,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 39,
+        "h": 34
       },
       "sourceSize": {
         "w": 40,
@@ -2450,8 +2402,8 @@
     },
     "chopper-green-down-0.png": {
       "frame": {
-        "x": 329,
-        "y": 417,
+        "x": 411,
+        "y": 393,
         "w": 37,
         "h": 38
       },
@@ -2472,10 +2424,10 @@
         "y": 0.5
       }
     },
-    "chopper-blue-down-3.png": {
+    "chopper-shadow-down-3.png": {
       "frame": {
-        "x": 36,
-        "y": 437,
+        "x": 1,
+        "y": 435,
         "w": 33,
         "h": 38
       },
@@ -2498,8 +2450,8 @@
     },
     "chopper-shadow-down-0.png": {
       "frame": {
-        "x": 368,
-        "y": 431,
+        "x": 36,
+        "y": 435,
         "w": 37,
         "h": 38
       },
@@ -2520,10 +2472,10 @@
         "y": 0.5
       }
     },
-    "chopper-blue-down-2.png": {
+    "chopper-green-down-3.png": {
       "frame": {
-        "x": 200,
-        "y": 437,
+        "x": 75,
+        "y": 435,
         "w": 33,
         "h": 38
       },
@@ -2544,106 +2496,10 @@
         "y": 0.5
       }
     },
-    "chopper-blue-down-1.png": {
+    "chopper-green-down-2.png": {
       "frame": {
-        "x": 71,
-        "y": 437,
-        "w": 33,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 1,
-        "w": 33,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-blue-down-0.png": {
-      "frame": {
-        "x": 407,
-        "y": 437,
-        "w": 37,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 37,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-1.png": {
-      "frame": {
-        "x": 235,
-        "y": 437,
-        "w": 33,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 1,
-        "w": 33,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-2.png": {
-      "frame": {
-        "x": 270,
-        "y": 437,
-        "w": 33,
-        "h": 38
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 1,
-        "w": 33,
-        "h": 38
-      },
-      "sourceSize": {
-        "w": 40,
-        "h": 40
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "chopper-shadow-down-3.png": {
-      "frame": {
-        "x": 467,
-        "y": 1,
+        "x": 110,
+        "y": 435,
         "w": 33,
         "h": 38
       },
@@ -2666,8 +2522,8 @@
     },
     "chopper-green-down-1.png": {
       "frame": {
-        "x": 467,
-        "y": 41,
+        "x": 145,
+        "y": 433,
         "w": 33,
         "h": 38
       },
@@ -2688,10 +2544,202 @@
         "y": 0.5
       }
     },
-    "wraith-green-right.png": {
+    "chopper-shadow-down-1.png": {
       "frame": {
-        "x": 467,
-        "y": 81,
+        "x": 180,
+        "y": 433,
+        "w": 33,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 1,
+        "w": 33,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-3.png": {
+      "frame": {
+        "x": 215,
+        "y": 433,
+        "w": 33,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 1,
+        "w": 33,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-2.png": {
+      "frame": {
+        "x": 250,
+        "y": 423,
+        "w": 33,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 1,
+        "w": 33,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-1.png": {
+      "frame": {
+        "x": 285,
+        "y": 433,
+        "w": 33,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 1,
+        "w": 33,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-blue-down-0.png": {
+      "frame": {
+        "x": 320,
+        "y": 433,
+        "w": 37,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 37,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chopper-shadow-down-2.png": {
+      "frame": {
+        "x": 359,
+        "y": 433,
+        "w": 33,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 1,
+        "w": 33,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-blue-down-left.png": {
+      "frame": {
+        "x": 1,
+        "y": 332,
+        "w": 30,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 30,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-blue-down-right.png": {
+      "frame": {
+        "x": 394,
+        "y": 433,
+        "w": 30,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-blue-down.png": {
+      "frame": {
+        "x": 426,
+        "y": 433,
         "w": 29,
         "h": 30
       },
@@ -2712,20 +2760,68 @@
         "y": 0.5
       }
     },
-    "wraith-blue-down-left.png": {
+    "heavy-tank-blue-left.png": {
       "frame": {
-        "x": 446,
-        "y": 437,
+        "x": 330,
+        "y": 293,
         "w": 30,
-        "h": 28
+        "h": 26
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
-        "y": 2,
+        "y": 3,
         "w": 30,
-        "h": 28
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-blue-right.png": {
+      "frame": {
+        "x": 460,
+        "y": 1,
+        "w": 30,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 30,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-blue-up-left.png": {
+      "frame": {
+        "x": 460,
+        "y": 29,
+        "w": 30,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 29
       },
       "sourceSize": {
         "w": 30,
@@ -2738,8 +2834,8 @@
     },
     "wraith-shadow-up-right.png": {
       "frame": {
-        "x": 452,
-        "y": 113,
+        "x": 460,
+        "y": 60,
         "w": 30,
         "h": 27
       },
@@ -2760,10 +2856,298 @@
         "y": 0.5
       }
     },
+    "heavy-tank-blue-up.png": {
+      "frame": {
+        "x": 460,
+        "y": 89,
+        "w": 26,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 0,
+        "w": 26,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-down-left.png": {
+      "frame": {
+        "x": 460,
+        "y": 121,
+        "w": 30,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 30,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-down-right.png": {
+      "frame": {
+        "x": 457,
+        "y": 151,
+        "w": 30,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-down.png": {
+      "frame": {
+        "x": 457,
+        "y": 182,
+        "w": 29,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-left.png": {
+      "frame": {
+        "x": 457,
+        "y": 214,
+        "w": 30,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 30,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-right.png": {
+      "frame": {
+        "x": 457,
+        "y": 242,
+        "w": 30,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 3,
+        "w": 30,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-up-left.png": {
+      "frame": {
+        "x": 457,
+        "y": 270,
+        "w": 30,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "wraith-shadow-up.png": {
+      "frame": {
+        "x": 457,
+        "y": 301,
+        "w": 30,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 30,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-up.png": {
+      "frame": {
+        "x": 457,
+        "y": 332,
+        "w": 26,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 0,
+        "w": 26,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "wraith-blue-down-left.png": {
+      "frame": {
+        "x": 457,
+        "y": 364,
+        "w": 30,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 2,
+        "w": 30,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "wraith-shadow-up-left.png": {
+      "frame": {
+        "x": 457,
+        "y": 394,
+        "w": 30,
+        "h": 27
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 2,
+        "w": 30,
+        "h": 27
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "wraith-shadow-left.png": {
+      "frame": {
+        "x": 457,
+        "y": 423,
+        "w": 30,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 2,
+        "w": 30,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "wraith-blue-left.png": {
       "frame": {
-        "x": 452,
-        "y": 142,
+        "x": 1,
+        "y": 475,
         "w": 29,
         "h": 30
       },
@@ -2786,8 +3170,8 @@
     },
     "wraith-blue-right.png": {
       "frame": {
-        "x": 452,
-        "y": 174,
+        "x": 394,
+        "y": 464,
         "w": 29,
         "h": 30
       },
@@ -2810,8 +3194,8 @@
     },
     "wraith-blue-up-left.png": {
       "frame": {
-        "x": 452,
-        "y": 206,
+        "x": 250,
+        "y": 463,
         "w": 30,
         "h": 27
       },
@@ -2832,10 +3216,10 @@
         "y": 0.5
       }
     },
-    "wraith-shadow-up-left.png": {
+    "wraith-shadow-down-left.png": {
       "frame": {
-        "x": 452,
-        "y": 235,
+        "x": 457,
+        "y": 453,
         "w": 30,
         "h": 27
       },
@@ -2843,7 +3227,7 @@
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
-        "y": 2,
+        "y": 3,
         "w": 30,
         "h": 27
       },
@@ -2858,8 +3242,8 @@
     },
     "wraith-blue-up.png": {
       "frame": {
-        "x": 452,
-        "y": 264,
+        "x": 425,
+        "y": 465,
         "w": 30,
         "h": 30
       },
@@ -2882,8 +3266,8 @@
     },
     "wraith-green-down-left.png": {
       "frame": {
-        "x": 452,
-        "y": 296,
+        "x": 32,
+        "y": 475,
         "w": 30,
         "h": 29
       },
@@ -2904,82 +3288,10 @@
         "y": 0.5
       }
     },
-    "wraith-shadow-left.png": {
-      "frame": {
-        "x": 452,
-        "y": 327,
-        "w": 30,
-        "h": 28
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 2,
-        "w": 30,
-        "h": 28
-      },
-      "sourceSize": {
-        "w": 30,
-        "h": 30
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "wraith-shadow-down-left.png": {
-      "frame": {
-        "x": 452,
-        "y": 357,
-        "w": 30,
-        "h": 27
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 3,
-        "w": 30,
-        "h": 27
-      },
-      "sourceSize": {
-        "w": 30,
-        "h": 30
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "wraith-green-left.png": {
-      "frame": {
-        "x": 452,
-        "y": 386,
-        "w": 30,
-        "h": 30
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 30,
-        "h": 30
-      },
-      "sourceSize": {
-        "w": 30,
-        "h": 30
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "wraith-green-up.png": {
       "frame": {
-        "x": 1,
-        "y": 477,
+        "x": 64,
+        "y": 475,
         "w": 30,
         "h": 30
       },
@@ -3002,8 +3314,8 @@
     },
     "wraith-green-up-left.png": {
       "frame": {
-        "x": 33,
-        "y": 477,
+        "x": 96,
+        "y": 475,
         "w": 30,
         "h": 28
       },
@@ -3024,44 +3336,44 @@
         "y": 0.5
       }
     },
-    "wraith-shadow-up.png": {
+    "wraith-green-left.png": {
       "frame": {
-        "x": 65,
-        "y": 477,
+        "x": 128,
+        "y": 475,
         "w": 30,
-        "h": 29
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 30,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "wraith-green-right.png": {
+      "frame": {
+        "x": 282,
+        "y": 473,
+        "w": 29,
+        "h": 30
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
-        "y": 1,
-        "w": 30,
-        "h": 29
-      },
-      "sourceSize": {
-        "w": 30,
-        "h": 30
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "wraith-green-up-right.png": {
-      "frame": {
-        "x": 97,
-        "y": 477,
-        "w": 29,
-        "h": 29
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 1,
         "y": 0,
         "w": 29,
-        "h": 29
+        "h": 30
       },
       "sourceSize": {
         "w": 30,
@@ -3072,9 +3384,9 @@
         "y": 0.5
       }
     },
-    "wraith-green-down.png": {
+    "wraith-shadow-down.png": {
       "frame": {
-        "x": 128,
+        "x": 160,
         "y": 473,
         "w": 29,
         "h": 29
@@ -3096,10 +3408,10 @@
         "y": 0.5
       }
     },
-    "wraith-shadow-down.png": {
+    "wraith-green-down.png": {
       "frame": {
-        "x": 159,
-        "y": 477,
+        "x": 313,
+        "y": 473,
         "w": 29,
         "h": 29
       },
@@ -3122,8 +3434,8 @@
     },
     "wraith-green-down-right.png": {
       "frame": {
-        "x": 190,
-        "y": 477,
+        "x": 191,
+        "y": 473,
         "w": 28,
         "h": 29
       },
@@ -3134,30 +3446,6 @@
         "y": 1,
         "w": 28,
         "h": 29
-      },
-      "sourceSize": {
-        "w": 30,
-        "h": 30
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "wraith-shadow-right.png": {
-      "frame": {
-        "x": 220,
-        "y": 477,
-        "w": 29,
-        "h": 28
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 1,
-        "w": 29,
-        "h": 28
       },
       "sourceSize": {
         "w": 30,
@@ -3170,8 +3458,56 @@
     },
     "wraith-blue-up-right.png": {
       "frame": {
-        "x": 251,
-        "y": 477,
+        "x": 344,
+        "y": 473,
+        "w": 29,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 0,
+        "w": 29,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-blue-up-right.png": {
+      "frame": {
+        "x": 492,
+        "y": 1,
+        "w": 29,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "wraith-green-up-right.png": {
+      "frame": {
+        "x": 492,
+        "y": 32,
         "w": 29,
         "h": 29
       },
@@ -3194,8 +3530,8 @@
     },
     "wraith-blue-down.png": {
       "frame": {
-        "x": 282,
-        "y": 477,
+        "x": 488,
+        "y": 89,
         "w": 28,
         "h": 29
       },
@@ -3216,10 +3552,58 @@
         "y": 0.5
       }
     },
+    "wraith-shadow-right.png": {
+      "frame": {
+        "x": 492,
+        "y": 120,
+        "w": 29,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 1,
+        "w": 29,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "heavy-tank-green-up-right.png": {
+      "frame": {
+        "x": 492,
+        "y": 150,
+        "w": 29,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 29,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 30
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "wraith-blue-down-right.png": {
       "frame": {
-        "x": 312,
-        "y": 477,
+        "x": 488,
+        "y": 182,
         "w": 28,
         "h": 28
       },
@@ -3242,8 +3626,8 @@
     },
     "wraith-shadow-down-right.png": {
       "frame": {
-        "x": 342,
-        "y": 477,
+        "x": 485,
+        "y": 332,
         "w": 28,
         "h": 27
       },
@@ -3391,8 +3775,8 @@
     "image": "spritesheet.png",
     "format": "RGBA8888",
     "size": {
-      "w": 501,
-      "h": 508
+      "w": 522,
+      "h": 506
     },
     "scale": 1
   }

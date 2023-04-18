@@ -1,39 +1,18 @@
 import { AnimatedSprite, Container, type Texture } from 'pixi.js'
-import { Team } from './common'
-
-export class BaseBuilding extends Container {
-  public buildableGrid = [
-    [1, 1],
-    [1, 1]
-  ]
-
-  public passableGrid = [
-    [1, 1],
-    [1, 1]
-  ]
-
-  public sight = 3
-  public hitPoints = 500
-  public cost = 5000
-  public life = 100
-}
-
-export interface IBaseOptions {
-  initX?: number
-  initY?: number
-  team: Team
-}
-
-export enum BaseAnimation {
-  healthy = 'healthy',
-  damaged = 'damaged',
-  constructing = 'constructing',
-}
+import { Team } from '../common'
+import { BaseAnimation, BaseBuilding } from './BaseBuilding'
 
 interface IBaseTextures {
   healthyTextures: Texture[]
   damagedTextures: Texture[]
   constructingTextures: Texture[]
+}
+
+export interface IBaseOptions {
+  uid?: number
+  initX?: number
+  initY?: number
+  team: Team
 }
 
 export class Base extends BaseBuilding {
@@ -49,12 +28,11 @@ export class Base extends BaseBuilding {
     constructingTextures: Texture[]
   }
 
-  public team!: Team
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite
   public constructingAnimation!: AnimatedSprite
   public currentAnimation!: AnimatedSprite
-  public animationsContainer = new Container<AnimatedSprite>()
+  public spritesContainer = new Container<AnimatedSprite>()
   static options = {
     healthyAnimationSpeed: 0.1,
     damagedAnimationSpeed: 0.1,
@@ -62,15 +40,9 @@ export class Base extends BaseBuilding {
   }
 
   constructor (options: IBaseOptions) {
-    super()
-    this.team = options.team
+    super(options)
+
     this.setup(options)
-    if (options.initX != null) {
-      this.position.x = options.initX
-    }
-    if (options.initY != null) {
-      this.position.y = options.initY
-    }
 
     this.switchAnimation(BaseAnimation.healthy)
   }
@@ -87,7 +59,7 @@ export class Base extends BaseBuilding {
   }
 
   setup (_: IBaseOptions): void {
-    this.addChild(this.animationsContainer)
+    this.addChild(this.spritesContainer)
 
     const { team } = this
     const { blueTextures, greenTextures } = Base
@@ -95,22 +67,22 @@ export class Base extends BaseBuilding {
     const { healthyAnimationSpeed, damagedAnimationSpeed, constructingAnimationSpeed } = Base.options
     const healthyAnimation = new AnimatedSprite(healthyTextures)
     healthyAnimation.animationSpeed = healthyAnimationSpeed
-    this.animationsContainer.addChild(healthyAnimation)
+    this.spritesContainer.addChild(healthyAnimation)
     this.healthyAnimation = healthyAnimation
 
     const damagedAnimation = new AnimatedSprite(damagedTextures)
     damagedAnimation.animationSpeed = damagedAnimationSpeed
-    this.animationsContainer.addChild(damagedAnimation)
+    this.spritesContainer.addChild(damagedAnimation)
     this.damagedAnimation = damagedAnimation
 
     const constructingAnimation = new AnimatedSprite(constructingTextures)
     constructingAnimation.animationSpeed = constructingAnimationSpeed
-    this.animationsContainer.addChild(constructingAnimation)
+    this.spritesContainer.addChild(constructingAnimation)
     this.constructingAnimation = constructingAnimation
   }
 
   hideAllAnimations (): void {
-    this.animationsContainer.children.forEach(spr => {
+    this.spritesContainer.children.forEach(spr => {
       spr.visible = false
     })
   }

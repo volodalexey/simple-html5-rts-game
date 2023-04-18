@@ -3,7 +3,10 @@ import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
-import { Base, type BaseBuilding, type IBaseOptions } from './Building'
+import { BaseBuilding } from './buildings/BaseBuilding'
+import { Base, type IBaseOptions } from './buildings/Building'
+import { HeavyTank, type IHeavyTankOptions } from './vehicles/HeavyTank'
+import { BaseVehicle } from './vehicles/Vehicle'
 
 export interface ITileMapOptions {
   viewWidth: number
@@ -20,6 +23,7 @@ interface IBoundsData {
 export class TileMap extends Container {
   public hitboxes = new Container<Hitbox>()
   public buildings = new Container<BaseBuilding>()
+  public vehicles = new Container<BaseVehicle>()
   public background = new Sprite()
   public viewWidth!: number
   public viewHeight!: number
@@ -36,6 +40,7 @@ export class TileMap extends Container {
     this.addChild(this.background)
     this.addChild(this.hitboxes)
     this.addChild(this.buildings)
+    this.addChild(this.vehicles)
   }
 
   static async idleLoad (): Promise<void> {
@@ -113,11 +118,19 @@ export class TileMap extends Container {
 
   }
 
-  addItem (item: BaseBuilding): void {
-    this.buildings.addChild(item)
+  addItem (item: BaseBuilding | BaseVehicle): void {
+    if (item instanceof BaseBuilding) {
+      this.buildings.addChild(item)
+    } else if (item instanceof BaseVehicle) {
+      this.vehicles.addChild(item)
+    }
   }
 
   addBaseBuilding (options: IBaseOptions): void {
     this.addItem(new Base(options))
+  }
+
+  addHeavyTankVehicle (options: IHeavyTankOptions): void {
+    this.addItem(new HeavyTank(options))
   }
 }

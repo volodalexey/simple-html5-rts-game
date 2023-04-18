@@ -565,6 +565,86 @@
       "folder": ""
     },
     {
+      "name": "heavy-tank-blue-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-down.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-blue-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-up.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-down.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heavy-tank-green-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-up.png",
+      "folder": ""
+    },
+    {
       "name": "wraith-blue-down-left.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/wraith-blue-down-left.png",
       "folder": ""
