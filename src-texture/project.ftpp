@@ -5,6 +5,86 @@
   "savePath": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture",
   "images": [
     {
+      "name": "base-blue-contructing-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-contructing-0.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-contructing-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-contructing-1.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-contructing-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-contructing-2.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-healthy-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-healthy-0.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-healthy-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-healthy-1.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-healthy-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-healthy-2.png",
+      "folder": ""
+    },
+    {
+      "name": "base-blue-healthy-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-blue-healthy-3.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-contructing-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-contructing-0.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-contructing-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-contructing-1.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-contructing-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-contructing-2.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-healthy-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-healthy-0.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-healthy-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-healthy-1.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-healthy-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-healthy-2.png",
+      "folder": ""
+    },
+    {
+      "name": "base-green-healthy-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/base-green-healthy-3.png",
+      "folder": ""
+    },
+    {
       "name": "chopper-blue-down-0.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-0.png",
       "folder": ""

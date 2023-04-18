@@ -1,12 +1,12 @@
 export enum EVectorDirection {
-  up = 'up',
-  right = 'right',
-  down = 'down',
-  left = 'left',
-  upRight = 'upRight',
-  downRight = 'downRight',
-  upLeft = 'upLeft',
-  downLeft = 'downLeft',
+  up = 'up', // 0
+  upRight = 'upRight', // 1
+  right = 'right', // 2
+  downRight = 'downRight', // 3
+  down = 'down', // 4
+  downLeft = 'downLeft', // 5
+  left = 'left', // 6
+  upLeft = 'upLeft', // 7
 }
 
 interface IVectorOptions {

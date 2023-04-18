@@ -3,6 +3,7 @@ import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
+import { Base, type BaseBuilding, type IBaseOptions } from './Building'
 
 export interface ITileMapOptions {
   viewWidth: number
@@ -18,6 +19,7 @@ interface IBoundsData {
 
 export class TileMap extends Container {
   public hitboxes = new Container<Hitbox>()
+  public buildings = new Container<BaseBuilding>()
   public background = new Sprite()
   public viewWidth!: number
   public viewHeight!: number
@@ -33,6 +35,7 @@ export class TileMap extends Container {
   setup (): void {
     this.addChild(this.background)
     this.addChild(this.hitboxes)
+    this.addChild(this.buildings)
   }
 
   static async idleLoad (): Promise<void> {
@@ -43,9 +46,9 @@ export class TileMap extends Container {
       }))
   }
 
-  initLevel (levelIndex: number): void {
-    const background: Texture = Assets.get(`level${levelIndex}Background`)
-    const settings: IMapSettings = Assets.get(`level${levelIndex}Settings`)
+  initLevel ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void {
+    const background: Texture = Assets.get(mapImageSrc)
+    const settings: IMapSettings = Assets.get(mapSettingsSrc)
 
     this.background.texture = background
 
@@ -108,5 +111,13 @@ export class TileMap extends Container {
 
   handleUpdate (deltaMS: number): void {
 
+  }
+
+  addItem (item: BaseBuilding): void {
+    this.buildings.addChild(item)
+  }
+
+  addBaseBuilding (options: IBaseOptions): void {
+    this.addItem(new Base(options))
   }
 }

@@ -3,6 +3,7 @@ import { logApp } from './logger'
 
 export interface IScene extends DisplayObject {
   handleUpdate: (deltaMS: number) => void
+  mountedHandler?: () => void
   handleResize: (options: {
     viewWidth: number
     viewHeight: number
@@ -54,14 +55,20 @@ export abstract class SceneManager {
     SceneManager.app.ticker.add(SceneManager.updateHandler)
   }
 
-  public static async changeScene (newScene: IScene): Promise<void> {
+  public static async changeScene (newScene: IScene, options = { initialResize: true }): Promise<void> {
     SceneManager.app.stage.removeChild(SceneManager.currentScene)
     SceneManager.currentScene.destroy()
 
     SceneManager.currentScene = newScene
     SceneManager.app.stage.addChild(SceneManager.currentScene)
 
-    SceneManager.resizeHandler()
+    if (options.initialResize) {
+      SceneManager.resizeHandler()
+    }
+
+    if (typeof newScene.mountedHandler === 'function') {
+      newScene.mountedHandler()
+    }
   }
 
   private static resizeDeBounce (): void {

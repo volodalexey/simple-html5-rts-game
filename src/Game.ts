@@ -1,6 +1,5 @@
 import { Container } from 'pixi.js'
 import { StatusBar } from './StatusBar'
-import { StartModal } from './StartModal'
 import { InputHandler } from './InputHandler'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
@@ -15,20 +14,11 @@ export class Game extends Container {
   public gameEnded = false
   public time = 0
 
-  static options = {
-    maxTime: 600000,
-    startLevel: 1,
-    maxLevel: 2
-  }
-
-  public currentLevel = Game.options.startLevel
-
   public viewWidth: number
   public viewHeight: number
   public inputHandler!: InputHandler
   public tileMap!: TileMap
   public statusBar!: StatusBar
-  public startModal!: StartModal
   public camera!: Camera
 
   constructor (options: IGameOptions) {
@@ -36,10 +26,6 @@ export class Game extends Container {
     this.viewWidth = options.viewWidth
     this.viewHeight = options.viewHeight
     this.setup(options)
-
-    this.addEventLesteners()
-
-    this.runLevel()
   }
 
   setup ({
@@ -58,33 +44,17 @@ export class Game extends Container {
     this.inputHandler = new InputHandler({ eventTarget: this.tileMap })
 
     this.camera = new Camera({ tileMap: this.tileMap })
-
-    this.startModal = new StartModal({ viewWidth, viewHeight })
-    this.startModal.visible = false
-    this.addChild(this.startModal)
   }
 
-  addEventLesteners (): void {
-    this.startModal.on('click', this.startGame)
-  }
-
-  startGame = (): void => {
-    this.startModal.visible = false
+  startGame = ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void => {
     this.gameEnded = false
     this.time = 0
-    this.currentLevel = Game.options.startLevel
-    this.runLevel()
+    this.runLevel({ mapImageSrc, mapSettingsSrc })
     this.inputHandler.restart()
   }
 
-  endGame (success = false): void {
+  endGame (): void {
     this.gameEnded = true
-    this.startModal.visible = true
-    if (success) {
-      this.startModal.win('Win!!')
-    } else {
-      this.startModal.lose('You lose!')
-    }
   }
 
   handleResize ({ viewWidth, viewHeight }: {
@@ -109,9 +79,7 @@ export class Game extends Container {
     this.statusBar.visible = true
 
     const calcWidth = availableWidth > occupiedWidth ? occupiedWidth : availableWidth
-    const calcHeight = availableHeight > occupiedHeight ? occupiedHeight : availableHeight
     this.statusBar.position.set(calcWidth / 2 - this.statusBar.width / 2, 0)
-    this.startModal.position.set(calcWidth / 2 - this.startModal.width / 2, calcHeight / 2 - this.startModal.height / 2)
   }
 
   handleUpdate (deltaMS: number): void {
@@ -120,27 +88,16 @@ export class Game extends Container {
     }
     this.time += deltaMS
     this.statusBar.updateTime(this.time)
-    if (this.time > Game.options.maxTime) {
-      this.endGame()
-      return
-    }
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
   }
 
-  runLevel (increment?: boolean): void {
-    if (increment === true) {
-      this.currentLevel++
-    }
-    if (this.currentLevel > Game.options.maxLevel) {
-      this.endGame(true)
-      return
-    }
+  runLevel ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void {
     this.tileMap.restart()
     this.tileMap.cleanFromAll()
 
-    this.tileMap.initLevel(this.currentLevel)
+    this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc })
 
-    this.statusBar.updateLevel(this.currentLevel)
+    this.statusBar.updateLevel(0)
   }
 }
