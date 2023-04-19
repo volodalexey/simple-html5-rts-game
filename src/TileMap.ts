@@ -1,12 +1,12 @@
-import { Assets, Container, Sprite, type Texture } from 'pixi.js'
+import { Assets, Container, type IPointData, Sprite, type Texture } from 'pixi.js'
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
 import { BaseBuilding } from './buildings/BaseBuilding'
-import { Base, type IBaseOptions } from './buildings/Building'
+import { Base, type IBaseOptions } from './buildings/Base'
 import { HeavyTank, type IHeavyTankOptions } from './vehicles/HeavyTank'
-import { BaseVehicle } from './vehicles/Vehicle'
+import { BaseVehicle } from './vehicles/BaseVehicle'
 
 export interface ITileMapOptions {
   viewWidth: number
@@ -132,5 +132,59 @@ export class TileMap extends Container {
 
   addHeavyTankVehicle (options: IHeavyTankOptions): void {
     this.addItem(new HeavyTank(options))
+  }
+
+  itemUnderPointer (point: IPointData): BaseVehicle | BaseBuilding | undefined {
+    // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
+    //   return;
+    // }
+    const vehicle = this.vehicles.children.find(vehicle => {
+      if (vehicle.isAlive() &&
+        point.x >= vehicle.x &&
+        point.x <= vehicle.x + vehicle.width &&
+        point.y >= vehicle.y &&
+        point.y <= vehicle.y + vehicle.height
+      ) {
+        return true
+      }
+      return false
+    })
+    if (vehicle != null) {
+      return vehicle
+    }
+    return this.buildings.children.find(building => {
+      if (building.isAlive() &&
+        point.x >= building.x &&
+        point.x <= building.x + building.width &&
+        point.y >= building.y &&
+        point.y <= building.y + building.height
+      ) {
+        return true
+      }
+      return false
+    })
+
+    // for (const item of this.buildings.children) {
+    //   if (item.type === 'buildings' || item.type == 'terrain') {
+    //     if (item.lifeCode != 'dead' &&
+    //       item.x <= mouse.gameX / game.gridSize &&
+    //       item.x >= (mouse.gameX - item.baseWidth) / game.gridSize &&
+    //       item.y <= mouse.gameY / game.gridSize &&
+    //       item.y >= (mouse.gameY - item.baseHeight) / game.gridSize
+    //     ) {
+    //       _c.log(item.uid)
+    //       return item
+    //     }
+    //   } else if (item.type == 'aircraft') {
+    //     if (item.lifeCode != 'dead' &&
+    //       Math.pow(item.x - mouse.gameX / game.gridSize, 2) + Math.pow(item.y - (mouse.gameY + item.pixelShadowHeight) / game.gridSize, 2) < Math.pow((item.radius) / game.gridSize, 2)) {
+    //       return item
+    //     }
+    //   } else {
+    //     if (item.lifeCode != 'dead' && Math.pow(item.x - mouse.gameX / game.gridSize, 2) + Math.pow(item.y - mouse.gameY / game.gridSize, 2) < Math.pow((item.radius) / game.gridSize, 2)) {
+    //       return item
+    //     }
+    //   }
+    // }
   }
 }

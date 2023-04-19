@@ -2,7 +2,7 @@ import { type Application, Container, Assets, type Spritesheet } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
 import { Game } from './Game'
 import { EVectorDirection } from './Vector'
-import { Base } from './buildings/Building'
+import { Base } from './buildings/Base'
 import { Team } from './common'
 import { HeavyTank } from './vehicles/HeavyTank'
 
@@ -70,7 +70,7 @@ const missions: IMission[] = [
       { type: 'buildings', name: 'base', initX: 1100, initY: 120, team: Team.blue, life: 100 },
 
       /* Player heavy tank */
-      { type: 'vehicles', name: 'heavy-tank', initX: 1140, initY: 240, direction: EVectorDirection.down, team: Team.blue, uid: -1 },
+      { type: 'vehicles', name: 'heavy-tank', initX: 1140, initY: 240, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
 
       /* Two transport vehicles waiting just outside the visible map */
       { type: 'vehicles', name: 'transport', initX: -60, initY: 40, direction: EVectorDirection.right, team: Team.blue, uid: -3, selectable: false },

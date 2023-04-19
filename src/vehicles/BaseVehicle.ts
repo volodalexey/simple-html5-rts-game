@@ -1,6 +1,7 @@
-import { AnimatedSprite, Container, type Texture } from 'pixi.js'
+import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../Vector'
 import { type Team } from '../common'
+import { type ISelectable } from '../common/ISelectable'
 
 export interface IBaseVehicleTextures {
   upTextures: Texture[]
@@ -22,7 +23,24 @@ export interface IBaseVehicleOptions {
   direction?: EVectorDirection
 }
 
-export class BaseVehicle extends Container {
+export class BaseVehicle extends Container implements ISelectable {
+  public selected = false
+  public selectable = true
+  public selectedGraphics = new Graphics()
+  public drawSelectionOptions = {
+    width: 0,
+    height: 0,
+    radius: 0,
+    lineWidth: 0,
+    lineColor: 0,
+    strokeWidth: 0,
+    strokeColor: 0,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
   public uid?: number
   public team!: Team
   public upAnimation!: AnimatedSprite
@@ -66,6 +84,7 @@ export class BaseVehicle extends Container {
       upLeftTextures
     }
   }: IBaseVehicleOptions): void {
+    this.addChild(this.selectedGraphics)
     this.addChild(this.spritesContainer)
 
     const upAnimation = new AnimatedSprite(upTextures)
@@ -99,6 +118,11 @@ export class BaseVehicle extends Container {
     const upLeftAnimation = new AnimatedSprite(upLeftTextures)
     this.spritesContainer.addChild(upLeftAnimation)
     this.upLeftAnimation = upLeftAnimation
+  }
+
+  setSelected (selected: boolean): void {
+    this.selectedGraphics.alpha = selected ? 0.5 : 0
+    this.selected = selected
   }
 
   hideAllAnimations (): void {
@@ -142,5 +166,26 @@ export class BaseVehicle extends Container {
     this.hideAllAnimations()
     this.currentAnimation.gotoAndPlay(0)
     this.currentAnimation.visible = true
+  }
+
+  drawSelection (): void {
+    const { offset, lineWidth, lineColor, strokeWidth, strokeColor, radius } = this.drawSelectionOptions
+    this.selectedGraphics.lineStyle({
+      width: lineWidth,
+      color: lineColor
+    })
+    this.selectedGraphics.drawCircle(offset.x, offset.y, radius)
+    this.selectedGraphics.endFill()
+    this.selectedGraphics.lineStyle({
+      width: strokeWidth,
+      color: strokeColor
+    })
+    this.selectedGraphics.drawCircle(offset.x, offset.y, radius + strokeWidth)
+    this.selectedGraphics.endFill()
+    this.selectedGraphics.alpha = 0
+  }
+
+  isAlive (): boolean {
+    return true
   }
 }
