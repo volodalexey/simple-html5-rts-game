@@ -1,13 +1,11 @@
 import { type Texture } from 'pixi.js'
 import { Team } from '../common'
-import { BaseBuilding, type IBaseBuildingTextures } from './BaseBuilding'
+import { BaseBuilding, type IBaseBuildingOptions, type IBaseBuildingTextures } from './BaseBuilding'
 
-export interface IBaseOptions {
-  uid?: number
-  initX?: number
-  initY?: number
-  team: Team
-}
+export type IBaseOptions = Pick<
+IBaseBuildingOptions,
+Exclude<keyof IBaseBuildingOptions, 'textures'>
+>
 
 export class Base extends BaseBuilding {
   static blueTextures: {
@@ -35,6 +33,9 @@ export class Base extends BaseBuilding {
       y: 19
     }
   }
+
+  public hitPoints = 500
+  public life = this.hitPoints
 
   constructor (options: IBaseOptions) {
     super({

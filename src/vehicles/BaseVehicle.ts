@@ -2,6 +2,7 @@ import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../Vector'
 import { type Team } from '../common'
 import { type ISelectable } from '../common/ISelectable'
+import { type ILifeable } from '../common/ILifeable'
 
 export interface IBaseVehicleTextures {
   upTextures: Texture[]
@@ -21,9 +22,16 @@ export interface IBaseVehicleOptions {
   team: Team
   textures: IBaseVehicleTextures
   direction?: EVectorDirection
+  life?: number
+  selectable?: boolean
+  orders?: {
+    type: 'patrol'
+    from: { x: number, y: number }
+    to: { x: number, y: number }
+  }
 }
 
-export class BaseVehicle extends Container implements ISelectable {
+export class BaseVehicle extends Container implements ISelectable, ILifeable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Graphics()
@@ -42,6 +50,8 @@ export class BaseVehicle extends Container implements ISelectable {
   }
 
   public uid?: number
+  public hitPoints = 0
+  public life = 0
   public team!: Team
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
@@ -69,6 +79,9 @@ export class BaseVehicle extends Container implements ISelectable {
     if (options.direction) {
       this.velocity.setDirection({ direction: options.direction, speed: 0 })
       this.switchAnimation(options.direction)
+    }
+    if (typeof options.selectable === 'boolean') {
+      this.selectable = options.selectable
     }
   }
 

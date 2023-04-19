@@ -565,6 +565,86 @@
       "folder": ""
     },
     {
+      "name": "harvester-blue-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-down.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-left.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-right.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-blue-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-up.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-down.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-left.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-right.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "harvester-green-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-up.png",
+      "folder": ""
+    },
+    {
       "name": "heavy-tank-blue-down-left.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-blue-down-left.png",
       "folder": ""
@@ -642,6 +722,166 @@
     {
       "name": "heavy-tank-green-up.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heavy-tank-green-up.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-down.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-blue-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-up.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-down.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scout-tank-green-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-up.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-down.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-left.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-right.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-blue-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-blue-up.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-down.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-left.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-right.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "transport-green-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/transport-green-up.png",
       "folder": ""
     },
     {

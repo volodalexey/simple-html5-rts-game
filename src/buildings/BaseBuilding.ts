@@ -1,6 +1,7 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { type Team } from '../common'
 import { type ISelectable } from '../common/ISelectable'
+import { type ILifeable } from '../common/ILifeable'
 
 export interface IBaseBuildingTextures {
   healthyTextures: Texture[]
@@ -14,9 +15,11 @@ export interface IBaseBuildingOptions {
   initY?: number
   team: Team
   textures: IBaseBuildingTextures
+  life?: number
+  selectable?: boolean
 }
 
-export class BaseBuilding extends Container implements ISelectable {
+export class BaseBuilding extends Container implements ISelectable, ILifeable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Graphics()
@@ -47,9 +50,9 @@ export class BaseBuilding extends Container implements ISelectable {
   ]
 
   public sight = 3
-  public hitPoints = 500
-  public cost = 5000
-  public life = 100
+  public hitPoints = 0
+  public life = 0
+  public cost = 0
 
   public uid?: number
   public team!: Team
@@ -70,6 +73,12 @@ export class BaseBuilding extends Container implements ISelectable {
     }
     if (options.initY != null) {
       this.position.y = options.initY
+    }
+    if (options.life != null) {
+      this.life = options.life
+    }
+    if (typeof options.selectable === 'boolean') {
+      this.selectable = options.selectable
     }
     this.setup(options)
 

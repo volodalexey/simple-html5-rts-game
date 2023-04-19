@@ -4,8 +4,6 @@ import { Hitbox } from './Hitbox'
 import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
 import { BaseBuilding } from './buildings/BaseBuilding'
-import { Base, type IBaseOptions } from './buildings/Base'
-import { HeavyTank, type IHeavyTankOptions } from './vehicles/HeavyTank'
 import { BaseVehicle } from './vehicles/BaseVehicle'
 
 export interface ITileMapOptions {
@@ -124,14 +122,6 @@ export class TileMap extends Container {
     } else if (item instanceof BaseVehicle) {
       this.vehicles.addChild(item)
     }
-  }
-
-  addBaseBuilding (options: IBaseOptions): void {
-    this.addItem(new Base(options))
-  }
-
-  addHeavyTankVehicle (options: IHeavyTankOptions): void {
-    this.addItem(new HeavyTank(options))
   }
 
   itemUnderPointer (point: IPointData): BaseVehicle | BaseBuilding | undefined {
