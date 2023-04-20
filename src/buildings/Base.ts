@@ -37,6 +37,16 @@ export class Base extends BaseBuilding {
   public hitPoints = 500
   public life = this.hitPoints
 
+  public buildableGrid = [
+    [1, 1],
+    [1, 1]
+  ]
+
+  public passableGrid = [
+    [1, 1],
+    [1, 1]
+  ]
+
   constructor (options: IBaseOptions) {
     super({
       ...options,

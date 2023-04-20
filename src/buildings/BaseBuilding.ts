@@ -1,7 +1,9 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { type Team } from '../common'
-import { type ISelectable } from '../common/ISelectable'
-import { type ILifeable } from '../common/ILifeable'
+import { type ISelectable } from '../interfaces/ISelectable'
+import { type ILifeable } from '../interfaces/ILifeable'
+import { EItemType, type IItem } from '../interfaces/IItem'
+import { type Game } from '../Game'
 
 export interface IBaseBuildingTextures {
   healthyTextures: Texture[]
@@ -10,6 +12,7 @@ export interface IBaseBuildingTextures {
 }
 
 export interface IBaseBuildingOptions {
+  game: Game
   uid?: number
   initX?: number
   initY?: number
@@ -19,7 +22,7 @@ export interface IBaseBuildingOptions {
   selectable?: boolean
 }
 
-export class BaseBuilding extends Container implements ISelectable, ILifeable {
+export class BaseBuilding extends Container implements IItem, ISelectable, ILifeable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Graphics()
@@ -39,22 +42,17 @@ export class BaseBuilding extends Container implements ISelectable, ILifeable {
 
   public spritesContainer = new Container<AnimatedSprite>()
 
-  public buildableGrid = [
-    [1, 1],
-    [1, 1]
-  ]
-
-  public passableGrid = [
-    [1, 1],
-    [1, 1]
-  ]
+  public buildableGrid: number[][] = []
+  public passableGrid: number[][] = []
 
   public sight = 3
   public hitPoints = 0
   public life = 0
   public cost = 0
 
+  public game: Game
   public uid?: number
+  public type = EItemType.buildings
   public team!: Team
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite
@@ -66,6 +64,7 @@ export class BaseBuilding extends Container implements ISelectable, ILifeable {
 
   constructor (options: IBaseBuildingOptions) {
     super()
+    this.game = options.game
     this.uid = options.uid
     this.team = options.team
     if (options.initX != null) {
@@ -165,6 +164,15 @@ export class BaseBuilding extends Container implements ISelectable, ILifeable {
 
   isAlive (): boolean {
     return true
+  }
+
+  getGridXY (): { gridX: number, gridY: number } {
+    const { gridSize } = this.game.tileMap
+    return { gridX: Math.floor(this.x / gridSize), gridY: Math.floor(this.y / gridSize) }
+  }
+
+  processOrders (): void {
+
   }
 }
 

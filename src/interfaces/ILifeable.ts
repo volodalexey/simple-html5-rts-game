@@ -16,4 +16,6 @@ export interface ILifeable {
   // }
 
   // selectedGraphics: Graphics
+
+  isAlive: () => boolean
 }

@@ -24,6 +24,13 @@ export class ScoutTank extends BaseVehicle {
     }
   }
 
+  public radius = 11
+  public speed = 3.2
+  public sight = 4
+  public cost = 500
+  public hitPoints = 50
+  public turnSpeed = 0.64
+
   constructor (options: IScoutTankOptions) {
     super({
       ...options,

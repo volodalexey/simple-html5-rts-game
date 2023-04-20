@@ -24,6 +24,13 @@ export class Transport extends BaseVehicle {
     }
   }
 
+  public radius = 15
+  public speed = 2.4
+  public sight = 3
+  public cost = 400
+  public hitPoints = 100
+  public turnSpeed = 0.32
+
   constructor (options: ITransportOptions) {
     super({
       ...options,

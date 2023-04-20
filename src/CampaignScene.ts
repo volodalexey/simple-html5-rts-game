@@ -1,30 +1,28 @@
-import { type Application, Container, Assets, type Spritesheet } from 'pixi.js'
+import { type Application, Container } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
 import { Game } from './Game'
 import { EVectorDirection } from './Vector'
 import { Base } from './buildings/Base'
 import { Team } from './common'
-import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
 
-// interface IMissionItem {
-//   type: string
-//   name: string
-//   initX: number
-//   initY: number
-//   team: Team
-//   direction?: EVectorDirection
-//   uid?: number
-//   life?: number
-//   selectable?: boolean
-//   orders?: {
-//     type: 'patrol'
-//     from: { x: number, y: number }
-//     to: { x: number, y: number }
-//   }
-// }
+interface IMissionItem {
+  Constructor: typeof Base | typeof HeavyTank | typeof ScoutTank | typeof Transport
+  initGridX: number
+  initGridY: number
+  team: Team
+  direction?: EVectorDirection
+  uid?: number
+  life?: number
+  selectable?: boolean
+  orders?: {
+    type: 'patrol'
+    from: { gridX: number, gridY: number }
+    to: { gridX: number, gridY: number }
+  }
+}
 
 interface ITimedTrigger {
   type: 'timed'
@@ -43,13 +41,13 @@ interface IMission {
   briefing: string
   mapImageSrc: string
   mapSettingsSrc: string
-  startX: number
-  startY: number
+  startGridX: number
+  startGridY: number
   cash: {
     blue: number
     green: number
   }
-  items: Array<Base | HeavyTank>
+  items: IMissionItem[]
   triggers: Array<ITimedTrigger | IConditionalTrigger>
 }
 
@@ -74,15 +72,14 @@ export class CampaignScene extends Container implements IScene {
     super()
 
     this.setup(options)
-
-    this.prepareTextures()
-    this.prepareMissions()
   }
 
   setup ({ viewWidth, viewHeight }: ICampaignSceneOptions): void {
     const game = new Game({
       viewWidth,
-      viewHeight
+      viewHeight,
+      team: Team.blue,
+      type: 'campaign'
     })
     this.addChild(game)
     this.game = game
@@ -105,124 +102,28 @@ export class CampaignScene extends Container implements IScene {
 
     this.game.startGame({ mapImageSrc: mission.mapImageSrc, mapSettingsSrc: mission.mapSettingsSrc })
     this.game.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
-    this.game.camera.goTo({ x: mission.startX, y: mission.startY })
+    this.game.camera.goTo({ x: mission.startGridX * this.game.tileMap.gridSize, y: mission.startGridY * this.game.tileMap.gridSize })
 
-    mission.items.forEach(item => {
-      this.game.tileMap.addItem(item)
+    mission.items.forEach(({ Constructor, initGridX, initGridY, team, direction, uid, life, selectable, orders }) => {
+      this.game.tileMap.addItem(new Constructor({
+        game: this.game,
+        initX: this.game.tileMap.gridSize * initGridX,
+        initY: this.game.tileMap.gridSize * initGridY,
+        team,
+        uid,
+        direction,
+        life,
+        selectable,
+        orders
+      }))
     })
+
+    this.game.cash = mission.cash.blue
   }
 
   mountedHandler (): void {
+    this.prepareMissions()
     this.startCurrentLevel()
-  }
-
-  prepareTextures (): void {
-    const spritesheet: Spritesheet = Assets.get('spritesheet')
-    const { animations, textures } = spritesheet
-    Base.prepareTextures({
-      blueTextures: {
-        healthyTextures: animations['base-blue-healthy'],
-        damagedTextures: [textures['base-blue-damaged.png']],
-        constructingTextures: animations['base-blue-contructing']
-      },
-      greenTextures: {
-        healthyTextures: animations['base-green-healthy'],
-        damagedTextures: [textures['base-green-damaged.png']],
-        constructingTextures: animations['base-green-contructing']
-      }
-    })
-
-    Harvester.prepareTextures({
-      blueTextures: {
-        upTextures: [textures['harvester-blue-up.png']],
-        upRightTextures: [textures['harvester-blue-up-right.png']],
-        rightTextures: [textures['harvester-blue-right.png']],
-        downRightTextures: [textures['harvester-blue-down-right.png']],
-        downTextures: [textures['harvester-blue-down.png']],
-        downLeftTextures: [textures['harvester-blue-down-left.png']],
-        leftTextures: [textures['harvester-blue-left.png']],
-        upLeftTextures: [textures['harvester-blue-up-left.png']]
-      },
-      greenTextures: {
-        upTextures: [textures['harvester-green-up.png']],
-        upRightTextures: [textures['harvester-green-up-right.png']],
-        rightTextures: [textures['harvester-green-right.png']],
-        downRightTextures: [textures['harvester-green-down-right.png']],
-        downTextures: [textures['harvester-green-down.png']],
-        downLeftTextures: [textures['harvester-green-down-left.png']],
-        leftTextures: [textures['harvester-green-left.png']],
-        upLeftTextures: [textures['harvester-green-up-left.png']]
-      }
-    })
-
-    HeavyTank.prepareTextures({
-      blueTextures: {
-        upTextures: [textures['heavy-tank-blue-up.png']],
-        upRightTextures: [textures['heavy-tank-blue-up-right.png']],
-        rightTextures: [textures['heavy-tank-blue-right.png']],
-        downRightTextures: [textures['heavy-tank-blue-down-right.png']],
-        downTextures: [textures['heavy-tank-blue-down.png']],
-        downLeftTextures: [textures['heavy-tank-blue-down-left.png']],
-        leftTextures: [textures['heavy-tank-blue-left.png']],
-        upLeftTextures: [textures['heavy-tank-blue-up-left.png']]
-      },
-      greenTextures: {
-        upTextures: [textures['heavy-tank-green-up.png']],
-        upRightTextures: [textures['heavy-tank-green-up-right.png']],
-        rightTextures: [textures['heavy-tank-green-right.png']],
-        downRightTextures: [textures['heavy-tank-green-down-right.png']],
-        downTextures: [textures['heavy-tank-green-down.png']],
-        downLeftTextures: [textures['heavy-tank-green-down-left.png']],
-        leftTextures: [textures['heavy-tank-green-left.png']],
-        upLeftTextures: [textures['heavy-tank-green-up-left.png']]
-      }
-    })
-
-    ScoutTank.prepareTextures({
-      blueTextures: {
-        upTextures: [textures['scout-tank-blue-up.png']],
-        upRightTextures: [textures['scout-tank-blue-up-right.png']],
-        rightTextures: [textures['scout-tank-blue-right.png']],
-        downRightTextures: [textures['scout-tank-blue-down-right.png']],
-        downTextures: [textures['scout-tank-blue-down.png']],
-        downLeftTextures: [textures['scout-tank-blue-down-left.png']],
-        leftTextures: [textures['scout-tank-blue-left.png']],
-        upLeftTextures: [textures['scout-tank-blue-up-left.png']]
-      },
-      greenTextures: {
-        upTextures: [textures['scout-tank-green-up.png']],
-        upRightTextures: [textures['scout-tank-green-up-right.png']],
-        rightTextures: [textures['scout-tank-green-right.png']],
-        downRightTextures: [textures['scout-tank-green-down-right.png']],
-        downTextures: [textures['scout-tank-green-down.png']],
-        downLeftTextures: [textures['scout-tank-green-down-left.png']],
-        leftTextures: [textures['scout-tank-green-left.png']],
-        upLeftTextures: [textures['scout-tank-green-up-left.png']]
-      }
-    })
-
-    Transport.prepareTextures({
-      blueTextures: {
-        upTextures: [textures['transport-blue-up.png']],
-        upRightTextures: [textures['transport-blue-up-right.png']],
-        rightTextures: [textures['transport-blue-right.png']],
-        downRightTextures: [textures['transport-blue-down-right.png']],
-        downTextures: [textures['transport-blue-down.png']],
-        downLeftTextures: [textures['transport-blue-down-left.png']],
-        leftTextures: [textures['transport-blue-left.png']],
-        upLeftTextures: [textures['transport-blue-up-left.png']]
-      },
-      greenTextures: {
-        upTextures: [textures['transport-green-up.png']],
-        upRightTextures: [textures['transport-green-up-right.png']],
-        rightTextures: [textures['transport-green-right.png']],
-        downRightTextures: [textures['transport-green-down-right.png']],
-        downTextures: [textures['transport-green-down.png']],
-        downLeftTextures: [textures['transport-green-down-left.png']],
-        leftTextures: [textures['transport-green-left.png']],
-        upLeftTextures: [textures['transport-green-up-left.png']]
-      }
-    })
   }
 
   prepareMissions (): void {
@@ -233,8 +134,8 @@ export class CampaignScene extends Container implements IScene {
 
         mapImageSrc: 'level1Background',
         mapSettingsSrc: 'level1Settings',
-        startX: 720,
-        startY: 0,
+        startGridX: 36,
+        startGridY: 0,
 
         cash: {
           blue: 0,
@@ -243,30 +144,18 @@ export class CampaignScene extends Container implements IScene {
 
         items: [
           /* Slightly damaged base */
-          new Base({
-            initX: 1100, initY: 120, team: Team.blue, life: 100
-          }),
+          { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
 
           /* Player heavy tank */
-          new HeavyTank({
-            initX: 1140, initY: 240, direction: EVectorDirection.downRight, team: Team.blue, uid: -1
-          }),
+          { Constructor: HeavyTank, initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
 
           /* Two transport vehicles waiting just outside the visible map */
-          new Transport({
-            initX: -60, initY: 40, direction: EVectorDirection.right, team: Team.blue, uid: -3, selectable: false
-          }),
-          new Transport({
-            initX: -60, initY: 160, direction: EVectorDirection.right, team: Team.blue, uid: -4, selectable: false
-          }),
+          { Constructor: Transport, initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, selectable: false },
+          { Constructor: Transport, initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, selectable: false },
 
           /* Two damaged enemy scout-tanks patroling the area */
-          new ScoutTank({
-            initX: 800, initY: 400, direction: EVectorDirection.up, team: Team.blue, uid: -2, life: 20, orders: { type: 'patrol', from: { x: 34, y: 20 }, to: { x: 42, y: 25 } }
-          }),
-          new ScoutTank({
-            initX: 280, initY: 0, direction: EVectorDirection.down, team: Team.blue, uid: -5, life: 20, orders: { type: 'patrol', from: { x: 14, y: 0 }, to: { x: 14, y: 14 } }
-          })
+          { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 20, orders: { type: 'patrol', from: { gridX: 34, gridY: 20 }, to: { gridX: 42, gridY: 25 } } },
+          { Constructor: ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 20, orders: { type: 'patrol', from: { gridX: 14, gridY: 0 }, to: { gridX: 14, gridY: 14 } } }
         ],
 
         triggers: [

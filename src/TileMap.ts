@@ -5,6 +5,7 @@ import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
 import { BaseBuilding } from './buildings/BaseBuilding'
 import { BaseVehicle } from './vehicles/BaseVehicle'
+import { type BaseItem } from './common'
 
 export interface ITileMapOptions {
   viewWidth: number
@@ -19,6 +20,11 @@ interface IBoundsData {
 }
 
 export class TileMap extends Container {
+  public gridSize !: number
+  public mapGridWidth !: number
+  public mapGridHeight !: number
+  public currentMapTerrainGrid: Array<Array<1 | 0>> = []
+  public currentMapPassableGrid: Array<Array<1 | 0>> = []
   public hitboxes = new Container<Hitbox>()
   public buildings = new Container<BaseBuilding>()
   public vehicles = new Container<BaseVehicle>()
@@ -64,10 +70,30 @@ export class TileMap extends Container {
       this.hitboxes.addChild(new Hitbox({
         initX: cp.x,
         initY: cp.y,
+        initGridX: Math.floor(cp.x / settings.tilewidth),
+        initGridY: Math.floor(cp.y / settings.tileheight),
         initWidth: cp.width,
         initHeight: cp.height
       }))
     })
+
+    this.gridSize = settings.tilewidth
+    this.mapGridWidth = settings.width
+    this.mapGridHeight = settings.height
+
+    // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
+    this.currentMapTerrainGrid = []
+    for (let y = 0; y < settings.height; y++) {
+      this.currentMapTerrainGrid[y] = []
+      for (let x = 0; x < settings.width; x++) {
+        this.currentMapTerrainGrid[y][x] = 0
+      }
+    }
+    for (let i = this.hitboxes.children.length - 1; i >= 0; i--) {
+      const obstruction = this.hitboxes.children[i]
+      this.currentMapTerrainGrid[obstruction.initGridY][obstruction.initGridX] = 1
+    }
+    this.currentMapPassableGrid = []
   }
 
   getViewportBounds (): IBoundsData {
@@ -113,15 +139,22 @@ export class TileMap extends Container {
   }
 
   handleUpdate (deltaMS: number): void {
-
+    const items = this.items
+    for (const item of items) {
+      item.processOrders()
+    }
   }
 
-  addItem (item: BaseBuilding | BaseVehicle): void {
+  addItem (item: BaseItem): void {
     if (item instanceof BaseBuilding) {
       this.buildings.addChild(item)
     } else if (item instanceof BaseVehicle) {
       this.vehicles.addChild(item)
     }
+  }
+
+  get items (): BaseItem[] {
+    return [...this.buildings.children, ...this.vehicles.children]
   }
 
   itemUnderPointer (point: IPointData): BaseVehicle | BaseBuilding | undefined {
@@ -176,5 +209,21 @@ export class TileMap extends Container {
     //     }
     //   }
     // }
+  }
+
+  rebuildPassableGrid (): void {
+    this.currentMapPassableGrid = this.currentMapTerrainGrid.map(g => g.slice())
+    for (let i = this.buildings.children.length - 1; i >= 0; i--) {
+      const item = this.buildings.children[i]
+      const { passableGrid } = item
+      const itemGrid = item.getGridXY()
+      for (let y = passableGrid.length - 1; y >= 0; y--) {
+        for (let x = passableGrid[y].length - 1; x >= 0; x--) {
+          if (passableGrid[y][x] !== 0) {
+            this.currentMapPassableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
+          }
+        }
+      }
+    }
   }
 }
