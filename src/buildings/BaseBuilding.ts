@@ -171,6 +171,11 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     return { gridX: Math.floor(this.x / gridSize), gridY: Math.floor(this.y / gridSize) }
   }
 
+  setPositionByGridXY ({ gridX, gridY }: { gridX: number, gridY: number }): void {
+    const { gridSize } = this.game.tileMap
+    this.position.set(gridX * gridSize, gridY * gridSize)
+  }
+
   processOrders (): void {
 
   }

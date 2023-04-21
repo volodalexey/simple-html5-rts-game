@@ -24,8 +24,8 @@ export class Game extends Container {
   public type!: IGameOptions['type']
   public team!: IGameOptions['team']
   public cash = 0
-  public speedAdjustmentFactor = 1 / 64
-  public turnSpeedAdjustmentFactor = 1 / 8
+  public speedAdjustmentFactor = 1 / 512
+  public turnSpeedAdjustmentFactor = 1 / 64
 
   public viewWidth: number
   public viewHeight: number

@@ -89,6 +89,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public canAttackLand = false
   public canAttackAir = false
   public cost = 0
+  public moveToLog = 0
 
   constructor (options: IBaseVehicleOptions) {
     super()
@@ -174,7 +175,9 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   switchAnimation (direction: EVectorDirection): void {
     let newAnimation
     const step = 0.5
-    if (direction >= EVectorDirection.upLeft + step && direction <= EVectorDirection.upRight - step) {
+    if ((direction >= EVectorDirection.upLeft + step && direction <= EVectorDirection.up) ||
+        (direction >= EVectorDirection.up && direction <= EVectorDirection.upRight - step)) {
+      // special case because of max direction
       newAnimation = this.upAnimation
     } else if (direction >= EVectorDirection.upRight + step && direction <= EVectorDirection.downRight - step) {
       newAnimation = this.rightAnimation
@@ -221,14 +224,24 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     return true
   }
 
-  getGridXY (floor = false): { gridX: number, gridY: number } {
+  getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
-    const ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
+    let ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
+    if (center) {
+      ret = { gridX: (this.x + this.width / 2) / gridSize, gridY: (this.y + this.height / 2) / gridSize }
+    } else {
+      ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
+    }
     if (floor) {
       ret.gridX = Math.floor(ret.gridX)
       ret.gridY = Math.floor(ret.gridY)
     }
     return ret
+  }
+
+  setPositionByGridXY ({ gridX, gridY }: { gridX: number, gridY: number }): void {
+    const { gridSize } = this.game.tileMap
+    this.position.set(gridX * gridSize, gridY * gridSize)
   }
 
   isValidTarget (item: BaseItem): boolean {
@@ -266,6 +279,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
 
   processOrders (): void {
     const { tileMap } = this.game
+    const thisGrid = this.getGridXY()
     switch (this.orders.type) {
       case 'stand':
         // var targets = this.findTargetsInSight()
@@ -279,7 +293,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           this.orders = { type: 'attack', to: target, nextOrder: this.orders }
           return
         }
-        if ((Math.pow(this.orders.to.gridX - this.x, 2) + Math.pow(this.orders.to.gridY - this.y, 2)) < Math.pow(this.radius * 4 / tileMap.gridSize, 2)) {
+        if ((Math.pow(this.orders.to.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.to.gridY - thisGrid.gridY, 2)) < Math.pow(this.radius * 4 / tileMap.gridSize, 2)) {
           const to = this.orders.to
           this.orders.to = this.orders.from
           this.orders.from = to
@@ -302,10 +316,11 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   }> {
     // Calculate new position on present path
     const { tileMap } = this.game
+    const thisGrid = this.getGridXY({ center: true })
     const movement = this.speed * this.game.speedAdjustmentFactor
     const angleRadians = -(Math.round(this.velocity.direction) / this.velocity.directions) * 2 * Math.PI
-    const newX = this.x - (movement * Math.sin(angleRadians))
-    const newY = this.y - (movement * Math.cos(angleRadians))
+    const newX = thisGrid.gridX - (movement * Math.sin(angleRadians))
+    const newY = thisGrid.gridY - (movement * Math.cos(angleRadians))
 
     // List of objects that will collide after next movement step
     const collisionObjects = []
@@ -318,12 +333,15 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     for (let j = x1; j <= x2; j++) {
       for (let i = y1; i <= y2; i++) {
         if (grid[i][j] === 1) { // grid square is obstructed
-          if (Math.pow(j + 0.5 - newX, 2) + Math.pow(i + 0.5 - newY, 2) < Math.pow(this.radius / tileMap.gridSize + 0.1, 2)) {
+          const centerX = j + 0.5
+          const centerY = i + 0.5
+          const distanceSq = Math.pow(centerX - newX, 2) + Math.pow(centerY - newY, 2)
+          if (distanceSq < Math.pow(this.radius / tileMap.gridSize + 0.1, 2)) {
             // Distance of obstructed grid from vehicle is less than hard collision threshold
-            collisionObjects.push({ collisionType: ECollisionType.hard, with: { type: 'wall', x: j + 0.5, y: i + 0.5 } })
-          } else if (Math.pow(j + 0.5 - newX, 2) + Math.pow(i + 0.5 - newY, 2) < Math.pow(this.radius / tileMap.gridSize + 0.7, 2)) {
+            collisionObjects.push({ collisionType: ECollisionType.hard, with: { type: 'wall', x: centerX, y: centerY } })
+          } else if (distanceSq < Math.pow(this.radius / tileMap.gridSize + 0.7, 2)) {
             // Distance of obstructed grid from vehicle is less than soft collision threshold
-            collisionObjects.push({ collisionType: ECollisionType.soft, with: { type: 'wall', x: j + 0.5, y: i + 0.5 } })
+            collisionObjects.push({ collisionType: ECollisionType.soft, with: { type: 'wall', x: centerX, y: centerY } })
           }
         }
       }
@@ -331,14 +349,16 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
 
     for (let i = tileMap.vehicles.children.length - 1; i >= 0; i--) {
       const vehicle = tileMap.vehicles.children[i]
+      const vehicleGrid = vehicle.getGridXY({ center: true })
       // Test vehicles that are less than 3 squares away for collisions
-      if (vehicle !== this && Math.abs(vehicle.x - this.x) < 3 && Math.abs(vehicle.y - this.y) < 3) {
-        if (Math.pow(vehicle.x - newX, 2) + Math.pow(vehicle.y - newY, 2) < Math.pow((this.radius + vehicle.radius) / tileMap.gridSize, 2)) {
+      if (vehicle !== this && Math.abs(vehicleGrid.gridX - thisGrid.gridX) < 3 && Math.abs(vehicleGrid.gridY - thisGrid.gridY) < 3) {
+        const distanceSq = Math.pow(vehicleGrid.gridX - newX, 2) + Math.pow(vehicleGrid.gridY - newY, 2)
+        if (distanceSq < Math.pow((this.radius + vehicle.radius) / tileMap.gridSize, 2)) {
           // Distance between vehicles is less than hard collision threshold (sum of vehicle radii)
-          collisionObjects.push({ collisionType: ECollisionType.hard, with: vehicle })
-        } else if (Math.pow(vehicle.x - newX, 2) + Math.pow(vehicle.y - newY, 2) < Math.pow((this.radius * 1.5 + vehicle.radius) / tileMap.gridSize, 2)) {
+          collisionObjects.push({ collisionType: ECollisionType.hard, with: { type: vehicle.type, x: vehicleGrid.gridX, y: vehicleGrid.gridY } })
+        } else if (distanceSq < Math.pow((this.radius * 1.5 + vehicle.radius) / tileMap.gridSize, 2)) {
           // Distance between vehicles is less than soft collision threshold (1.5 times vehicle radius + colliding vehicle radius)
-          collisionObjects.push({ collisionType: ECollisionType.soft, with: vehicle })
+          collisionObjects.push({ collisionType: ECollisionType.soft, with: { type: vehicle.type, x: vehicleGrid.gridX, y: vehicleGrid.gridY } })
         }
       }
     }
@@ -476,8 +496,12 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
       const angleRadians = -(Math.round(this.velocity.direction) / this.velocity.directions) * 2 * Math.PI
       this.lastMovementGridX = -(movement * Math.sin(angleRadians))
       this.lastMovementGridY = -(movement * Math.cos(angleRadians))
-      this.x = (this.x + this.lastMovementGridX)
-      this.y = (this.y + this.lastMovementGridY)
+      const newGridX = thisGrid.gridX + this.lastMovementGridX
+      const newGridY = thisGrid.gridY + this.lastMovementGridY
+      this.setPositionByGridXY({
+        gridX: newGridX,
+        gridY: newGridY
+      })
       if (Math.abs(difference) > turnAmount) {
         this.velocity.setDirection({
           direction: wrapDirection({
@@ -488,6 +512,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         })
       }
     }
+    this.moveToLog++
     return true
   }
 }

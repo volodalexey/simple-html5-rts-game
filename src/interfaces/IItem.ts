@@ -8,5 +8,6 @@ export enum EItemType {
 export interface IItem {
   type: EItemType
   getGridXY: () => { gridX: number, gridY: number }
+  setPositionByGridXY: (options: { gridX: number, gridY: number }) => void
   processOrders: () => void
 }

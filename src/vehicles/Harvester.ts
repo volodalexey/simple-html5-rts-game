@@ -25,11 +25,11 @@ export class Harvester extends BaseVehicle {
   }
 
   public radius = 10
-  public speed = 1.6
+  public speed = 10
   public sight = 3
   public cost = 1600
   public hitPoints = 50
-  public turnSpeed = 0.32
+  public turnSpeed = 2
 
   constructor (options: IHarvesterOptions) {
     super({

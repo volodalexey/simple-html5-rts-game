@@ -25,11 +25,11 @@ export class HeavyTank extends BaseVehicle {
   }
 
   public radius = 13
-  public speed = 2.4
+  public speed = 15
   public sight = 5
   public cost = 1200
   public hitPoints = 50
-  public turnSpeed = 0.8
+  public turnSpeed = 4
 
   constructor (options: IHeavyTankOptions) {
     super({
