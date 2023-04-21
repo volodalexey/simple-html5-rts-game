@@ -13,6 +13,7 @@ import { Transport } from './vehicles/Transport'
 import { EItemType, type IItem } from './interfaces/IItem'
 import { type IAttackable } from './interfaces/IAttackable'
 import { type IOrder } from './interfaces/IOrder'
+import { AUDIO } from './audio'
 
 export interface IGameOptions {
   viewWidth: number
@@ -97,7 +98,7 @@ export class Game extends Container {
         // then command them to attack the clicked item
         if (uids.length > 0) {
           this.processCommand(uids, { type: 'attack', toUid: underPointerItem.uid })
-          // sounds.play('acknowledge-attacking')
+          AUDIO.play('acknowledge-attacking')
         }
       }
     } else {
@@ -115,7 +116,7 @@ export class Game extends Container {
       if (uids.length > 0) {
         const { gridSize } = this.tileMap
         this.processCommand(uids, { type: 'move', to: { gridX: point.x / gridSize, gridY: point.y / gridSize }, collisionCount: 0 })
-        // sounds.play('acknowledge-moving')
+        AUDIO.play('acknowledge-moving')
       }
     }
   }

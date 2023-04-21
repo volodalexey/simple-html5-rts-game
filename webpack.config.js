@@ -26,7 +26,7 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.(wav)$/,
+        test: /\.(mp3)$/,
         type: 'asset/resource',
         generator: {
           filename: './assets/audio/[name][ext]'
