@@ -36,7 +36,7 @@ export class ScoutTank extends BaseVehicle {
       ...options,
       textures: options.team === Team.blue ? ScoutTank.blueTextures : ScoutTank.greenTextures
     })
-
+    this.life = options.life ?? this.hitPoints
     this.drawSelection()
   }
 

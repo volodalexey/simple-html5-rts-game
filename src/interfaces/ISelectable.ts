@@ -1,6 +1,8 @@
 import { type Graphics } from 'pixi.js'
+import { type Team } from '../common'
 
 export interface ISelectable {
+  team: Team
   selected: boolean
   selectable: boolean
   drawSelectionOptions: {

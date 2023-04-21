@@ -36,7 +36,7 @@ export class Transport extends BaseVehicle {
       ...options,
       textures: options.team === Team.blue ? Transport.blueTextures : Transport.greenTextures
     })
-
+    this.life = options.life ?? this.hitPoints
     this.drawSelection()
   }
 

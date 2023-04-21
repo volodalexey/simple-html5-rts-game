@@ -226,4 +226,8 @@ export class TileMap extends Container {
       }
     }
   }
+
+  getItemByUid (uid: number): BaseItem | undefined {
+    return this.items.find(item => item.uid === uid)
+  }
 }

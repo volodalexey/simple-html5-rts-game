@@ -36,7 +36,7 @@ export class Harvester extends BaseVehicle {
       ...options,
       textures: options.team === Team.blue ? Harvester.blueTextures : Harvester.greenTextures
     })
-
+    this.life = options.life ?? this.hitPoints
     this.drawSelection()
   }
 

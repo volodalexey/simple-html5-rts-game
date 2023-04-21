@@ -4,6 +4,7 @@ import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
+import { type IOrder } from '../interfaces/IOrder'
 
 export interface IBaseBuildingTextures {
   healthyTextures: Texture[]
@@ -20,6 +21,7 @@ export interface IBaseBuildingOptions {
   textures: IBaseBuildingTextures
   life?: number
   selectable?: boolean
+  orders?: IOrder
 }
 
 export class BaseBuilding extends Container implements IItem, ISelectable, ILifeable {
@@ -45,6 +47,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   public buildableGrid: number[][] = []
   public passableGrid: number[][] = []
 
+  public orders: IOrder
   public sight = 3
   public hitPoints = 0
   public life = 0
@@ -53,7 +56,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   public game: Game
   public uid?: number
   public type = EItemType.buildings
-  public team!: Team
+  public team: Team
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite
   public constructingAnimation!: AnimatedSprite
@@ -67,6 +70,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     this.game = options.game
     this.uid = options.uid
     this.team = options.team
+    this.orders = options.orders ?? { type: 'stand' }
     if (options.initX != null) {
       this.position.x = options.initX
     }
@@ -163,7 +167,11 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   }
 
   isAlive (): boolean {
-    return true
+    return this.life > 0
+  }
+
+  isDead (): boolean {
+    return !this.isAlive()
   }
 
   getGridXY (): { gridX: number, gridY: number } {

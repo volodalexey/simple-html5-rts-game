@@ -36,7 +36,7 @@ export class HeavyTank extends BaseVehicle {
       ...options,
       textures: options.team === Team.blue ? HeavyTank.blueTextures : HeavyTank.greenTextures
     })
-
+    this.life = options.life ?? this.hitPoints
     this.drawSelection()
   }
 

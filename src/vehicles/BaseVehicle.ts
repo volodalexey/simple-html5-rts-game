@@ -64,7 +64,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public type = EItemType.vehicles
   public hitPoints = 0
   public life = 0
-  public team!: Team
+  public team: Team
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
   public rightAnimation!: AnimatedSprite
@@ -82,7 +82,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public colliding = false
   public lastMovementGridX = 0
   public lastMovementGridY = 0
-  public orders!: IOrder
+  public orders: IOrder
   public sight = 0
   public radius = 0
   public canAttack = false
@@ -221,7 +221,11 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   }
 
   isAlive (): boolean {
-    return true
+    return this.life > 0
+  }
+
+  isDead (): boolean {
+    return !this.isAlive()
   }
 
   getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
@@ -279,14 +283,49 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
 
   processOrders (): void {
     const { tileMap } = this.game
-    const thisGrid = this.getGridXY()
+    const thisGrid = this.getGridXY({ center: true })
     switch (this.orders.type) {
-      case 'stand':
-        // var targets = this.findTargetsInSight()
-        // if (targets.length > 0) {
-        //   this.orders = { type: 'attack', to: targets[0] }
-        // }
+      case 'move': {
+        // Move towards destination until distance from destination is less than vehicle radius
+        const distanceFromDestinationSquared = (Math.pow(this.orders.to.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.to.gridY - thisGrid.gridY, 2))
+        if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
+          // Stop when within one radius of the destination
+          this.orders = { type: 'stand' }
+          return
+        } else if (distanceFromDestinationSquared < Math.pow(this.radius * 2 / tileMap.gridSize, 2)) {
+          // Stop when within 3 radius of the destination if colliding with something
+          this.orders = { type: 'stand' }
+          return
+        } else {
+          if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
+            // Count collsions within 5 radius distance of goal
+            if (this.orders.collisionCount === 0) {
+              this.orders.collisionCount = 1
+            } else {
+              this.orders.collisionCount++
+            }
+            // Stop if more than 30 collisions occur
+            if (this.orders.collisionCount > 30) {
+              this.orders = { type: 'stand' }
+              return
+            }
+          }
+          const moving = this.moveTo(this.orders.to)
+          // Pathfinding couldn't find a path so stop
+          if (!moving) {
+            this.orders = { type: 'stand' }
+            return
+          }
+        }
         break
+      }
+      case 'stand': {
+        const target = this.findTargetsInSight()
+        if (target != null) {
+          this.orders = { type: 'attack', to: target }
+        }
+        break
+      }
       case 'patrol': {
         const target = this.findTargetsInSight(1)
         if (target != null) {

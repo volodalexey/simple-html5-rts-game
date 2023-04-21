@@ -52,7 +52,7 @@ export class Base extends BaseBuilding {
       ...options,
       textures: options.team === Team.blue ? Base.blueTextures : Base.greenTextures
     })
-
+    this.life = options.life ?? this.hitPoints
     this.drawSelection()
   }
 

@@ -10,6 +10,9 @@ import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
+import { EItemType, type IItem } from './interfaces/IItem'
+import { type IAttackable } from './interfaces/IAttackable'
+import { type IOrder } from './interfaces/IOrder'
 
 export interface IGameOptions {
   viewWidth: number
@@ -26,13 +29,15 @@ export class Game extends Container {
   public cash = 0
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
+  public deployBuilding = false
+  public canDeployBuilding = false
 
   public viewWidth: number
   public viewHeight: number
   public tileMap!: TileMap
   public statusBar!: StatusBar
   public camera!: Camera
-  public selectedItems: ISelectable[] = []
+  public selectedItems: Array<ISelectable & IItem> = []
 
   constructor (options: IGameOptions) {
     super()
@@ -68,17 +73,58 @@ export class Game extends Container {
   }
 
   handlePointerTap = (e: FederatedPointerEvent): void => {
-    const underPointerItem = this.tileMap.itemUnderPointer(this.tileMap.toLocal(e))
+    const point = this.tileMap.toLocal(e)
+    const underPointerItem = this.tileMap.itemUnderPointer(point)
+    const uids: number[] = []
     if (underPointerItem != null) {
-      // Pressing shift adds to existing selection. If shift is not pressed, clear existing selection
-      if (!e.shiftKey) {
-        this.clearSelection()
+      if (underPointerItem.team === this.team) {
+        // Pressing shift adds to existing selection. If shift is not pressed, clear existing selection
+        if (!e.shiftKey) {
+          this.clearSelection()
+        }
+        this.selectItem(underPointerItem, e.shiftKey)
+      } else if (underPointerItem.type !== EItemType.terrain) {
+        // Player right clicked on an enemy item
+        // identify selected items from players team that can attack
+        for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+          const item = this.selectedItems[i]
+          if (item.team === this.team && (item as unknown as IAttackable).canAttack) {
+            if (item.uid != null) {
+              uids.push(item.uid)
+            }
+          }
+        }
+        // then command them to attack the clicked item
+        if (uids.length > 0) {
+          this.processCommand(uids, { type: 'attack', toUid: underPointerItem.uid })
+          // sounds.play('acknowledge-attacking')
+        }
       }
-      this.selectItem(underPointerItem, e.shiftKey)
+    } else {
+      // Player right clicked on the ground
+      // identify selected items from players team that can move
+      for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+        const item = this.selectedItems[i]
+        if (item.team === this.team && (item.type === EItemType.vehicles || item.type === EItemType.aircraft)) {
+          if (item.uid != null) {
+            uids.push(item.uid)
+          }
+        }
+      }
+      // then command them to move to the clicked location
+      if (uids.length > 0) {
+        const { gridSize } = this.tileMap
+        this.processCommand(uids, { type: 'move', to: { gridX: point.x / gridSize, gridY: point.y / gridSize }, collisionCount: 0 })
+        // sounds.play('acknowledge-moving')
+      }
     }
   }
 
-  selectItem (item: ISelectable, shiftPressed: boolean): void {
+  isItemSelected (item: ISelectable & IItem): boolean {
+    return this.selectedItems.includes(item)
+  }
+
+  selectItem (item: ISelectable & IItem, shiftPressed: boolean): void {
     // Pressing shift and clicking on a selected item will deselect it
     if (shiftPressed && item.selected) {
       // deselect item
@@ -265,5 +311,29 @@ export class Game extends Container {
         upLeftTextures: [textures['transport-green-up-left.png']]
       }
     })
+  }
+
+  // Receive command from singleplayer or multiplayer object and send it to units
+  processCommand (uids: number[], orders: IOrder): void {
+    // In case the target "to" object is in terms of uid, fetch the target object
+    let toObject
+    if (orders.type !== 'patrol' && orders.type !== 'stand' && orders.type !== 'move' && typeof orders.toUid === 'number') {
+      toObject = this.tileMap.getItemByUid(orders.toUid)
+      if ((toObject == null) || toObject.isDead()) {
+        // To object no longer exists. Invalid command
+        return
+      }
+    }
+
+    for (const uid of uids) {
+      const item = this.tileMap.getItemByUid(uid)
+      // if uid is a valid item, set the order for the item
+      if (item != null) {
+        item.orders = Object.assign({}, orders)
+        if (toObject != null && item.orders.type !== 'stand') {
+          item.orders.to = toObject
+        }
+      }
+    }
   }
 }
