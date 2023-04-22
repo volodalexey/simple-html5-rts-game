@@ -1,22 +1,22 @@
+import { type LifeBar } from '../LifeBar'
 
 export interface ILifeable {
   life: number
   hitPoints: number
-  // drawLifeBarOptions: {
-  //   width: number
-  //   height: number
-  //   lineWidth: number
-  //   lineColor: number
-  //   strokeWidth: number
-  //   strokeColor: number
-  //   offset: {
-  //     x: number
-  //     y: number
-  //   }
-  // }
-
-  // selectedGraphics: Graphics
-
+  lifeBar: LifeBar
+  drawLifeBarOptions: {
+    borderColor: number
+    borderThickness: number
+    borderAlpha: number
+    width: number
+    height: number
+    fillColor: number
+    emptyColor: number
+    offset: {
+      x: number
+      y: number
+    }
+  }
   isAlive: () => boolean
   isDead: () => boolean
 }

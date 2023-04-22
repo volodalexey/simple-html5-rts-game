@@ -24,6 +24,20 @@ export class HeavyTank extends BaseVehicle {
     }
   }
 
+  public drawLifeBarOptions = {
+    borderColor: 0xffffff,
+    borderThickness: 1,
+    borderAlpha: 0.5,
+    width: 30,
+    height: 5,
+    fillColor: 0x15803d,
+    emptyColor: 0xff0000,
+    offset: {
+      x: 0,
+      y: -7
+    }
+  }
+
   public radius = 13
   public speed = 15
   public sight = 5
@@ -38,6 +52,8 @@ export class HeavyTank extends BaseVehicle {
     })
     this.life = options.life ?? this.hitPoints
     this.drawSelection()
+    this.drawLifeBar()
+    this.updateLife()
   }
 
   static prepareTextures ({

@@ -10,6 +10,7 @@ import { AStar } from '../AStar'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { type IBuildable } from '../interfaces/IBuildable'
+import { LifeBar } from '../LifeBar'
 
 export interface IBaseVehicleTextures {
   upTextures: Texture[]
@@ -59,11 +60,26 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     }
   }
 
+  public drawLifeBarOptions = {
+    borderColor: 0,
+    borderThickness: 0,
+    borderAlpha: 0,
+    width: 0,
+    height: 0,
+    fillColor: 0,
+    emptyColor: 0,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
   public game: Game
   public uid?: number
   public type = EItemType.vehicles
   public hitPoints = 0
   public life = 0
+  public lifeBar!: LifeBar
   public team: Team
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
@@ -159,6 +175,9 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     const upLeftAnimation = new AnimatedSprite(upLeftTextures)
     this.spritesContainer.addChild(upLeftAnimation)
     this.upLeftAnimation = upLeftAnimation
+
+    this.lifeBar = new LifeBar(this.drawLifeBarOptions)
+    this.addChild(this.lifeBar)
   }
 
   setSelected (selected: boolean): void {
@@ -218,6 +237,16 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     this.selectedGraphics.drawCircle(offset.x, offset.y, radius + strokeWidth)
     this.selectedGraphics.endFill()
     this.selectedGraphics.alpha = 0
+  }
+
+  drawLifeBar (): void {
+    this.lifeBar.draw(this.drawLifeBarOptions)
+    const { offset } = this.drawLifeBarOptions
+    this.lifeBar.position.set(offset.x, offset.y)
+  }
+
+  updateLife (): void {
+    this.lifeBar.updateLife(this.life / this.hitPoints)
   }
 
   isAlive (): boolean {

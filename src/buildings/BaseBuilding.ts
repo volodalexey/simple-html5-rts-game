@@ -5,6 +5,7 @@ import { type ILifeable } from '../interfaces/ILifeable'
 import { EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
+import { LifeBar } from '../LifeBar'
 
 export interface IBaseBuildingTextures {
   healthyTextures: Texture[]
@@ -41,6 +42,22 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
       y: 0
     }
   }
+
+  public drawLifeBarOptions = {
+    borderColor: 0,
+    borderThickness: 0,
+    borderAlpha: 0,
+    width: 0,
+    height: 0,
+    fillColor: 0,
+    emptyColor: 0,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
+  public lifeBar!: LifeBar
 
   public spritesContainer = new Container<AnimatedSprite>()
 
@@ -114,6 +131,9 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     constructingAnimation.animationSpeed = constructingAnimationSpeed
     this.spritesContainer.addChild(constructingAnimation)
     this.constructingAnimation = constructingAnimation
+
+    this.lifeBar = new LifeBar(this.drawLifeBarOptions)
+    this.addChild(this.lifeBar)
   }
 
   drawSelection (): void {
@@ -182,6 +202,16 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   setPositionByGridXY ({ gridX, gridY }: { gridX: number, gridY: number }): void {
     const { gridSize } = this.game.tileMap
     this.position.set(gridX * gridSize, gridY * gridSize)
+  }
+
+  drawLifeBar (): void {
+    this.lifeBar.draw(this.drawLifeBarOptions)
+    const { offset } = this.drawLifeBarOptions
+    this.lifeBar.position.set(offset.x, offset.y)
+  }
+
+  updateLife (): void {
+    this.lifeBar.updateLife(this.life / this.hitPoints)
   }
 
   processOrders (): void {

@@ -34,6 +34,20 @@ export class Base extends BaseBuilding {
     }
   }
 
+  public drawLifeBarOptions = {
+    borderColor: 0xffffff,
+    borderThickness: 1,
+    borderAlpha: 0.5,
+    width: 40,
+    height: 5,
+    fillColor: 0x15803d,
+    emptyColor: 0xff0000,
+    offset: {
+      x: 1,
+      y: -4
+    }
+  }
+
   public hitPoints = 500
   public life = this.hitPoints
 
@@ -54,6 +68,8 @@ export class Base extends BaseBuilding {
     })
     this.life = options.life ?? this.hitPoints
     this.drawSelection()
+    this.drawLifeBar()
+    this.updateLife()
   }
 
   static prepareTextures ({
