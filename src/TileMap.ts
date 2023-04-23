@@ -5,7 +5,8 @@ import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
 import { BaseBuilding } from './buildings/BaseBuilding'
 import { BaseVehicle } from './vehicles/BaseVehicle'
-import { type BaseItem } from './common'
+import { type BaseActiveItem, type BaseItem } from './common'
+import { BaseProjectile } from './projectiles/BaseProjectile'
 
 export interface ITileMapOptions {
   viewWidth: number
@@ -28,6 +29,7 @@ export class TileMap extends Container {
   public hitboxes = new Container<Hitbox>()
   public buildings = new Container<BaseBuilding>()
   public vehicles = new Container<BaseVehicle>()
+  public projectiles = new Container<BaseProjectile>()
   public background = new Sprite()
   public viewWidth!: number
   public viewHeight!: number
@@ -45,6 +47,7 @@ export class TileMap extends Container {
     this.addChild(this.hitboxes)
     this.addChild(this.buildings)
     this.addChild(this.vehicles)
+    this.addChild(this.projectiles)
   }
 
   static async idleLoad (): Promise<void> {
@@ -139,9 +142,9 @@ export class TileMap extends Container {
   }
 
   handleUpdate (deltaMS: number): void {
-    const items = this.items
+    const items = this.allItems
     for (const item of items) {
-      item.processOrders()
+      item.handleUpdate(deltaMS)
     }
   }
 
@@ -150,14 +153,20 @@ export class TileMap extends Container {
       this.buildings.addChild(item)
     } else if (item instanceof BaseVehicle) {
       this.vehicles.addChild(item)
+    } else if (item instanceof BaseProjectile) {
+      this.projectiles.addChild(item)
     }
   }
 
-  get items (): BaseItem[] {
+  get activeItems (): BaseActiveItem[] {
     return [...this.buildings.children, ...this.vehicles.children]
   }
 
-  itemUnderPointer (point: IPointData): BaseVehicle | BaseBuilding | undefined {
+  get allItems (): BaseItem[] {
+    return [...this.buildings.children, ...this.vehicles.children, ...this.projectiles.children]
+  }
+
+  itemUnderPointer (point: IPointData): BaseActiveItem | undefined {
     // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
     //   return;
     // }
@@ -186,29 +195,6 @@ export class TileMap extends Container {
       }
       return false
     })
-
-    // for (const item of this.buildings.children) {
-    //   if (item.type === 'buildings' || item.type == 'terrain') {
-    //     if (item.lifeCode != 'dead' &&
-    //       item.x <= mouse.gameX / game.gridSize &&
-    //       item.x >= (mouse.gameX - item.baseWidth) / game.gridSize &&
-    //       item.y <= mouse.gameY / game.gridSize &&
-    //       item.y >= (mouse.gameY - item.baseHeight) / game.gridSize
-    //     ) {
-    //       _c.log(item.uid)
-    //       return item
-    //     }
-    //   } else if (item.type == 'aircraft') {
-    //     if (item.lifeCode != 'dead' &&
-    //       Math.pow(item.x - mouse.gameX / game.gridSize, 2) + Math.pow(item.y - (mouse.gameY + item.pixelShadowHeight) / game.gridSize, 2) < Math.pow((item.radius) / game.gridSize, 2)) {
-    //       return item
-    //     }
-    //   } else {
-    //     if (item.lifeCode != 'dead' && Math.pow(item.x - mouse.gameX / game.gridSize, 2) + Math.pow(item.y - mouse.gameY / game.gridSize, 2) < Math.pow((item.radius) / game.gridSize, 2)) {
-    //       return item
-    //     }
-    //   }
-    // }
   }
 
   rebuildPassableGrid (): void {
@@ -227,7 +213,7 @@ export class TileMap extends Container {
     }
   }
 
-  getItemByUid (uid: number): BaseItem | undefined {
-    return this.items.find(item => item.uid === uid)
+  getItemByUid (uid: number): BaseActiveItem | undefined {
+    return this.activeItems.find(item => item.uid === uid)
   }
 }

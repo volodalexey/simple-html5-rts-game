@@ -7,8 +7,10 @@ canvas {
   display: block;
 }
 
-.ellipsis {
-  margin-right: auto;
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hidden {
@@ -19,22 +21,4 @@ canvas {
 .error-stack {
   color: red;
   font-size: 2rem;
-}
-
-@keyframes ellipsis {
-  from {
-    width: 0;
-  }
-
-  to {
-    width: 9rem;
-  }
-}
-
-.ellipsis::after {
-  font-size: 4rem;
-  content: "......";
-  display: inline-block;
-  overflow: hidden;
-  animation: ellipsis 2s linear infinite;
 }

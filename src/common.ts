@@ -1,5 +1,6 @@
 import { type EVectorDirection } from './Vector'
 import { type BaseBuilding } from './buildings/BaseBuilding'
+import { type BaseProjectile } from './projectiles/BaseProjectile'
 import { type BaseVehicle } from './vehicles/BaseVehicle'
 
 export enum Team {
@@ -7,7 +8,8 @@ export enum Team {
   green = 'green'
 }
 
-export type BaseItem = BaseBuilding | BaseVehicle
+export type BaseItem = BaseBuilding | BaseVehicle | BaseProjectile
+export type BaseActiveItem = BaseBuilding | BaseVehicle
 
 /**
  * Wrap value of direction so that it lies between 0 and directions-1

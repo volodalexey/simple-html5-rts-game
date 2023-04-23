@@ -102,7 +102,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     }
     this.setup(options)
 
-    this.switchAnimation(BaseAnimation.healthy)
+    this.updateAnimation()
   }
 
   setup ({
@@ -181,6 +181,14 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     this.currentAnimation.visible = true
   }
 
+  updateAnimation (): void {
+    if (this.life > this.hitPoints * 0.4) {
+      this.switchAnimation(BaseAnimation.healthy)
+    } else if (this.life > 0) {
+      this.switchAnimation(BaseAnimation.damaged)
+    }
+  }
+
   setSelected (selected: boolean): void {
     this.selectedGraphics.alpha = selected ? 0.5 : 0
     this.selected = selected
@@ -192,6 +200,15 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
 
   isDead (): boolean {
     return !this.isAlive()
+  }
+
+  subLife (damage: number): void {
+    this.life -= damage
+    if (this.life < 0) {
+      this.life = 0
+    }
+    this.updateLife()
+    this.updateAnimation()
   }
 
   getGridXY (): { gridX: number, gridY: number } {
@@ -216,6 +233,10 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
 
   processOrders (): void {
 
+  }
+
+  handleUpdate (deltaMS: number): void {
+    this.processOrders()
   }
 }
 

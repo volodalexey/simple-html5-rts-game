@@ -70,6 +70,7 @@ export class Base extends BaseBuilding {
     this.drawSelection()
     this.drawLifeBar()
     this.updateLife()
+    this.updateAnimation()
   }
 
   static prepareTextures ({

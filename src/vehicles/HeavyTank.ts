@@ -1,4 +1,5 @@
 import { Team } from '../common'
+import { CannonBall } from '../projectiles/CannonBall'
 import { BaseVehicle, type IBaseVehicleOptions, type IBaseVehicleTextures } from './BaseVehicle'
 
 export type IHeavyTankOptions = Pick<
@@ -44,6 +45,10 @@ export class HeavyTank extends BaseVehicle {
   public cost = 1200
   public hitPoints = 50
   public turnSpeed = 4
+  public Projectile = CannonBall
+  public canAttack = true
+  public canAttackLand = true
+  public canAttackAir = false
 
   constructor (options: IHeavyTankOptions) {
     super({

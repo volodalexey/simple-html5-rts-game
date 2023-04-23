@@ -11,7 +11,6 @@ export enum EVectorDirection {
 
 interface IVectorOptions {
   direction: EVectorDirection
-  speed: number
 }
 
 export class Vector {

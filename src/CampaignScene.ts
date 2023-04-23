@@ -147,7 +147,8 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
 
           /* Player heavy tank */
-          { Constructor: HeavyTank, initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
+          { Constructor: HeavyTank, initGridX: 40, initGridY: 27, direction: EVectorDirection.up, team: Team.blue, uid: -1 },
+          // { Constructor: HeavyTank, initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
 
           /* Two transport vehicles waiting just outside the visible map */
           { Constructor: Transport, initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, selectable: false },

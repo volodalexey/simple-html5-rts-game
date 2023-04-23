@@ -14,6 +14,10 @@ import { EItemType, type IItem } from './interfaces/IItem'
 import { type IAttackable } from './interfaces/IAttackable'
 import { type IOrder } from './interfaces/IOrder'
 import { AUDIO } from './audio'
+import { Bullet } from './projectiles/Bullet'
+import { CannonBall } from './projectiles/CannonBall'
+import { Laser } from './projectiles/Laser'
+import { Rocket } from './projectiles/HeatSeeker'
 
 export interface IGameOptions {
   viewWidth: number
@@ -30,6 +34,7 @@ export class Game extends Container {
   public cash = 0
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
+  public reloadAdjustmentFactor = 1 / 8
   public deployBuilding = false
   public canDeployBuilding = false
 
@@ -312,17 +317,75 @@ export class Game extends Container {
         upLeftTextures: [textures['transport-green-up-left.png']]
       }
     })
+
+    Bullet.prepareTextures({
+      textures: {
+        upTextures: [textures['bullet-up.png']],
+        upRightTextures: [textures['bullet-up-right.png']],
+        rightTextures: [textures['bullet-right.png']],
+        downRightTextures: [textures['bullet-down-right.png']],
+        downTextures: [textures['bullet-down.png']],
+        downLeftTextures: [textures['bullet-down-left.png']],
+        leftTextures: [textures['bullet-left.png']],
+        upLeftTextures: [textures['bullet-up-left.png']],
+        explodeTextures: animations['bullet-explode']
+      }
+    })
+
+    CannonBall.prepareTextures({
+      textures: {
+        upTextures: [textures['cannon-ball-up.png']],
+        upRightTextures: [textures['cannon-ball-up-right.png']],
+        rightTextures: [textures['cannon-ball-right.png']],
+        downRightTextures: [textures['cannon-ball-down-right.png']],
+        downTextures: [textures['cannon-ball-down.png']],
+        downLeftTextures: [textures['cannon-ball-down-left.png']],
+        leftTextures: [textures['cannon-ball-left.png']],
+        upLeftTextures: [textures['cannon-ball-up-left.png']],
+        explodeTextures: animations['cannon-ball-explode']
+      }
+    })
+
+    Laser.prepareTextures({
+      textures: {
+        upTextures: [textures['fire-ball-up.png']],
+        upRightTextures: [textures['fire-ball-up-right.png']],
+        rightTextures: [textures['fire-ball-right.png']],
+        downRightTextures: [textures['fire-ball-down-right.png']],
+        downTextures: [textures['fire-ball-down.png']],
+        downLeftTextures: [textures['fire-ball-down-left.png']],
+        leftTextures: [textures['fire-ball-left.png']],
+        upLeftTextures: [textures['fire-ball-up-left.png']],
+        explodeTextures: animations['fire-ball-explode']
+      }
+    })
+
+    Rocket.prepareTextures({
+      textures: {
+        upTextures: [textures['heatseeker-up.png']],
+        upRightTextures: [textures['heatseeker-up-right.png']],
+        rightTextures: [textures['heatseeker-right.png']],
+        downRightTextures: [textures['heatseeker-down-right.png']],
+        downTextures: [textures['heatseeker-down.png']],
+        downLeftTextures: [textures['heatseeker-down-left.png']],
+        leftTextures: [textures['heatseeker-left.png']],
+        upLeftTextures: [textures['heatseeker-up-left.png']],
+        explodeTextures: animations['heatseeker-explode']
+      }
+    })
   }
 
   // Receive command from singleplayer or multiplayer object and send it to units
   processCommand (uids: number[], orders: IOrder): void {
     // In case the target "to" object is in terms of uid, fetch the target object
     let toObject
-    if (orders.type !== 'patrol' && orders.type !== 'stand' && orders.type !== 'move' && typeof orders.toUid === 'number') {
-      toObject = this.tileMap.getItemByUid(orders.toUid)
-      if ((toObject == null) || toObject.isDead()) {
-        // To object no longer exists. Invalid command
-        return
+    if (orders.type === 'attack' || orders.type === 'guard') {
+      if (typeof orders.toUid === 'number') {
+        toObject = this.tileMap.getItemByUid(orders.toUid)
+        if ((toObject == null) || toObject.isDead()) {
+          // To object no longer exists. Invalid command
+          return
+        }
       }
     }
 

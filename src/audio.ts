@@ -69,11 +69,30 @@ export const AUDIO = {
   yup: new Howl({
     src: yupAudio
   }),
-  play (name: 'acknowledge-attacking' | 'acknowledge-moving'): void {
+  play (name: '' | 'acknowledge-attacking' | 'acknowledge-moving'
+  | 'bullet' | 'bullet-hit' | 'rocket' | 'laser' | 'cannon-ball' | 'cannon-hit'
+  | 'message-received'): void {
+    let sounds: Howl[] = []
     if (name === 'acknowledge-attacking') {
-      this.engaging.play()
+      sounds = [this.engaging]
     } else if (name === 'acknowledge-moving') {
-      const sounds = [this.yup, this.roger1, this.roger2]
+      sounds = [this.yup, this.roger1, this.roger2]
+    } else if (name === 'bullet') {
+      sounds = [this.bullet1, this.bullet2]
+    } else if (name === 'bullet-hit') {
+      sounds = [this.bulletHit]
+    } else if (name === 'rocket') {
+      sounds = [this.heatseeker1, this.heatseeker2]
+    } else if (name === 'laser') {
+      sounds = [this.laser1, this.laser2]
+    } else if (name === 'cannon-ball') {
+      sounds = [this.cannon1, this.cannon2]
+    } else if (name === 'cannon-hit') {
+      sounds = [this.cannonHit]
+    } else if (name === 'message-received') {
+      sounds = [this.message]
+    }
+    if (sounds.length > 0) {
       sounds[Math.floor(Math.random() * sounds.length)].play()
     }
   }

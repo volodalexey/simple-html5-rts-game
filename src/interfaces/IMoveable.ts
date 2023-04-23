@@ -1,7 +1,7 @@
 import { type Vector } from '../Vector'
 
 export interface IMoveable {
-  velocity: Vector
+  vector: Vector
   speed: number
   turnSpeed: number
   hardCollision: boolean

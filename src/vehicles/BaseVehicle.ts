@@ -1,6 +1,6 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../Vector'
-import { findAngle, type BaseItem, type Team, angleDiff, wrapDirection } from '../common'
+import { findAngle, type Team, angleDiff, wrapDirection, type BaseActiveItem } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { type IAttackable } from '../interfaces/IAttackable'
@@ -11,6 +11,10 @@ import { type IMoveable } from '../interfaces/IMoveable'
 import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { type IBuildable } from '../interfaces/IBuildable'
 import { LifeBar } from '../LifeBar'
+import { type Bullet } from '../projectiles/Bullet'
+import { type CannonBall } from '../projectiles/CannonBall'
+import { type Laser } from '../projectiles/Laser'
+import { type Rocket } from '../projectiles/HeatSeeker'
 
 export interface IBaseVehicleTextures {
   upTextures: Texture[]
@@ -91,7 +95,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public upLeftAnimation!: AnimatedSprite
   public currentAnimation!: AnimatedSprite
   public spritesContainer = new Container<AnimatedSprite>()
-  public velocity = new Vector({ direction: EVectorDirection.down, speed: 0 })
+  public vector = new Vector({ direction: EVectorDirection.down })
   public speed = 0
   public turnSpeed = 0
   public hardCollision = false
@@ -106,6 +110,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public canAttackAir = false
   public cost = 0
   public moveToLog = 0
+  public reloadTimeLeft = 0
+  public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
 
   constructor (options: IBaseVehicleOptions) {
     super()
@@ -120,8 +126,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     if (options.initY != null) {
       this.position.y = options.initY
     }
-    if (options.direction) {
-      this.velocity.setDirection({ direction: options.direction, speed: 0 })
+    if (options.direction != null) {
+      this.vector.setDirection({ direction: options.direction })
       this.switchAnimation(options.direction)
     }
     if (typeof options.selectable === 'boolean') {
@@ -257,6 +263,15 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     return !this.isAlive()
   }
 
+  subLife (damage: number): void {
+    this.life -= damage
+    if (this.life <= 0) {
+      this.removeFromParent()
+    } else {
+      this.updateLife()
+    }
+  }
+
   getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
     let ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
@@ -277,7 +292,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     this.position.set(gridX * gridSize, gridY * gridSize)
   }
 
-  isValidTarget (item: BaseItem): boolean {
+  isValidTarget (item: BaseActiveItem): boolean {
     return item.team !== this.team &&
       (
         (this.canAttackLand && (item.type === EItemType.buildings || item.type === EItemType.vehicles)) ||
@@ -285,10 +300,10 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
       )
   }
 
-  findTargetsInSight (addSight = 0): BaseItem | undefined {
+  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
     const thisGrid = this.getGridXY()
-    const targetsByDistance: Record<string, BaseItem[]> = {}
-    const items = this.game.tileMap.items
+    const targetsByDistance: Record<string, BaseActiveItem[]> = {}
+    const items = this.game.tileMap.activeItems
     for (let i = items.length - 1; i >= 0; i--) {
       const item = items[i]
       if (this.isValidTarget(item)) {
@@ -349,14 +364,86 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         break
       }
       case 'stand': {
-        const target = this.findTargetsInSight()
+        const target = this.findTargetInSight()
         if (target != null) {
           this.orders = { type: 'attack', to: target }
         }
         break
       }
+      case 'sentry': {
+        const target = this.findTargetInSight(2)
+        if (target != null) {
+          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+        }
+        break
+      }
+      case 'hunt': {
+        const target = this.findTargetInSight(100)
+        if (target != null) {
+          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+        }
+        break
+      }
+      case 'attack': {
+        if (this.orders.to == null) {
+          return
+        }
+        if (this.orders.to.isDead() || !this.isValidTarget(this.orders.to)) {
+          if (this.orders.nextOrder != null) {
+            this.orders = this.orders.nextOrder
+          } else {
+            this.orders = { type: 'stand' }
+          }
+          return
+        }
+        const toGrid = this.orders.to.getGridXY()
+        if ((Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)) < Math.pow(this.sight, 2)) {
+          // Turn towards target and then start attacking when within range of the target
+          const newDirection = findAngle({
+            object: { x: toGrid.gridX, y: toGrid.gridY },
+            unit: { x: thisGrid.gridX, y: thisGrid.gridY },
+            directions: this.vector.directions
+          })
+          const difference = angleDiff({ angle1: this.vector.direction, angle2: newDirection, directions: this.vector.directions })
+          const turnAmount = this.turnSpeed * this.game.turnSpeedAdjustmentFactor
+          if (Math.abs(difference) > turnAmount) {
+            this.vector.setDirection({
+              direction: wrapDirection({
+                direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,
+                directions: this.vector.directions
+              })
+            })
+            return
+          } else {
+            this.vector.setDirection({ direction: newDirection })
+            if (this.reloadTimeLeft <= 0) {
+              this.reloadTimeLeft = this.Projectile.reloadTime
+              const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
+              const bulletX = thisGrid.gridX - (this.radius * Math.sin(angleRadians) / tileMap.gridSize)
+              const bulletY = thisGrid.gridY - (this.radius * Math.cos(angleRadians) / tileMap.gridSize)
+              const projectile = new this.Projectile({
+                game: this.game,
+                initX: bulletX * tileMap.gridSize,
+                initY: bulletY * tileMap.gridSize,
+                direction: newDirection,
+                target: this.orders.to
+              })
+              tileMap.addItem(projectile)
+            }
+          }
+        } else {
+          const toGrid = this.orders.to.getGridXY()
+          const moving = this.moveTo(toGrid)
+          // Pathfinding couldn't find a path so stop
+          if (!moving) {
+            this.orders = { type: 'stand' }
+            return
+          }
+        }
+        break
+      }
       case 'patrol': {
-        const target = this.findTargetsInSight(1)
+        const target = this.findTargetInSight(1)
         if (target != null) {
           this.orders = { type: 'attack', to: target, nextOrder: this.orders }
           return
@@ -371,7 +458,14 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         break
       }
     }
-    this.switchAnimation(this.velocity.direction)
+    this.switchAnimation(this.vector.direction)
+  }
+
+  handleUpdate (deltaMS: number): void {
+    if (this.reloadTimeLeft > 0) {
+      this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
+    }
+    this.processOrders()
   }
 
   checkCollisionObjects (grid: Array<Array<0 | 1>>): Array<{
@@ -386,7 +480,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     const { tileMap } = this.game
     const thisGrid = this.getGridXY({ center: true })
     const movement = this.speed * this.game.speedAdjustmentFactor
-    const angleRadians = -(Math.round(this.velocity.direction) / this.velocity.directions) * 2 * Math.PI
+    const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
     const newX = thisGrid.gridX - (movement * Math.sin(angleRadians))
     const newY = thisGrid.gridY - (movement * Math.cos(angleRadians))
 
@@ -435,6 +529,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   }
 
   moveTo (destination: IPointGridData): boolean {
+    this.lastMovementGridX = 0
+    this.lastMovementGridY = 0
     const { tileMap } = this.game
     if (tileMap.currentMapPassableGrid.length === 0) {
       tileMap.rebuildPassableGrid()
@@ -444,7 +540,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     // First find path to destination
     const destX = Math.floor(destination.gridX)
     const destY = Math.floor(destination.gridY)
-    const start = { gridX: Math.floor(this.x / tileMap.gridSize), gridY: Math.floor(this.y / tileMap.gridSize) }
+    const start = { gridX: Math.floor(thisGrid.gridX), gridY: Math.floor(thisGrid.gridY) }
     const end = { gridX: destX, gridY: destY }
 
     const grid = tileMap.currentMapPassableGrid.map(g => g.slice())
@@ -463,7 +559,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           y: destination.gridY
         },
         unit: { x: thisGrid.gridX, y: thisGrid.gridY },
-        directions: this.velocity.directions
+        directions: this.vector.directions
       })
     } else {
       // Use A* algorithm to try and find a path to the destination
@@ -473,7 +569,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         newDirection = findAngle({
           object: nextStep,
           unit: { x: thisGrid.gridX, y: thisGrid.gridY },
-          directions: this.velocity.directions
+          directions: this.vector.directions
         })
       } else if (start.gridX === end.gridX && start.gridY === end.gridY) {
         // Reached destination grid square
@@ -489,7 +585,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
             y: destination.gridY
           },
           unit: { x: thisGrid.gridX, y: thisGrid.gridY },
-          directions: this.velocity.directions
+          directions: this.vector.directions
         })
       } else {
         // There is no path
@@ -516,9 +612,9 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         const objectAngle = findAngle({
           object: collObject.with,
           unit: { x: thisGrid.gridX, y: thisGrid.gridY },
-          directions: this.velocity.directions
+          directions: this.vector.directions
         })
-        const objectAngleRadians = -(objectAngle / this.velocity.directions) * 2 * Math.PI
+        const objectAngleRadians = -(objectAngle / this.vector.directions) * 2 * Math.PI
         let forceMagnitude
         switch (collObject.collisionType) {
           case ECollisionType.hard:
@@ -537,31 +633,30 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         forceVector.y += (forceMagnitude * Math.cos(objectAngleRadians))
       }
       // Find a new direction based on the force vector
-      newDirection = findAngle({ object: forceVector, unit: { x: 0, y: 0 }, directions: this.velocity.directions })
+      newDirection = findAngle({ object: forceVector, unit: { x: 0, y: 0 }, directions: this.vector.directions })
     } else {
       this.colliding = false
     }
 
     // Calculate turn amount for new direction
-    const difference = angleDiff({ angle1: this.velocity.direction, angle2: newDirection, directions: this.velocity.directions })
+    const difference = angleDiff({ angle1: this.vector.direction, angle2: newDirection, directions: this.vector.directions })
     const turnAmount = this.turnSpeed * this.game.turnSpeedAdjustmentFactor
 
     // Either turn or move forward based on collision type
     if (this.hardCollision) {
       // In case of hard collision, do not move forward, just turn towards new direction
       if (Math.abs(difference) > turnAmount) {
-        this.velocity.setDirection({
+        this.vector.setDirection({
           direction: wrapDirection({
-            direction: this.velocity.direction + turnAmount * Math.abs(difference) / difference,
-            directions: this.velocity.directions
-          }),
-          speed: this.speed
+            direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,
+            directions: this.vector.directions
+          })
         })
       }
     } else {
       // Otherwise, move forward, but keep turning as needed
       const movement = this.speed * this.game.speedAdjustmentFactor
-      const angleRadians = -(Math.round(this.velocity.direction) / this.velocity.directions) * 2 * Math.PI
+      const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
       this.lastMovementGridX = -(movement * Math.sin(angleRadians))
       this.lastMovementGridY = -(movement * Math.cos(angleRadians))
       const newGridX = thisGrid.gridX + this.lastMovementGridX
@@ -571,12 +666,11 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         gridY: newGridY
       })
       if (Math.abs(difference) > turnAmount) {
-        this.velocity.setDirection({
+        this.vector.setDirection({
           direction: wrapDirection({
-            direction: this.velocity.direction + turnAmount * Math.abs(difference) / difference,
-            directions: this.velocity.directions
-          }),
-          speed: this.speed
+            direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,
+            directions: this.vector.directions
+          })
         })
       }
     }

@@ -1,4 +1,5 @@
 import { Team } from '../common'
+import { Bullet } from '../projectiles/Bullet'
 import { BaseVehicle, type IBaseVehicleOptions, type IBaseVehicleTextures } from './BaseVehicle'
 
 export type IScoutTankOptions = Pick<
@@ -44,6 +45,10 @@ export class ScoutTank extends BaseVehicle {
   public cost = 500
   public hitPoints = 50
   public turnSpeed = 4
+  public Projectile = Bullet
+  public canAttack = true
+  public canAttackLand = true
+  public canAttackAir = false
 
   constructor (options: IScoutTankOptions) {
     super({

@@ -4,7 +4,8 @@ export enum EItemType {
   buildings = 'buildings',
   vehicles = 'vehicles',
   aircraft = 'aircraft',
-  terrain = 'terrain'
+  terrain = 'terrain',
+  bullets = 'bullets'
 }
 
 export interface IItem {
@@ -12,6 +13,6 @@ export interface IItem {
   type: EItemType
   getGridXY: () => { gridX: number, gridY: number }
   setPositionByGridXY: (options: { gridX: number, gridY: number }) => void
-  processOrders: () => void
+  handleUpdate: (deltaMS: number) => void
   orders: IOrder
 }

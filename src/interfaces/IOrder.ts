@@ -1,7 +1,7 @@
-import { type BaseItem } from '../common'
+import { type BaseActiveItem } from '../common'
 import { type EItemType } from './IItem'
 
-export type IOrder = IMoveOrder | IAttackOrder | IPatrolOrder | IStandOrder | IGuardOrder | IDeployOrder
+export type IOrder = IMoveOrder | IFireOrder | IAttackOrder | IPatrolOrder | IStandOrder | ISentryOrder | IHuntOrder | IGuardOrder | IDeployOrder
 
 type IPath = Array<{
   x: number
@@ -15,9 +15,15 @@ interface IMoveOrder {
   collisionCount: number
 }
 
+export interface IFireOrder {
+  type: 'fire'
+  to: BaseActiveItem
+  path?: IPath
+}
+
 interface IAttackOrder {
   type: 'attack'
-  to?: BaseItem
+  to?: BaseActiveItem
   nextOrder?: IOrder
   path?: IPath
   toUid?: number
@@ -39,6 +45,18 @@ interface IPatrolOrder {
 interface IStandOrder {
   type: 'stand'
   path?: IPath
+}
+
+interface ISentryOrder {
+  type: 'sentry'
+  path?: IPath
+  to?: IPointGridData
+}
+
+interface IHuntOrder {
+  type: 'hunt'
+  path?: IPath
+  to?: IPointGridData
 }
 
 interface IGuardOrder {

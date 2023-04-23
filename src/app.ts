@@ -4,9 +4,9 @@ import { LoaderScene } from './LoaderScene'
 import { MenuScene } from './MenuScene'
 
 async function run (): Promise<void> {
-  const ellipsis: HTMLElement | null = document.querySelector('.ellipsis')
-  if (ellipsis != null) {
-    ellipsis.style.display = 'none'
+  const loader: HTMLElement | null = document.querySelector('.loader')
+  if (loader != null) {
+    loader.parentElement?.removeChild(loader)
   }
   await SceneManager.initialize()
   const loaderScene = new LoaderScene({

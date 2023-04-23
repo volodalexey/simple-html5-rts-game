@@ -85,6 +85,136 @@
       "folder": ""
     },
     {
+      "name": "bullet-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-down.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-explode-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-explode-0.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-explode-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-explode-1.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-explode-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-explode-2.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-left.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-right.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "bullet-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/bullet-up.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-down.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-0.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-1.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-2.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-3.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-4.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-5.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-explode-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-explode-6.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-left.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-right.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "cannon-ball-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/cannon-ball-up.png",
+      "folder": ""
+    },
+    {
       "name": "chopper-blue-down-0.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-0.png",
       "folder": ""
@@ -565,6 +695,81 @@
       "folder": ""
     },
     {
+      "name": "fireball-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-down.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-0.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-1.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-2.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-3.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-4.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-5.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-explode-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-explode-6.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-left.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-right.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "fireball-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/fireball-up.png",
+      "folder": ""
+    },
+    {
       "name": "harvester-blue-down-left.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-down-left.png",
       "folder": ""
@@ -642,6 +847,81 @@
     {
       "name": "harvester-green-up.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-green-up.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-down.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-0.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-1.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-2.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-3.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-4.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-5.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-explode-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-explode-6.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "heatseeker-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/heatseeker-up.png",
       "folder": ""
     },
     {
