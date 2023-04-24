@@ -15,13 +15,11 @@ export class ScoutTank extends BaseVehicle {
     width: 0,
     height: 0,
     radius: 11,
-    lineWidth: 1,
-    lineColor: 0xffd700,
-    strokeWidth: 1,
-    strokeColor: 0xffff00,
+    strokeWidth: 2,
+    strokeColor: 0,
     offset: {
-      x: 11,
-      y: 10
+      x: -2,
+      y: -2
     }
   }
 
@@ -29,12 +27,12 @@ export class ScoutTank extends BaseVehicle {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 20,
+    width: 22,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 1,
+      x: 0,
       y: -7
     }
   }
@@ -56,9 +54,13 @@ export class ScoutTank extends BaseVehicle {
       textures: options.team === Team.blue ? ScoutTank.blueTextures : ScoutTank.greenTextures
     })
     this.life = options.life ?? this.hitPoints
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
     this.drawSelection()
+    this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+
+    this.checkDrawVehicleBounds()
   }
 
   static prepareTextures ({

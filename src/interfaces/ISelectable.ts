@@ -1,4 +1,4 @@
-import { type Graphics } from 'pixi.js'
+import { type Container } from 'pixi.js'
 import { type Team } from '../common'
 
 export interface ISelectable {
@@ -9,8 +9,6 @@ export interface ISelectable {
     width: number
     height: number
     radius: number
-    lineWidth: number
-    lineColor: number
     strokeWidth: number
     strokeColor: number
     offset: {
@@ -19,7 +17,8 @@ export interface ISelectable {
     }
   }
 
-  selectedGraphics: Graphics
-
+  selectedGraphics: Container
   setSelected: (selected: boolean) => void
+  getSelectionPosition: () => { x: number, y: number }
+  getSelectionBounds: () => { top: number, right: number, bottom: number, left: number }
 }

@@ -10,9 +10,9 @@ export class CannonBall extends BaseProjectile {
   static textures: IBaseProjectileTextures
   static reloadTime = 40
 
-  public speed = 25
+  public speed = 60
   public range = 6
-  public damage = 10
+  public damage = 20
 
   constructor (options: ICannonBallOptions) {
     super({

@@ -21,16 +21,14 @@ export class Base extends BaseBuilding {
   }
 
   public drawSelectionOptions = {
-    width: 41,
-    height: 41,
+    width: 44,
+    height: 44,
     radius: 0,
-    lineWidth: 1,
-    lineColor: 0xffd700,
-    strokeWidth: 1,
-    strokeColor: 0xffff00,
+    strokeWidth: 2,
+    strokeColor: 0xffffff,
     offset: {
-      x: 0,
-      y: 19
+      x: -2,
+      y: 18
     }
   }
 
@@ -67,10 +65,14 @@ export class Base extends BaseBuilding {
       textures: options.team === Team.blue ? Base.blueTextures : Base.greenTextures
     })
     this.life = options.life ?? this.hitPoints
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
     this.drawSelection()
+    this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
     this.updateAnimation()
+
+    this.checkDrawBuildingBounds()
   }
 
   static prepareTextures ({

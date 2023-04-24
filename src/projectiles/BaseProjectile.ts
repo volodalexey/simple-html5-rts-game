@@ -1,10 +1,11 @@
-import { AnimatedSprite, Container, type Texture } from 'pixi.js'
+import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { EItemType, type IItem } from '../interfaces/IItem'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { EVectorDirection, Vector } from '../Vector'
 import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
-import { findAngle, type BaseActiveItem, angleDiff, wrapDirection } from '../common'
+import { findAngle, type BaseActiveItem, angleDiff, wrapDirection, checkCollision } from '../common'
+import { logProjectileBounds } from '../logger'
 
 export interface IBaseProjectileTextures {
   upTextures: Texture[]
@@ -61,9 +62,11 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
     this.game = options.game
     this.orders = { type: 'fire', to: options.target }
     this.setup(options)
-    this.position.set(options.initX, options.initY)
+    this.setPositionByXY({ x: options.initX, y: options.initY, center: true })
     this.vector.setDirection({ direction: options.direction })
     this.switchAnimationByDirection(options.direction)
+
+    this.checkDrawProjectileBounds()
   }
 
   setup ({
@@ -166,14 +169,32 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
     }
   }
 
+  getSelectionPosition ({ center = false } = {}): { x: number, y: number } {
+    const ret = {
+      x: this.x,
+      y: this.y
+    }
+    if (center) {
+      ret.x += this.width / 2
+      ret.y += this.height / 2
+    }
+    return ret
+  }
+
+  getSelectionBounds (): { top: number, right: number, bottom: number, left: number } {
+    const selectionPosition = this.getSelectionPosition()
+    return {
+      top: selectionPosition.y,
+      right: selectionPosition.x + this.width,
+      bottom: selectionPosition.y + this.height,
+      left: selectionPosition.x
+    }
+  }
+
   getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
-    let ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
-    if (center) {
-      ret = { gridX: (this.x + this.width / 2) / gridSize, gridY: (this.y + this.height / 2) / gridSize }
-    } else {
-      ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
-    }
+    const selectionPosition = this.getSelectionPosition({ center })
+    const ret = { gridX: selectionPosition.x / gridSize, gridY: selectionPosition.y / gridSize }
     if (floor) {
       ret.gridX = Math.floor(ret.gridX)
       ret.gridY = Math.floor(ret.gridY)
@@ -181,18 +202,33 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
     return ret
   }
 
-  setPositionByGridXY ({ gridX, gridY }: { gridX: number, gridY: number }): void {
+  setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
+    const diffX = 0 - (center ? this.upAnimation.width / 2 : 0)
+    const diffY = 0 - (center ? this.upAnimation.height / 2 : 0)
+    this.position.set(x + diffX, y + diffY)
+  }
+
+  setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
     const { gridSize } = this.game.tileMap
-    this.position.set(gridX * gridSize, gridY * gridSize)
+    this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
+  }
+
+  checkDrawProjectileBounds (): void {
+    if (logProjectileBounds.enabled) {
+      const gr = new Graphics()
+      gr.beginFill(0xffffff)
+      gr.alpha = 0.5
+      gr.drawRect(0, 0, this.width, this.height)
+      gr.endFill()
+      this.addChild(gr)
+    }
   }
 
   reachedTarget (): boolean {
     if (this.orders.type === 'fire') {
-      const item = this.orders.to
-      return this.x >= item.x &&
-      this.x <= item.x + item.width &&
-      this.y >= item.y &&
-      this.y <= item.y + item.height
+      const thisBounds = this.getSelectionBounds()
+      const toBounds = this.orders.to.getSelectionBounds()
+      return checkCollision(thisBounds, toBounds) > 0.12
     }
     return false
   }
@@ -234,7 +270,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
   }
 
   moveTo (destination: BaseActiveItem): void {
-    const thisGrid = this.getGridXY()
+    const thisGrid = this.getGridXY({ center: true })
     // Weapons like the heatseeker can turn slowly towards target while moving
     if (this.turnSpeed > 0) {
       const destGrid = destination.getGridXY({ center: true })
@@ -266,14 +302,15 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
     const movement = this.speed * this.game.speedAdjustmentFactor
     this.distanceTravelled += movement
 
-    const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
+    const angleRadians = -(this.vector.direction / this.vector.directions) * 2 * Math.PI
     this.lastMovementGridX = -(movement * Math.sin(angleRadians))
     this.lastMovementGridY = -(movement * Math.cos(angleRadians))
     const newGridX = thisGrid.gridX + this.lastMovementGridX
     const newGridY = thisGrid.gridY + this.lastMovementGridY
     this.setPositionByGridXY({
       gridX: newGridX,
-      gridY: newGridY
+      gridY: newGridY,
+      center: true
     })
   }
 }

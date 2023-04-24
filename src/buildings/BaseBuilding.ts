@@ -6,6 +6,7 @@ import { EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
+import { logBuildingBounds } from '../logger'
 
 export interface IBaseBuildingTextures {
   healthyTextures: Texture[]
@@ -16,8 +17,8 @@ export interface IBaseBuildingTextures {
 export interface IBaseBuildingOptions {
   game: Game
   uid?: number
-  initX?: number
-  initY?: number
+  initX: number
+  initY: number
   team: Team
   textures: IBaseBuildingTextures
   life?: number
@@ -28,13 +29,11 @@ export interface IBaseBuildingOptions {
 export class BaseBuilding extends Container implements IItem, ISelectable, ILifeable {
   public selected = false
   public selectable = true
-  public selectedGraphics = new Graphics()
+  public selectedGraphics = new Container()
   public drawSelectionOptions = {
     width: 0,
     height: 0,
     radius: 0,
-    lineWidth: 0,
-    lineColor: 0,
     strokeWidth: 0,
     strokeColor: 0,
     offset: {
@@ -88,12 +87,6 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     this.uid = options.uid
     this.team = options.team
     this.orders = options.orders ?? { type: 'stand' }
-    if (options.initX != null) {
-      this.position.x = options.initX
-    }
-    if (options.initY != null) {
-      this.position.y = options.initY
-    }
     if (options.life != null) {
       this.life = options.life
     }
@@ -137,19 +130,16 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   }
 
   drawSelection (): void {
-    const { offset, lineWidth, lineColor, strokeWidth, strokeColor, width, height } = this.drawSelectionOptions
-    this.selectedGraphics.lineStyle({
-      width: lineWidth,
-      color: lineColor
-    })
-    this.selectedGraphics.drawRect(offset.x, offset.y, width, height)
-    this.selectedGraphics.endFill()
-    this.selectedGraphics.lineStyle({
-      width: strokeWidth,
-      color: strokeColor
-    })
-    this.selectedGraphics.drawRect(offset.x - strokeWidth, offset.y - strokeWidth, width + strokeWidth * 2, height + strokeWidth * 2)
-    this.selectedGraphics.endFill()
+    const { offset, strokeWidth, strokeColor, width, height } = this.drawSelectionOptions
+    this.selectedGraphics.position.set(offset.x, offset.y)
+    const selection = new Graphics()
+    this.selectedGraphics.addChild(selection)
+    selection.beginFill(strokeColor)
+    selection.drawRect(0, 0, width, height)
+    selection.endFill()
+    selection.beginHole()
+    selection.drawRect(strokeWidth, strokeWidth, width - strokeWidth * 2, height - strokeWidth * 2)
+    selection.endHole()
     this.selectedGraphics.alpha = 0
   }
 
@@ -194,6 +184,65 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     this.selected = selected
   }
 
+  getSelectionPosition ({ center = false } = {}): { x: number, y: number } {
+    const sub = this.drawSelectionOptions.strokeWidth
+    const ret = {
+      x: this.x + this.selectedGraphics.x + sub,
+      y: this.y + this.selectedGraphics.y + sub
+    }
+    if (center) {
+      ret.x += (this.selectedGraphics.width - sub * 2) / 2
+      ret.y += (this.selectedGraphics.height - sub * 2) / 2
+    }
+    return ret
+  }
+
+  getSelectionBounds (): { top: number, right: number, bottom: number, left: number } {
+    const selectionPosition = this.getSelectionPosition()
+    const sub = this.drawSelectionOptions.strokeWidth
+    return {
+      top: selectionPosition.y,
+      right: selectionPosition.x + this.selectedGraphics.width - sub * 2,
+      bottom: selectionPosition.y + this.selectedGraphics.height - sub * 2,
+      left: selectionPosition.x
+    }
+  }
+
+  getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
+    const { gridSize } = this.game.tileMap
+    const selectionPosition = this.getSelectionPosition({ center })
+    const ret = { gridX: selectionPosition.x / gridSize, gridY: selectionPosition.y / gridSize }
+    if (floor) {
+      ret.gridX = Math.floor(ret.gridX)
+      ret.gridY = Math.floor(ret.gridY)
+    }
+    return ret
+  }
+
+  setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
+    const sub = this.drawSelectionOptions.strokeWidth
+    const diffX = 0 - (this.selectedGraphics.x + (center ? this.selectedGraphics.width / 2 : sub))
+    const diffY = 0 - (this.selectedGraphics.y + (center ? this.selectedGraphics.height / 2 : sub))
+    this.position.set(x + diffX, y + diffY)
+  }
+
+  setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
+    const { gridSize } = this.game.tileMap
+    this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
+  }
+
+  checkDrawBuildingBounds (): void {
+    if (logBuildingBounds.enabled) {
+      const selectionBounds = this.getSelectionBounds()
+      const gr = new Graphics()
+      gr.beginFill(0xffffff)
+      gr.alpha = 0.5
+      gr.drawRect(selectionBounds.left - this.x, selectionBounds.top - this.y, selectionBounds.right - selectionBounds.left, selectionBounds.bottom - selectionBounds.top)
+      gr.endFill()
+      this.addChild(gr)
+    }
+  }
+
   isAlive (): boolean {
     return this.life > 0
   }
@@ -209,16 +258,6 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     }
     this.updateLife()
     this.updateAnimation()
-  }
-
-  getGridXY (): { gridX: number, gridY: number } {
-    const { gridSize } = this.game.tileMap
-    return { gridX: Math.floor(this.x / gridSize), gridY: Math.floor(this.y / gridSize) }
-  }
-
-  setPositionByGridXY ({ gridX, gridY }: { gridX: number, gridY: number }): void {
-    const { gridSize } = this.game.tileMap
-    this.position.set(gridX * gridSize, gridY * gridSize)
   }
 
   drawLifeBar (): void {

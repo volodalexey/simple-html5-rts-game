@@ -15,13 +15,11 @@ export class HeavyTank extends BaseVehicle {
     width: 0,
     height: 0,
     radius: 13,
-    lineWidth: 1,
-    lineColor: 0xffd700,
-    strokeWidth: 1,
-    strokeColor: 0xffff00,
+    strokeWidth: 2,
+    strokeColor: 0,
     offset: {
-      x: 15,
-      y: 15
+      x: 1,
+      y: 1
     }
   }
 
@@ -29,13 +27,13 @@ export class HeavyTank extends BaseVehicle {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 30,
+    width: 26,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 0,
-      y: -7
+      x: 3,
+      y: -6
     }
   }
 
@@ -56,9 +54,13 @@ export class HeavyTank extends BaseVehicle {
       textures: options.team === Team.blue ? HeavyTank.blueTextures : HeavyTank.greenTextures
     })
     this.life = options.life ?? this.hitPoints
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
     this.drawSelection()
+    this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+
+    this.checkDrawVehicleBounds()
   }
 
   static prepareTextures ({

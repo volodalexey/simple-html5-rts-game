@@ -12,7 +12,8 @@ export interface IItem {
   uid?: number
   type: EItemType
   getGridXY: () => { gridX: number, gridY: number }
-  setPositionByGridXY: (options: { gridX: number, gridY: number }) => void
+  setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
+  setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
   handleUpdate: (deltaMS: number) => void
   orders: IOrder
 }

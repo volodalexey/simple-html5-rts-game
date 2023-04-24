@@ -15,6 +15,7 @@ import { type Bullet } from '../projectiles/Bullet'
 import { type CannonBall } from '../projectiles/CannonBall'
 import { type Laser } from '../projectiles/Laser'
 import { type Rocket } from '../projectiles/HeatSeeker'
+import { logVehicleBounds } from '../logger'
 
 export interface IBaseVehicleTextures {
   upTextures: Texture[]
@@ -30,8 +31,8 @@ export interface IBaseVehicleTextures {
 export interface IBaseVehicleOptions {
   game: Game
   uid?: number
-  initX?: number
-  initY?: number
+  initX: number
+  initY: number
   team: Team
   textures: IBaseVehicleTextures
   direction?: EVectorDirection
@@ -49,13 +50,11 @@ enum ECollisionType {
 export class BaseVehicle extends Container implements IItem, ISelectable, ILifeable, IAttackable, IMoveable, IBuildable {
   public selected = false
   public selectable = true
-  public selectedGraphics = new Graphics()
+  public selectedGraphics = new Container()
   public drawSelectionOptions = {
     width: 0,
     height: 0,
     radius: 0,
-    lineWidth: 0,
-    lineColor: 0,
     strokeWidth: 0,
     strokeColor: 0,
     offset: {
@@ -120,12 +119,6 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     this.team = options.team
     this.orders = options.orders ?? { type: 'stand' }
     this.setup(options)
-    if (options.initX != null) {
-      this.position.x = options.initX
-    }
-    if (options.initY != null) {
-      this.position.y = options.initY
-    }
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
       this.switchAnimation(options.direction)
@@ -191,6 +184,65 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     this.selected = selected
   }
 
+  getSelectionPosition ({ center = false } = {}): { x: number, y: number } {
+    const sub = this.drawSelectionOptions.strokeWidth
+    const ret = {
+      x: this.x + this.selectedGraphics.x + sub,
+      y: this.y + this.selectedGraphics.y + sub
+    }
+    if (center) {
+      ret.x += (this.selectedGraphics.width - sub * 2) / 2
+      ret.y += (this.selectedGraphics.height - sub * 2) / 2
+    }
+    return ret
+  }
+
+  getSelectionBounds (): { top: number, right: number, bottom: number, left: number } {
+    const selectionPosition = this.getSelectionPosition()
+    const sub = this.drawSelectionOptions.strokeWidth
+    return {
+      top: selectionPosition.y,
+      right: selectionPosition.x + this.selectedGraphics.width - sub * 2,
+      bottom: selectionPosition.y + this.selectedGraphics.height - sub * 2,
+      left: selectionPosition.x
+    }
+  }
+
+  getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
+    const { gridSize } = this.game.tileMap
+    const selectionPosition = this.getSelectionPosition({ center })
+    const ret = { gridX: selectionPosition.x / gridSize, gridY: selectionPosition.y / gridSize }
+    if (floor) {
+      ret.gridX = Math.floor(ret.gridX)
+      ret.gridY = Math.floor(ret.gridY)
+    }
+    return ret
+  }
+
+  setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
+    const sub = this.drawSelectionOptions.strokeWidth
+    const diffX = 0 - (this.selectedGraphics.x + (center ? this.selectedGraphics.width / 2 : sub))
+    const diffY = 0 - (this.selectedGraphics.y + (center ? this.selectedGraphics.height / 2 : sub))
+    this.position.set(x + diffX, y + diffY)
+  }
+
+  setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
+    const { gridSize } = this.game.tileMap
+    this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
+  }
+
+  checkDrawVehicleBounds (): void {
+    if (logVehicleBounds.enabled) {
+      const selectionBounds = this.getSelectionBounds()
+      const gr = new Graphics()
+      gr.beginFill(0xffffff)
+      gr.alpha = 0.5
+      gr.drawRect(selectionBounds.left - this.x, selectionBounds.top - this.y, selectionBounds.right - selectionBounds.left, selectionBounds.bottom - selectionBounds.top)
+      gr.endFill()
+      this.addChild(gr)
+    }
+  }
+
   hideAllAnimations (): void {
     this.spritesContainer.children.forEach(spr => {
       spr.visible = false
@@ -229,19 +281,16 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   }
 
   drawSelection (): void {
-    const { offset, lineWidth, lineColor, strokeWidth, strokeColor, radius } = this.drawSelectionOptions
-    this.selectedGraphics.lineStyle({
-      width: lineWidth,
-      color: lineColor
-    })
-    this.selectedGraphics.drawCircle(offset.x, offset.y, radius)
-    this.selectedGraphics.endFill()
-    this.selectedGraphics.lineStyle({
-      width: strokeWidth,
-      color: strokeColor
-    })
-    this.selectedGraphics.drawCircle(offset.x, offset.y, radius + strokeWidth)
-    this.selectedGraphics.endFill()
+    const { offset, strokeWidth, strokeColor, radius } = this.drawSelectionOptions
+    this.selectedGraphics.position.set(offset.x, offset.y)
+    const selection = new Graphics()
+    this.selectedGraphics.addChild(selection)
+    selection.beginFill(strokeColor)
+    selection.drawCircle(radius + strokeWidth, radius + strokeWidth, radius + strokeWidth)
+    selection.endFill()
+    selection.beginHole()
+    selection.drawCircle(radius + strokeWidth, radius + strokeWidth, radius)
+    selection.endHole()
     this.selectedGraphics.alpha = 0
   }
 
@@ -270,26 +319,6 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     } else {
       this.updateLife()
     }
-  }
-
-  getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
-    const { gridSize } = this.game.tileMap
-    let ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
-    if (center) {
-      ret = { gridX: (this.x + this.width / 2) / gridSize, gridY: (this.y + this.height / 2) / gridSize }
-    } else {
-      ret = { gridX: this.x / gridSize, gridY: this.y / gridSize }
-    }
-    if (floor) {
-      ret.gridX = Math.floor(ret.gridX)
-      ret.gridY = Math.floor(ret.gridY)
-    }
-    return ret
-  }
-
-  setPositionByGridXY ({ gridX, gridY }: { gridX: number, gridY: number }): void {
-    const { gridSize } = this.game.tileMap
-    this.position.set(gridX * gridSize, gridY * gridSize)
   }
 
   isValidTarget (item: BaseActiveItem): boolean {
@@ -396,7 +425,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           }
           return
         }
-        const toGrid = this.orders.to.getGridXY()
+        const toGrid = this.orders.to.getGridXY({ center: true })
         if ((Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)) < Math.pow(this.sight, 2)) {
           // Turn towards target and then start attacking when within range of the target
           const newDirection = findAngle({
@@ -535,7 +564,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     if (tileMap.currentMapPassableGrid.length === 0) {
       tileMap.rebuildPassableGrid()
     }
-    const thisGrid = this.getGridXY()
+    const thisGrid = this.getGridXY({ center: true })
 
     // First find path to destination
     const destX = Math.floor(destination.gridX)
@@ -663,7 +692,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
       const newGridY = thisGrid.gridY + this.lastMovementGridY
       this.setPositionByGridXY({
         gridX: newGridX,
-        gridY: newGridY
+        gridY: newGridY,
+        center: true
       })
       if (Math.abs(difference) > turnAmount) {
         this.vector.setDirection({
