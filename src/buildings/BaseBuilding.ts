@@ -253,11 +253,18 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
 
   subLife (damage: number): void {
     this.life -= damage
-    if (this.life < 0) {
-      this.life = 0
+    if (this.life <= 0) {
+      this.removeAndDestroy()
+    } else {
+      this.updateLife()
+      this.updateAnimation()
     }
-    this.updateLife()
-    this.updateAnimation()
+  }
+
+  removeAndDestroy (): void {
+    this.game.deselectItem(this)
+    this.removeFromParent()
+    this.game.tileMap.currentMapPassableGrid = []
   }
 
   drawLifeBar (): void {

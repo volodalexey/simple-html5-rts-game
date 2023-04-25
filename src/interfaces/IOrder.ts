@@ -63,7 +63,8 @@ interface IGuardOrder {
   type: 'guard'
   toUid?: number
   path?: IPath
-  to?: IPointGridData
+  to: BaseActiveItem
+  nextOrder?: IOrder
 }
 
 interface IDeployOrder {

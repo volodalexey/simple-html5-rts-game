@@ -26,6 +26,8 @@ export interface IGameOptions {
   team: Team
 }
 
+type SelectableItem = ISelectable & IItem
+
 export class Game extends Container {
   public gameEnded = false
   public time = 0
@@ -43,7 +45,7 @@ export class Game extends Container {
   public tileMap!: TileMap
   public statusBar!: StatusBar
   public camera!: Camera
-  public selectedItems: Array<ISelectable & IItem> = []
+  public selectedItems: SelectableItem[] = []
 
   constructor (options: IGameOptions) {
     super()
@@ -126,21 +128,14 @@ export class Game extends Container {
     }
   }
 
-  isItemSelected (item: ISelectable & IItem): boolean {
+  isItemSelected (item: SelectableItem): boolean {
     return this.selectedItems.includes(item)
   }
 
-  selectItem (item: ISelectable & IItem, shiftPressed: boolean): void {
+  selectItem (item: SelectableItem, shiftPressed: boolean): void {
     // Pressing shift and clicking on a selected item will deselect it
     if (shiftPressed && item.selected) {
-      // deselect item
-      item.selected = false
-      for (let i = this.selectedItems.length - 1; i >= 0; i--) {
-        if (this.selectedItems[i] === item) {
-          this.selectedItems.splice(i, 1)
-          break
-        }
-      }
+      this.deselectItem(item)
       return
     }
 
@@ -150,13 +145,21 @@ export class Game extends Container {
     }
   }
 
+  deselectItem (item: SelectableItem): void {
+    const selectedIdx = this.selectedItems.indexOf(item)
+    if (selectedIdx > -1) {
+      this.selectedItems.splice(selectedIdx, 1)
+    }
+    item.setSelected(false)
+  }
+
   startGame = ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void => {
     this.gameEnded = false
     this.time = 0
     this.runLevel({ mapImageSrc, mapSettingsSrc })
   }
 
-  endGame (): void {
+  endGame (message: string): void {
     this.gameEnded = true
   }
 

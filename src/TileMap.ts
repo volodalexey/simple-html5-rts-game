@@ -213,7 +213,18 @@ export class TileMap extends Container {
     }
   }
 
-  getItemByUid (uid: number): BaseActiveItem | undefined {
-    return this.activeItems.find(item => item.uid === uid)
+  getItemByUid (uid: number, activeItems?: BaseActiveItem[]): BaseActiveItem | undefined {
+    return (activeItems ?? this.activeItems).find(item => item.uid === uid)
+  }
+
+  isItemsDead (uids: number[] | number): boolean {
+    if (!Array.isArray(uids)) {
+      uids = [uids]
+    }
+    const { activeItems } = this
+    return uids.some(uid => {
+      const activeItem = this.getItemByUid(uid, activeItems)
+      return activeItem == null || activeItem.isDead()
+    })
   }
 }

@@ -106,6 +106,8 @@ export class CampaignScene extends Container implements IScene {
       } else if (trigger.type === 'conditional') {
         if (trigger.condition()) {
           trigger.action()
+          mission.triggers.splice(i, 1)
+          i--
         }
       }
     }
@@ -137,7 +139,7 @@ export class CampaignScene extends Container implements IScene {
 
     this.game.showMessage({
       character: EMessageCharacter.system,
-      message: `Mission: ${mission.name}`,
+      message: `Mission: ${mission.name}\n${mission.briefing}`,
       playSound: false
     })
   }
@@ -202,59 +204,78 @@ export class CampaignScene extends Container implements IScene {
           },
           {
             type: 'conditional',
-            condition: function () {
-              // return (isItemDead(-1) || isItemDead(-3) || isItemDead(-4))
-              return false
+            condition: () => {
+              return this.game.tileMap.isItemsDead([-1, -3, -4])
             },
-            action: function () {
-              // singleplayer.endLevel(false)
+            action: () => {
+              this.game.endGame('You lost vehicles')
             }
           },
           {
             type: 'conditional',
-            condition: function () {
+            condition: () => {
               // Check if first enemy is dead
-              // return isItemDead(-2)
-              return false
+              return this.game.tileMap.isItemsDead(-2)
             },
-            action: function () {
-              // game.showMessage('op', 'The rebels have been getting very aggressive lately. I hope the convoy is safe. Find them and escort them back to the base.')
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'The rebels have been getting very aggressive lately. I hope the convoy is safe. Find them and escort them back to the base.'
+              })
             }
           },
           {
             type: 'conditional',
-            condition: function () {
-              // const hero = game.getItemByUid(-1)
-              // return (hero && hero.x < 30 && hero.y < 30)
+            condition: () => {
+              const hero = this.game.tileMap.getItemByUid(-1)
+              if (hero != null) {
+                const heroGrid = hero.getGridXY({ center: true })
+                return heroGrid.gridX < 30 && heroGrid.gridY < 30
+              }
               return false
             },
-            action: function () {
-              // game.showMessage('driver', 'Can anyone hear us? Our convoy has been pinned down by rebel tanks. We need help.')
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.driver,
+                message: 'Can anyone hear us? Our convoy has been pinned down by rebel tanks. We need help.'
+              })
             }
           },
           {
             type: 'conditional',
-            condition: function () {
-              // const hero = game.getItemByUid(-1)
-              // return (hero && hero.x < 10 && hero.y < 10)
+            condition: () => {
+              const hero = this.game.tileMap.getItemByUid(-1)
+              if (hero != null) {
+                const heroGrid = hero.getGridXY({ center: true })
+                return heroGrid.gridX < 10 && heroGrid.gridY < 10
+              }
               return false
             },
-            action: function () {
-              // const hero = game.getItemByUid(-1)
-              // game.showMessage('driver', 'Thank you. We thought we would never get out of here alive.')
-              // game.sendCommand([-3, -4], { type: 'guard', to: hero })
+            action: () => {
+              const hero = this.game.tileMap.getItemByUid(-1)
+              if (hero != null) {
+                this.game.showMessage({
+                  character: EMessageCharacter.driver,
+                  message: 'Thank you. We thought we would never get out of here alive.'
+                })
+                this.game.processCommand([-3, -4], { type: 'guard', to: hero })
+              }
             }
           },
           {
             type: 'conditional',
-            condition: function () {
-              // const transport1 = game.getItemByUid(-3)
-              // const transport2 = game.getItemByUid(-4)
-              // return (transport1 && transport2 && transport1.x > 52 && transport2.x > 52 && transport2.y < 18 && transport1.y < 18)
+            condition: () => {
+              const transport1 = this.game.tileMap.getItemByUid(-3)
+              const transport2 = this.game.tileMap.getItemByUid(-4)
+              if (transport1 != null && transport2 != null) {
+                const transport1Grid = transport1.getGridXY({ center: true })
+                const transport2Grid = transport2.getGridXY({ center: true })
+                return transport1Grid.gridX > 52 && transport1Grid.gridY < 18 && transport2Grid.gridX > 52 && transport2Grid.gridY < 18
+              }
               return false
             },
-            action: function () {
-              // singleplayer.endLevel(true)
+            action: () => {
+              this.game.endGame('Congratulations!')
             }
           }
 

@@ -293,7 +293,7 @@ export class StatusBar extends Container {
   }
 
   handleWheel = (e: FederatedWheelEvent): void => {
-    let nextPivot = this.messageList.pivot.y - e.deltaY / 10
+    let nextPivot = this.messageList.pivot.y + e.deltaY / 10
     const { maxPivot } = this
     if (nextPivot <= 0) {
       nextPivot = 0

@@ -315,7 +315,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   subLife (damage: number): void {
     this.life -= damage
     if (this.life <= 0) {
-      this.removeFromParent()
+      this.removeAndDestroy()
     } else {
       this.updateLife()
     }
@@ -485,6 +485,26 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           this.moveTo(this.orders.to)
         }
         break
+      }
+      case 'guard': {
+        if (this.orders.to.isDead()) {
+          if (this.orders.nextOrder != null) {
+            this.orders = this.orders.nextOrder
+          } else {
+            this.orders = { type: 'stand' }
+          }
+          return
+        }
+        if ((Math.pow(this.orders.to.x - this.x, 2) + Math.pow(this.orders.to.y - this.y, 2)) < Math.pow(this.sight - 2, 2)) {
+          const target = this.findTargetInSight(1)
+          if (target != null) {
+            this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+            return
+          }
+        } else {
+          const toGrid = this.orders.to.getGridXY({ center: true })
+          this.moveTo(toGrid)
+        }
       }
     }
     this.switchAnimation(this.vector.direction)
@@ -706,5 +726,10 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     }
     this.moveToLog++
     return true
+  }
+
+  removeAndDestroy (): void {
+    this.game.deselectItem(this)
+    this.removeFromParent()
   }
 }
