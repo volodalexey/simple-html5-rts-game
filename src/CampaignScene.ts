@@ -7,6 +7,7 @@ import { Team } from './common'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
+import { EMessageCharacter } from './StatusBar'
 
 interface IMissionItem {
   Constructor: typeof Base | typeof HeavyTank | typeof ScoutTank | typeof Transport
@@ -33,7 +34,7 @@ interface ITimedTrigger {
 interface IConditionalTrigger {
   type: 'conditional'
   action: () => void
-  condition: () => void
+  condition: () => boolean
 }
 
 interface IMission {
@@ -94,6 +95,20 @@ export class CampaignScene extends Container implements IScene {
 
   handleUpdate (deltaMS: number): void {
     this.game.handleUpdate(deltaMS)
+
+    const mission = this.missions[this.currentMission]
+    for (let i = 0; i < mission.triggers.length; i++) {
+      const trigger = mission.triggers[i]
+      if (trigger.type === 'timed' && this.game.time >= trigger.time) {
+        trigger.action()
+        mission.triggers.splice(i, 1)
+        i--
+      } else if (trigger.type === 'conditional') {
+        if (trigger.condition()) {
+          trigger.action()
+        }
+      }
+    }
   }
 
   startCurrentLevel (): void {
@@ -119,6 +134,12 @@ export class CampaignScene extends Container implements IScene {
     })
 
     this.game.cash = mission.cash.blue
+
+    this.game.showMessage({
+      character: EMessageCharacter.system,
+      message: `Mission: ${mission.name}`,
+      playSound: false
+    })
   }
 
   mountedHandler (): void {
@@ -154,29 +175,36 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: Transport, initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, selectable: false },
 
           /* Two damaged enemy scout-tanks patroling the area */
-          { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 20, orders: { type: 'patrol', from: { gridX: 34, gridY: 20 }, to: { gridX: 42, gridY: 25 } } },
-          { Constructor: ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 20, orders: { type: 'patrol', from: { gridX: 14, gridY: 0 }, to: { gridX: 14, gridY: 14 } } }
+          { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, orders: { type: 'patrol', from: { gridX: 34, gridY: 20 }, to: { gridX: 42, gridY: 25 } } },
+          { Constructor: ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 21, orders: { type: 'patrol', from: { gridX: 14, gridY: 0 }, to: { gridX: 14, gridY: 14 } } }
         ],
 
         triggers: [
           {
             type: 'timed',
             time: 3000,
-            action: function () {
-              // game.showMessage('op', "Commander!! We haven't heard from the last convoy in over two hours. They should have arrived by now.")
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: "Commander!! We haven't heard from the last convoy in over two hours. They should have arrived by now."
+              })
             }
           },
           {
             type: 'timed',
             time: 10000,
-            action: function () {
-              // game.showMessage('op', 'They were last seen in the North West Sector. Could you investigate?')
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'They were last seen in the North West Sector. Could you investigate?'
+              })
             }
           },
           {
             type: 'conditional',
             condition: function () {
               // return (isItemDead(-1) || isItemDead(-3) || isItemDead(-4))
+              return false
             },
             action: function () {
               // singleplayer.endLevel(false)
@@ -187,6 +215,7 @@ export class CampaignScene extends Container implements IScene {
             condition: function () {
               // Check if first enemy is dead
               // return isItemDead(-2)
+              return false
             },
             action: function () {
               // game.showMessage('op', 'The rebels have been getting very aggressive lately. I hope the convoy is safe. Find them and escort them back to the base.')
@@ -197,6 +226,7 @@ export class CampaignScene extends Container implements IScene {
             condition: function () {
               // const hero = game.getItemByUid(-1)
               // return (hero && hero.x < 30 && hero.y < 30)
+              return false
             },
             action: function () {
               // game.showMessage('driver', 'Can anyone hear us? Our convoy has been pinned down by rebel tanks. We need help.')
@@ -207,6 +237,7 @@ export class CampaignScene extends Container implements IScene {
             condition: function () {
               // const hero = game.getItemByUid(-1)
               // return (hero && hero.x < 10 && hero.y < 10)
+              return false
             },
             action: function () {
               // const hero = game.getItemByUid(-1)
@@ -220,6 +251,7 @@ export class CampaignScene extends Container implements IScene {
               // const transport1 = game.getItemByUid(-3)
               // const transport2 = game.getItemByUid(-4)
               // return (transport1 && transport2 && transport1.x > 52 && transport2.x > 52 && transport2.y < 18 && transport1.y < 18)
+              return false
             },
             action: function () {
               // singleplayer.endLevel(true)

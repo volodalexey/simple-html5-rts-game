@@ -1,5 +1,5 @@
 import { Container, type Spritesheet, type FederatedPointerEvent, Assets } from 'pixi.js'
-import { StatusBar } from './StatusBar'
+import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
 import { logLayout } from './logger'
@@ -164,6 +164,7 @@ export class Game extends Container {
     viewWidth: number
     viewHeight: number
   }): void {
+    this.statusBar.handleResize({ viewWidth, viewHeight })
     this.tileMap.handleResize({ viewWidth, viewHeight })
 
     const availableWidth = viewWidth
@@ -190,7 +191,7 @@ export class Game extends Container {
       return
     }
     this.time += deltaMS
-    this.statusBar.updateTime(this.time)
+    this.statusBar.handleUpdate(deltaMS)
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
   }
@@ -200,8 +201,6 @@ export class Game extends Container {
     this.tileMap.cleanFromAll()
 
     this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc })
-
-    this.statusBar.updateLevel(0)
   }
 
   clearSelection (): void {
@@ -373,6 +372,15 @@ export class Game extends Container {
         explodeTextures: animations['heatseeker-explode']
       }
     })
+
+    StatusBar.prepareTextures({
+      textures: {
+        girl1Texture: textures['character-girl1.png'],
+        girl2Texture: textures['character-girl2.png'],
+        man1Texture: textures['character-man1.png'],
+        systemTexture: textures['character-system.png']
+      }
+    })
   }
 
   // Receive command from singleplayer or multiplayer object and send it to units
@@ -399,5 +407,12 @@ export class Game extends Container {
         }
       }
     }
+  }
+
+  showMessage ({ character, message, playSound = true }: { character: EMessageCharacter, message: string, playSound?: boolean }): void {
+    if (playSound) {
+      AUDIO.play('message-received')
+    }
+    this.statusBar.appendMessage({ character, message, time: this.time })
   }
 }
