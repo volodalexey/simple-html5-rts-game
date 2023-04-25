@@ -4,7 +4,7 @@ import { type IMoveable } from '../interfaces/IMoveable'
 import { EVectorDirection, Vector } from '../Vector'
 import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
-import { findAngle, type BaseActiveItem, angleDiff, wrapDirection, checkCollision } from '../common'
+import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid } from '../common'
 import { logProjectileBounds } from '../logger'
 
 export interface IBaseProjectileTextures {
@@ -39,6 +39,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
   public vector = new Vector({ direction: EVectorDirection.down })
   public speed = 0
   public turnSpeed = 0
+  public moveTurning = false
   public hardCollision = false
   public colliding = false
   public lastMovementGridX = 0
@@ -275,13 +276,8 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
     if (this.turnSpeed > 0) {
       const destGrid = destination.getGridXY({ center: true })
       // Find out where we need to turn to get to destination
-      const newDirection = findAngle({
-        object: {
-          x: destGrid.gridX,
-          y: destGrid.gridY
-        },
-        unit: { x: thisGrid.gridX, y: thisGrid.gridY },
-        directions: this.vector.directions
+      const newDirection = findAngleGrid({
+        from: destGrid, to: thisGrid, directions: this.vector.directions
       })
       // Calculate difference between new direction and current direction
       const difference = angleDiff({

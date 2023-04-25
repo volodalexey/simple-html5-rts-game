@@ -208,7 +208,7 @@ export class CampaignScene extends Container implements IScene {
               return this.game.tileMap.isItemsDead([-1, -3, -4])
             },
             action: () => {
-              this.game.endGame('You lost vehicles')
+              this.game.endGame('Mission Failed.\n\nTry again?')
             }
           },
           {
@@ -275,7 +275,7 @@ export class CampaignScene extends Container implements IScene {
               return false
             },
             action: () => {
-              this.game.endGame('Congratulations!')
+              this.game.endGame('Mission Accomplished!')
             }
           }
 

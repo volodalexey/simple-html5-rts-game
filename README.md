@@ -2,7 +2,7 @@
 
 # [DEMO](https://volodalexey.github.io/simple-html5-rts-game/)
 
-Originally created by [Aditya Ravi Shankar](https://github.com/adityaravishankar) as [Last Colony](https://github.com/adityaravishankar/last-colony) in following book [Pro HTML5 Games](https://www.amazon.com/HTML5-Games-Experts-Voice-Development-ebook/dp/B00ACC6AT6).
+Originally created by [Aditya Ravi Shankar](https://github.com/adityaravishankar) as [Last Colony](https://github.com/adityaravishankar/last-colony) in following book [Pro HTML5 Games](https://www.amazon.com/HTML5-Games-Experts-Voice-Development-ebook/dp/B00ACC6AT6). Extended techniques in [this repo](https://github.com/cdk-king/lastColony).
 
 `src-tiled` folder refers to [Tiled Map Editor](https://www.mapeditor.org/download.html)
 

@@ -36,6 +36,7 @@ export class Game extends Container {
   public cash = 0
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
+  public speedAdjustmentWhileTurningFactor = 0.4
   public reloadAdjustmentFactor = 1 / 8
   public deployBuilding = false
   public canDeployBuilding = false

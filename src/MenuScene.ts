@@ -63,13 +63,13 @@ export class MenuScene extends Container implements IScene {
     })
     this.choices.addChild(campaignButton)
 
-    const multiplayerButton = new Button({
-      text: 'Multiplayer',
+    const vsCPUButton = new Button({
+      text: 'Versus CPU',
       onClick: this.goToMultiplayerScene,
       ...style
     })
-    this.choices.addChild(multiplayerButton)
-    multiplayerButton.position.set(0, campaignButton.height)
+    this.choices.addChild(vsCPUButton)
+    vsCPUButton.position.set(0, campaignButton.height)
   }
 
   handleResize ({ viewWidth, viewHeight }: {

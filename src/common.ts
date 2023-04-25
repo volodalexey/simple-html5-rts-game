@@ -28,13 +28,31 @@ export function wrapDirection ({ direction, directions }: { direction: number, d
  * Finds the angle between two objects in terms of a direction (where 0 <= angle < directions)
  */
 export function findAngle ({
-  object, unit, directions
+  from, to, directions
 }: {
-  object: { x: number, y: number }
-  unit: { x: number, y: number }
-  directions: EVectorDirection }): EVectorDirection {
-  const dy = (object.y) - (unit.y)
-  const dx = (object.x) - (unit.x)
+  from: { x: number, y: number }
+  to: { x: number, y: number }
+  directions: EVectorDirection
+}): EVectorDirection {
+  const dy = (from.y) - (to.y)
+  const dx = (from.x) - (to.x)
+  // Convert Arctan to value between (0 - directions)
+  const angle = wrapDirection({
+    direction: directions / 2 - (Math.atan2(dx, dy) * directions / (2 * Math.PI)),
+    directions
+  })
+  return angle
+}
+
+export function findAngleGrid ({
+  from, to, directions
+}: {
+  from: { gridX: number, gridY: number }
+  to: { gridX: number, gridY: number }
+  directions: EVectorDirection
+}): EVectorDirection {
+  const dy = from.gridY - to.gridY
+  const dx = from.gridX - to.gridX
   // Convert Arctan to value between (0 - directions)
   const angle = wrapDirection({
     direction: directions / 2 - (Math.atan2(dx, dy) * directions / (2 * Math.PI)),

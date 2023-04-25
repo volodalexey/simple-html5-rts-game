@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
-import { type Team } from '../common'
+import { type BaseActiveItem, type Team } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { EItemType, type IItem } from '../interfaces/IItem'
@@ -7,6 +7,8 @@ import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logBuildingBounds } from '../logger'
+import { type IAttackable } from '../interfaces/IAttackable'
+import { type Bullet } from '../projectiles/Bullet'
 
 export interface IBaseBuildingTextures {
   healthyTextures: Texture[]
@@ -26,7 +28,7 @@ export interface IBaseBuildingOptions {
   orders?: IOrder
 }
 
-export class BaseBuilding extends Container implements IItem, ISelectable, ILifeable {
+export class BaseBuilding extends Container implements IItem, ISelectable, ILifeable, IAttackable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Container()
@@ -64,10 +66,17 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   public passableGrid: number[][] = []
 
   public orders: IOrder
-  public sight = 3
   public hitPoints = 0
   public life = 0
+
+  public sight = 0
+  public radius = 0
+  public canAttack = false
+  public canAttackLand = false
+  public canAttackAir = false
   public cost = 0
+  public reloadTimeLeft = 0
+  public Projectile!: typeof Bullet
 
   public game: Game
   public uid?: number
@@ -283,6 +292,39 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
 
   handleUpdate (deltaMS: number): void {
     this.processOrders()
+  }
+
+  isValidTarget (item: BaseActiveItem): boolean {
+    return item.team !== this.team &&
+      (
+        (this.canAttackLand && (item.type === EItemType.buildings || item.type === EItemType.vehicles)) ||
+        (this.canAttackAir && (item.type === EItemType.aircraft))
+      )
+  }
+
+  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
+    const thisGrid = this.getGridXY()
+    const targetsByDistance: Record<string, BaseActiveItem[]> = {}
+    const items = this.game.tileMap.activeItems
+    for (let i = items.length - 1; i >= 0; i--) {
+      const item = items[i]
+      if (this.isValidTarget(item)) {
+        const itemGrid = item.getGridXY()
+        const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
+        if (distance < Math.pow(this.sight + addSight, 2)) {
+          if (!Array.isArray(targetsByDistance[distance])) {
+            targetsByDistance[distance] = []
+          }
+          targetsByDistance[distance].push(item)
+        }
+      }
+    }
+
+    // Sort targets based on distance from attacker
+    const targetKeys = Object.keys(targetsByDistance).map(Number).sort((a, b) => a - b)
+    const targets = targetKeys.map(key => targetsByDistance[key]).flat()
+
+    return targets[0]
   }
 }
 
