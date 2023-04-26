@@ -18,6 +18,7 @@ interface IMissionItem {
   uid?: number
   life?: number
   selectable?: boolean
+  ordersable?: boolean
   orders?: {
     type: 'patrol'
     from: { gridX: number, gridY: number }
@@ -121,17 +122,12 @@ export class CampaignScene extends Container implements IScene {
     this.game.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
     this.game.camera.goTo({ x: mission.startGridX * this.game.tileMap.gridSize, y: mission.startGridY * this.game.tileMap.gridSize })
 
-    mission.items.forEach(({ Constructor, initGridX, initGridY, team, direction, uid, life, selectable, orders }) => {
+    mission.items.forEach(({ Constructor, initGridX, initGridY, ...rest }) => {
       this.game.tileMap.addItem(new Constructor({
         game: this.game,
         initX: this.game.tileMap.gridSize * initGridX,
         initY: this.game.tileMap.gridSize * initGridY,
-        team,
-        uid,
-        direction,
-        life,
-        selectable,
-        orders
+        ...rest
       }))
     })
 
@@ -171,13 +167,10 @@ export class CampaignScene extends Container implements IScene {
 
           /* Player heavy tank */
           { Constructor: HeavyTank, initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
-          { Constructor: HeavyTank, initGridX: 58, initGridY: 15, direction: EVectorDirection.downRight, team: Team.blue, uid: -20 },
-          { Constructor: ScoutTank, initGridX: 58, initGridY: 20, direction: EVectorDirection.downRight, team: Team.blue, uid: -30 },
-          { Constructor: ScoutTank, initGridX: 58, initGridY: 22, direction: EVectorDirection.downRight, team: Team.blue, uid: -40 },
 
           /* Two transport vehicles waiting just outside the visible map */
-          { Constructor: Transport, initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, selectable: false },
-          { Constructor: Transport, initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, selectable: false },
+          { Constructor: Transport, initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, ordersable: false },
+          { Constructor: Transport, initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, ordersable: false },
 
           /* Two damaged enemy scout-tanks patroling the area */
           { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, orders: { type: 'patrol', from: { gridX: 34, gridY: 20 }, to: { gridX: 42, gridY: 25 } } },

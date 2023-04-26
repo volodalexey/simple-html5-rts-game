@@ -17,6 +17,7 @@ export class HeavyTank extends BaseVehicle {
     radius: 13,
     strokeWidth: 2,
     strokeColor: 0,
+    strokeSecondColor: 0xffffff,
     offset: {
       x: 1,
       y: 1
@@ -54,7 +55,7 @@ export class HeavyTank extends BaseVehicle {
       textures: options.team === Team.blue ? HeavyTank.blueTextures : HeavyTank.greenTextures
     })
     this.life = options.life ?? this.hitPoints
-    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()

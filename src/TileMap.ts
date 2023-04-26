@@ -5,7 +5,7 @@ import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
 import { BaseBuilding } from './buildings/BaseBuilding'
 import { BaseVehicle } from './vehicles/BaseVehicle'
-import { type BaseActiveItem, type BaseItem } from './common'
+import { type BaseMoveableItem, type BaseActiveItem, type BaseItem } from './common'
 import { BaseProjectile } from './projectiles/BaseProjectile'
 import { type Order } from './Order'
 
@@ -177,6 +177,10 @@ export class TileMap extends Container {
     return [...this.buildings.children, ...this.vehicles.children]
   }
 
+  get moveableItems (): BaseMoveableItem[] {
+    return [...this.vehicles.children]
+  }
+
   get allItems (): BaseItem[] {
     return [...this.buildings.children, ...this.vehicles.children, ...this.projectiles.children]
   }
@@ -185,27 +189,13 @@ export class TileMap extends Container {
     // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
     //   return;
     // }
-    const foundItem = this.activeItems.find(activeItem => {
+    return this.activeItems.find(activeItem => {
       const itemBounds = activeItem.getSelectionBounds()
       if (activeItem.isAlive() &&
         point.x >= itemBounds.left &&
         point.x <= itemBounds.right &&
         point.y >= itemBounds.top &&
         point.y <= itemBounds.bottom
-      ) {
-        return true
-      }
-      return false
-    })
-    if (foundItem != null) {
-      return foundItem
-    }
-    return this.buildings.children.find(building => {
-      if (building.isAlive() &&
-        point.x >= building.x &&
-        point.x <= building.x + building.width &&
-        point.y >= building.y &&
-        point.y <= building.y + building.height
       ) {
         return true
       }

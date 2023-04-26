@@ -22,6 +22,10 @@ export class Order extends Graphics {
         return 0x00ff00
       case 'attack':
         return 0xff0000
+      case 'patrol':
+        return 0xffff00
+      case 'guard':
+        return 0x0000ff
       default:
         return 0xffffff
     }
@@ -33,14 +37,27 @@ export class Order extends Graphics {
         return 0x00ff00
       case 'attack':
         return 0xff0000
+      case 'patrol':
+        return 0x00ffff
+      case 'guard':
+        return 0x0000ff
       default:
         return 0xffffff
     }
   }
 
+  getFromRadius (type: IOrder['type']): number {
+    switch (type) {
+      case 'patrol':
+        return 3
+      default:
+        return 0
+    }
+  }
+
   getDestinationRadius (type: IOrder['type']): number {
     switch (type) {
-      case 'attack':
+      case 'attack': case 'guard':
         return 15
       default:
         return 3
@@ -57,13 +74,18 @@ export class Order extends Graphics {
         to = { x: selectedItem.orders.to.gridX * tileMap.gridSize, y: selectedItem.orders.to.gridY * tileMap.gridSize }
         break
       }
-      case 'attack': {
+      case 'attack': case 'guard': {
         const toTarget = selectedItem.orders.toUid != null ? tileMap.getItemByUid(selectedItem.orders.toUid) : selectedItem.orders.to
         if (toTarget != null) {
           const toGrid = toTarget.getSelectionPosition({ center: true })
           from = selectedItemPosition
           to = toGrid
         }
+        break
+      }
+      case 'patrol': {
+        from = { x: selectedItem.orders.from.gridX * tileMap.gridSize, y: selectedItem.orders.from.gridY * tileMap.gridSize }
+        to = { x: selectedItem.orders.to.gridX * tileMap.gridSize, y: selectedItem.orders.to.gridY * tileMap.gridSize }
         break
       }
     }
@@ -80,6 +102,7 @@ export class Order extends Graphics {
       width: lineWidth,
       color: this.getLineColor(type)
     })
+    this.drawCircle(from.x, from.y, this.getFromRadius(type))
 
     const len = Math.hypot(to.x - from.x, to.y - from.y)
     const norm = { x: (to.x - from.x) / len, y: (to.y - from.y) / len }
@@ -96,6 +119,10 @@ export class Order extends Graphics {
         progress += gap
       }
     }
+    this.lineStyle({
+      width: lineWidth,
+      color: this.getDestinationColor(type)
+    })
     this.drawCircle(to.x, to.y, this.getDestinationRadius(type))
     this.endFill()
     this.alpha = 0.5

@@ -33,6 +33,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
 
   public game: Game
   public type = EItemType.bullets
+  public ordersable = true
   public range = 0
   public damage = 0
   public distanceTravelled = 0

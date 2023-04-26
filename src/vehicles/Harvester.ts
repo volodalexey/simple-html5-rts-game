@@ -16,6 +16,7 @@ export class Harvester extends BaseVehicle {
     radius: 10,
     strokeWidth: 2,
     strokeColor: 0,
+    strokeSecondColor: 0xffffff,
     offset: {
       x: -1,
       y: -2
@@ -49,7 +50,7 @@ export class Harvester extends BaseVehicle {
       textures: options.team === Team.blue ? Harvester.blueTextures : Harvester.greenTextures
     })
     this.life = options.life ?? this.hitPoints
-    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()

@@ -16,6 +16,7 @@ export class Transport extends BaseVehicle {
     radius: 15,
     strokeWidth: 2,
     strokeColor: 0xffff00,
+    strokeSecondColor: 0xffffff,
     offset: {
       x: -2,
       y: -2
@@ -49,7 +50,7 @@ export class Transport extends BaseVehicle {
       textures: options.team === Team.blue ? Transport.blueTextures : Transport.greenTextures
     })
     this.life = options.life ?? this.hitPoints
-    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()

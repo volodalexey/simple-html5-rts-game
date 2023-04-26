@@ -38,6 +38,7 @@ export interface IBaseVehicleOptions {
   direction?: EVectorDirection
   life?: number
   selectable?: boolean
+  ordersable?: boolean
   orders?: IOrder
 }
 
@@ -57,6 +58,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     radius: 0,
     strokeWidth: 0,
     strokeColor: 0,
+    strokeSecondColor: 0,
     offset: {
       x: 0,
       y: 0
@@ -80,6 +82,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public game: Game
   public uid?: number
   public type = EItemType.vehicles
+  public ordersable = true
   public hitPoints = 0
   public life = 0
   public lifeBar!: LifeBar
@@ -125,6 +128,9 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     }
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
+    }
+    if (typeof options.ordersable === 'boolean') {
+      this.ordersable = options.ordersable
     }
   }
 
@@ -281,16 +287,21 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   }
 
   drawSelection (): void {
-    const { offset, strokeWidth, strokeColor, radius } = this.drawSelectionOptions
+    const { offset, strokeWidth, strokeColor, strokeSecondColor, radius } = this.drawSelectionOptions
     this.selectedGraphics.position.set(offset.x, offset.y)
     const selection = new Graphics()
     this.selectedGraphics.addChild(selection)
-    selection.beginFill(strokeColor)
-    selection.drawCircle(radius + strokeWidth, radius + strokeWidth, radius + strokeWidth)
-    selection.endFill()
-    selection.beginHole()
-    selection.drawCircle(radius + strokeWidth, radius + strokeWidth, radius)
-    selection.endHole()
+    const segmentsCount = 8
+    const segment = Math.PI * 2 / segmentsCount
+    const cx = radius + strokeWidth
+    const cy = radius + strokeWidth
+    for (let i = 0; i < segmentsCount; i++) {
+      selection.beginFill(i % 2 === 0 ? strokeColor : strokeSecondColor)
+      selection.moveTo(cx, cy)
+      selection.arc(cx, cy, radius + strokeWidth, segment * i, segment * (i + 1))
+      selection.lineTo(cx, cy)
+      selection.endFill()
+    }
     this.selectedGraphics.alpha = 0
   }
 
@@ -464,8 +475,9 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           const toGrid = this.orders.to.getGridXY()
           const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
           const moving = this.moveTo(toGrid, distanceFromDestinationSquared)
-          // Pathfinding couldn't find a path so stop
           if (!moving) {
+            // Pathfinding couldn't find a path so stop
+            // e.g. enemy is in hard collide state
             this.orders = { type: 'stand' }
             return
           }

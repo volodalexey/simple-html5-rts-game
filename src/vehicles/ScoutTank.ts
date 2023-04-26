@@ -17,6 +17,7 @@ export class ScoutTank extends BaseVehicle {
     radius: 11,
     strokeWidth: 2,
     strokeColor: 0,
+    strokeSecondColor: 0xffffff,
     offset: {
       x: -2,
       y: -2
@@ -54,7 +55,7 @@ export class ScoutTank extends BaseVehicle {
       textures: options.team === Team.blue ? ScoutTank.blueTextures : ScoutTank.greenTextures
     })
     this.life = options.life ?? this.hitPoints
-    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
+    this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()

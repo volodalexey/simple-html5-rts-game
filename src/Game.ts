@@ -112,9 +112,9 @@ export class Game extends Container {
         if (Math.abs(e.globalX - previousPointerTapEvent.globalX) < 10 && Math.abs(e.globalY - previousPointerTapEvent.globalY) < 10) {
           logPointerEvent('Game pointerdoubletap')
           this.clearSelection()
-          const { activeItems } = this.tileMap
-          for (let i = 0; i < activeItems.length; i++) {
-            const item = activeItems[i]
+          const { moveableItems } = this.tileMap
+          for (let i = 0; i < moveableItems.length; i++) {
+            const item = moveableItems[i]
             if (underPointerItem.constructor === item.constructor && item.team === underPointerItem.team) {
               // select all the same items include under pointer item
               this.selectItem(item, false)
@@ -126,18 +126,19 @@ export class Game extends Container {
     }
     const uids: number[] = []
     if (underPointerItem != null) {
-      if (underPointerItem.team === this.team) {
+      const teamItemsCount = this.selectedItems.filter(si => si.team === this.team).length
+      if (teamItemsCount === 0 || underPointerItem.team === this.team) {
         // Pressing shift adds to existing selection. If shift is not pressed, clear existing selection
         if (!e.shiftKey) {
           this.clearSelection()
         }
         this.selectItem(underPointerItem, e.shiftKey)
       } else if (underPointerItem.type !== EItemType.terrain) {
-        // Player right clicked on an enemy item
+        // Player clicked on an enemy item
         // identify selected items from players team that can attack
         for (let i = this.selectedItems.length - 1; i >= 0; i--) {
           const item = this.selectedItems[i]
-          if (item.team === this.team && (item as unknown as IAttackable).canAttack) {
+          if (item.team === this.team && item.ordersable && (item as unknown as IAttackable).canAttack) {
             if (item.uid != null) {
               uids.push(item.uid)
             }
@@ -150,11 +151,11 @@ export class Game extends Container {
         }
       }
     } else {
-      // Player right clicked on the ground
+      // Player clicked on the ground
       // identify selected items from players team that can move
       for (let i = this.selectedItems.length - 1; i >= 0; i--) {
         const item = this.selectedItems[i]
-        if (item.team === this.team && (item.type === EItemType.vehicles || item.type === EItemType.aircraft)) {
+        if (item.team === this.team && item.ordersable && (item.type === EItemType.vehicles || item.type === EItemType.aircraft)) {
           if (item.uid != null) {
             uids.push(item.uid)
           }
@@ -191,7 +192,9 @@ export class Game extends Container {
     if (this.dragSelect.width === 0) {
       this.handlePointerTap(e)
     } else {
-      this.clearSelection()
+      if (!e.shiftKey) {
+        this.clearSelection()
+      }
       const dragSelectBounds = this.dragSelect.getBounds()
       const startPoint = this.tileMap.toLocal({ x: dragSelectBounds.left, y: dragSelectBounds.top })
       const endPoint = this.tileMap.toLocal({ x: dragSelectBounds.right, y: dragSelectBounds.bottom })
@@ -199,33 +202,20 @@ export class Game extends Container {
       const right = endPoint.x
       const top = startPoint.y
       const bottom = endPoint.y
-      const { activeItems } = this.tileMap
-      const toSelectItems = activeItems.filter((activeItem) => {
-        if (!activeItem.selectable || activeItem.isDead()) {
-          return false
+      const { moveableItems } = this.tileMap
+      moveableItems.forEach((moveableItem) => {
+        if (!moveableItem.selectable || moveableItem.isDead()) {
+          return
         }
 
-        const itemBounds = activeItem.getSelectionBounds()
+        const itemBounds = moveableItem.getSelectionBounds()
 
         if (itemBounds.left >= left &&
           itemBounds.right <= right &&
           itemBounds.top >= top &&
           itemBounds.bottom <= bottom
         ) {
-          return true
-        }
-        return false
-      })
-      const enemyItemsCount = toSelectItems.filter(item => item.team !== this.team).length
-      toSelectItems.forEach(item => {
-        if (enemyItemsCount > 0 && enemyItemsCount !== toSelectItems.length) {
-          if (item.team === this.team) {
-            // if at leat one enemy item is selection => select only ours items
-            this.selectItem(item, true)
-          }
-        } else {
-          // otherwise select all our items
-          this.selectItem(item, true)
+          this.selectItem(moveableItem, true)
         }
       })
     }

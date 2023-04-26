@@ -25,6 +25,7 @@ export interface IBaseBuildingOptions {
   textures: IBaseBuildingTextures
   life?: number
   selectable?: boolean
+  ordersable?: boolean
   orders?: IOrder
 }
 
@@ -81,6 +82,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   public game: Game
   public uid?: number
   public type = EItemType.buildings
+  public ordersable = true
   public team: Team
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite
@@ -101,6 +103,9 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     }
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
+    }
+    if (typeof options.ordersable === 'boolean') {
+      this.ordersable = options.ordersable
     }
     this.setup(options)
 
@@ -139,16 +144,13 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   }
 
   drawSelection (): void {
-    const { offset, strokeWidth, strokeColor, width, height } = this.drawSelectionOptions
+    const { offset, strokeColor, width, height } = this.drawSelectionOptions
     this.selectedGraphics.position.set(offset.x, offset.y)
     const selection = new Graphics()
     this.selectedGraphics.addChild(selection)
     selection.beginFill(strokeColor)
     selection.drawRect(0, 0, width, height)
     selection.endFill()
-    selection.beginHole()
-    selection.drawRect(strokeWidth, strokeWidth, width - strokeWidth * 2, height - strokeWidth * 2)
-    selection.endHole()
     this.selectedGraphics.alpha = 0
   }
 

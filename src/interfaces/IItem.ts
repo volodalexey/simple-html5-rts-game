@@ -11,6 +11,7 @@ export enum EItemType {
 export interface IItem {
   uid?: number
   type: EItemType
+  ordersable: boolean
   getGridXY: () => { gridX: number, gridY: number }
   setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
   setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
