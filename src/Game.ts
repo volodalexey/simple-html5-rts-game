@@ -1,8 +1,8 @@
-import { Container, type Spritesheet, type FederatedPointerEvent, Assets } from 'pixi.js'
+import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphics, type IPointData } from 'pixi.js'
 import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
-import { logLayout } from './logger'
+import { logLayout, logPointerEvent } from './logger'
 import { type SelectableItem, type Team } from './common'
 import { Base } from './buildings/Base'
 import { Harvester } from './vehicles/Harvester'
@@ -45,6 +45,19 @@ export class Game extends Container {
   public statusBar!: StatusBar
   public camera!: Camera
   public selectedItems: SelectableItem[] = []
+  public dragSelectThreshold = 5
+  public dragSelect = new Graphics()
+  public doubleTapMaxTime = 300
+  public pointerDownX = -1
+  public pointerDownY = -1
+  public previousPointerTapEvent?: {
+    type: FederatedPointerEvent['pointerType']
+    pointerId: FederatedPointerEvent['pointerId']
+    pointerType: FederatedPointerEvent['pointerType']
+    timeStamp: FederatedPointerEvent['timeStamp']
+    globalX: FederatedPointerEvent['globalX']
+    globalY: FederatedPointerEvent['globalY']
+  }
 
   constructor (options: IGameOptions) {
     super()
@@ -67,6 +80,7 @@ export class Game extends Container {
       viewHeight
     })
     this.addChild(this.tileMap)
+    this.addChild(this.dragSelect)
 
     this.statusBar = new StatusBar()
     this.addChild(this.statusBar)
@@ -76,12 +90,40 @@ export class Game extends Container {
 
   addEventLesteners (): void {
     this.tileMap.interactive = true
-    this.tileMap.on('pointertap', this.handlePointerTap)
+    this.tileMap.on('pointerdown', this.handlePointerDown)
+    this.tileMap.on('pointerup', this.handlePointerUp)
+    this.tileMap.on('pointermove', this.handlePointerMove)
+    this.tileMap.on('pointerleave', this.handlePointerLeave)
   }
 
   handlePointerTap = (e: FederatedPointerEvent): void => {
+    logPointerEvent('Game pointertap')
+    if (this.gameEnded) {
+      return
+    }
     const point = this.tileMap.toLocal(e)
     const underPointerItem = this.tileMap.itemUnderPointer(point)
+    const { previousPointerTapEvent } = this
+    if (previousPointerTapEvent != null && underPointerItem != null &&
+      (underPointerItem.type === EItemType.vehicles || underPointerItem.type === EItemType.aircraft)) {
+      const isPreviousMouse = previousPointerTapEvent.pointerType === 'mouse' && e.pointerType === 'mouse' && previousPointerTapEvent.pointerId === e.pointerId
+      const isPreviousTouch = previousPointerTapEvent.pointerType === 'touch' && e.pointerType === 'touch' && previousPointerTapEvent.pointerId + 1 === e.pointerId
+      if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < this.doubleTapMaxTime) {
+        if (Math.abs(e.globalX - previousPointerTapEvent.globalX) < 10 && Math.abs(e.globalY - previousPointerTapEvent.globalY) < 10) {
+          logPointerEvent('Game pointerdoubletap')
+          this.clearSelection()
+          const { activeItems } = this.tileMap
+          for (let i = 0; i < activeItems.length; i++) {
+            const item = activeItems[i]
+            if (underPointerItem.constructor === item.constructor && item.team === underPointerItem.team) {
+              // select all the same items include under pointer item
+              this.selectItem(item, false)
+            }
+          }
+          return
+        }
+      }
+    }
     const uids: number[] = []
     if (underPointerItem != null) {
       if (underPointerItem.team === this.team) {
@@ -124,6 +166,102 @@ export class Game extends Container {
         this.processCommand(uids, { type: 'move', to: { gridX: point.x / gridSize, gridY: point.y / gridSize }, collisionCount: 0 })
         AUDIO.play('acknowledge-moving')
       }
+    }
+
+    this.previousPointerTapEvent = {
+      type: e.type,
+      pointerId: e.pointerId,
+      pointerType: e.pointerType,
+      timeStamp: e.timeStamp,
+      globalX: e.globalX,
+      globalY: e.globalY
+    }
+  }
+
+  handlePointerDown = (e: FederatedPointerEvent): void => {
+    const localPosition = this.toLocal(e)
+    this.pointerDownX = localPosition.x
+    this.pointerDownY = localPosition.y
+    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} down`)
+  }
+
+  handlePointerUp = (e: FederatedPointerEvent): void => {
+    this.pointerDownX = this.pointerDownY = -1
+    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} up`)
+    if (this.dragSelect.width === 0) {
+      this.handlePointerTap(e)
+    } else {
+      this.clearSelection()
+      const dragSelectBounds = this.dragSelect.getBounds()
+      const startPoint = this.tileMap.toLocal({ x: dragSelectBounds.left, y: dragSelectBounds.top })
+      const endPoint = this.tileMap.toLocal({ x: dragSelectBounds.right, y: dragSelectBounds.bottom })
+      const left = startPoint.x
+      const right = endPoint.x
+      const top = startPoint.y
+      const bottom = endPoint.y
+      const { activeItems } = this.tileMap
+      const toSelectItems = activeItems.filter((activeItem) => {
+        if (!activeItem.selectable || activeItem.isDead()) {
+          return false
+        }
+
+        const itemBounds = activeItem.getSelectionBounds()
+
+        if (itemBounds.left >= left &&
+          itemBounds.right <= right &&
+          itemBounds.top >= top &&
+          itemBounds.bottom <= bottom
+        ) {
+          return true
+        }
+        return false
+      })
+      const enemyItemsCount = toSelectItems.filter(item => item.team !== this.team).length
+      toSelectItems.forEach(item => {
+        if (enemyItemsCount > 0 && enemyItemsCount !== toSelectItems.length) {
+          if (item.team === this.team) {
+            // if at leat one enemy item is selection => select only ours items
+            this.selectItem(item, true)
+          }
+        } else {
+          // otherwise select all our items
+          this.selectItem(item, true)
+        }
+      })
+    }
+    this.dragSelect.clear()
+  }
+
+  handlePointerLeave = (): void => {
+    this.pointerDownX = this.pointerDownY = -1
+    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} leave`)
+    this.dragSelect.clear()
+  }
+
+  handlePointerMove = (e: FederatedPointerEvent): void => {
+    const localPosition = this.toLocal(e)
+    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} mX=${e.x} mY=${e.y}`)
+    if (this.pointerDownX > -1 && this.pointerDownY > -1 &&
+      Math.abs(localPosition.x - this.pointerDownX) > this.dragSelectThreshold &&
+      Math.abs(localPosition.y - this.pointerDownY) > this.dragSelectThreshold) {
+      this.drawDragSelect(localPosition)
+    }
+  }
+
+  drawDragSelect (currentPosition: IPointData): void {
+    this.dragSelect.clear()
+    const width = Math.abs(currentPosition.x - this.pointerDownX)
+    const height = Math.abs(currentPosition.y - this.pointerDownY)
+    if (width > 0 && height > 0) {
+      this.dragSelect.lineStyle({
+        width: 1,
+        color: 0xffff00
+      })
+      const x = Math.min(currentPosition.x, this.pointerDownX)
+      const y = Math.min(currentPosition.y, this.pointerDownY)
+      this.dragSelect.position.set(x, y)
+      this.dragSelect.drawRect(0, 0, width, height)
+      this.dragSelect.endFill()
     }
   }
 

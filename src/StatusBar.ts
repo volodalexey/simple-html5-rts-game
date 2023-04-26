@@ -264,21 +264,21 @@ export class StatusBar extends Container {
 
   handlePointerDown = (): void => {
     this.pointerDown = true
-    logPointerEvent(`this.pointerDown=${this.pointerDown}`)
+    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} down`)
   }
 
   handlePointerUp = (): void => {
     this.pointerDown = false
-    logPointerEvent(`this.pointerDown=${this.pointerDown}`)
+    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} up`)
   }
 
   handlePointerLeave = (): void => {
     this.pointerDown = false
-    logPointerEvent(`this.pointerDown=${this.pointerDown}`)
+    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} leave`)
   }
 
   handlePointerMove = (e: FederatedPointerEvent): void => {
-    logPointerEvent(`handlePointerMove() this.pointerDown=${this.pointerDown}`)
+    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} move`)
     if (this.pointerDown) {
       logPointerEvent(`e.movementY=${e.movementY}`)
       let nextPivot = this.messageList.pivot.y - e.movementY

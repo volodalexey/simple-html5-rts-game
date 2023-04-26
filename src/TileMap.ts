@@ -185,19 +185,20 @@ export class TileMap extends Container {
     // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
     //   return;
     // }
-    const vehicle = this.vehicles.children.find(vehicle => {
-      if (vehicle.isAlive() &&
-        point.x >= vehicle.x &&
-        point.x <= vehicle.x + vehicle.width &&
-        point.y >= vehicle.y &&
-        point.y <= vehicle.y + vehicle.height
+    const foundItem = this.activeItems.find(activeItem => {
+      const itemBounds = activeItem.getSelectionBounds()
+      if (activeItem.isAlive() &&
+        point.x >= itemBounds.left &&
+        point.x <= itemBounds.right &&
+        point.y >= itemBounds.top &&
+        point.y <= itemBounds.bottom
       ) {
         return true
       }
       return false
     })
-    if (vehicle != null) {
-      return vehicle
+    if (foundItem != null) {
+      return foundItem
     }
     return this.buildings.children.find(building => {
       if (building.isAlive() &&
