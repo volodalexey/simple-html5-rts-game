@@ -7,6 +7,7 @@ import { BaseBuilding } from './buildings/BaseBuilding'
 import { BaseVehicle } from './vehicles/BaseVehicle'
 import { type BaseActiveItem, type BaseItem } from './common'
 import { BaseProjectile } from './projectiles/BaseProjectile'
+import { type Order } from './Order'
 
 export interface ITileMapOptions {
   viewWidth: number
@@ -29,6 +30,7 @@ export class TileMap extends Container {
   public hitboxes = new Container<Hitbox>()
   public buildings = new Container<BaseBuilding>()
   public vehicles = new Container<BaseVehicle>()
+  public orders = new Container<Order>()
   public projectiles = new Container<BaseProjectile>()
   public background = new Sprite()
   public viewWidth!: number
@@ -46,6 +48,7 @@ export class TileMap extends Container {
     this.addChild(this.background)
     this.addChild(this.hitboxes)
     this.addChild(this.buildings)
+    this.addChild(this.orders)
     this.addChild(this.vehicles)
     this.addChild(this.projectiles)
   }
@@ -138,6 +141,18 @@ export class TileMap extends Container {
   cleanFromAll (): void {
     while (this.hitboxes.children[0] != null) {
       this.hitboxes.children[0].removeFromParent()
+    }
+    while (this.vehicles.children[0] != null) {
+      this.vehicles.children[0].removeFromParent()
+    }
+    while (this.buildings.children[0] != null) {
+      this.buildings.children[0].removeFromParent()
+    }
+    while (this.projectiles.children[0] != null) {
+      this.projectiles.children[0].removeFromParent()
+    }
+    while (this.orders.children[0] != null) {
+      this.orders.children[0].removeFromParent()
     }
   }
 

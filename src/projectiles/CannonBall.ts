@@ -11,7 +11,7 @@ export class CannonBall extends BaseProjectile {
   static reloadTime = 40
 
   public speed = 60
-  public range = 6
+  public range = 11
   public damage = 20
 
   constructor (options: ICannonBallOptions) {

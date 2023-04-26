@@ -39,7 +39,7 @@ export class HeavyTank extends BaseVehicle {
 
   public radius = 13
   public speed = 15
-  public sight = 5
+  public sight = 10
   public cost = 1200
   public hitPoints = 50
   public turnSpeed = 4

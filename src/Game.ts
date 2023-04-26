@@ -3,14 +3,13 @@ import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
 import { logLayout } from './logger'
-import { type ISelectable } from './interfaces/ISelectable'
-import { type Team } from './common'
+import { type SelectableItem, type Team } from './common'
 import { Base } from './buildings/Base'
 import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
-import { EItemType, type IItem } from './interfaces/IItem'
+import { EItemType } from './interfaces/IItem'
 import { type IAttackable } from './interfaces/IAttackable'
 import { type IOrder } from './interfaces/IOrder'
 import { AUDIO } from './audio'
@@ -18,6 +17,7 @@ import { Bullet } from './projectiles/Bullet'
 import { CannonBall } from './projectiles/CannonBall'
 import { Laser } from './projectiles/Laser'
 import { Rocket } from './projectiles/HeatSeeker'
+import { Order } from './Order'
 
 export interface IGameOptions {
   viewWidth: number
@@ -25,8 +25,6 @@ export interface IGameOptions {
   type: 'campaign' | 'singleplayer' | 'multiplayer'
   team: Team
 }
-
-type SelectableItem = ISelectable & IItem
 
 export class Game extends Container {
   public gameEnded = false
@@ -149,7 +147,11 @@ export class Game extends Container {
   deselectItem (item: SelectableItem): void {
     const selectedIdx = this.selectedItems.indexOf(item)
     if (selectedIdx > -1) {
-      this.selectedItems.splice(selectedIdx, 1)
+      const selectedItem = this.selectedItems.splice(selectedIdx, 1)[0]
+      const order = this.tileMap.orders.children.find(o => o.item === selectedItem)
+      if (order != null) {
+        order.removeFromParent()
+      }
     }
     item.setSelected(false)
   }
@@ -198,6 +200,24 @@ export class Game extends Container {
     this.statusBar.handleUpdate(deltaMS)
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
+
+    this.drawOrders()
+  }
+
+  drawOrders (): void {
+    this.selectedItems.forEach(selectedItem => {
+      if (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.aircraft) {
+        let order = this.tileMap.orders.children.find(o => o.item === selectedItem)
+        if (order == null) {
+          order = new Order({ item: selectedItem })
+          this.tileMap.orders.addChild(order)
+        }
+        order.drawOrderLine({
+          selectedItem,
+          tileMap: this.tileMap
+        })
+      }
+    })
   }
 
   runLevel ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void {
@@ -208,8 +228,10 @@ export class Game extends Container {
   }
 
   clearSelection (): void {
-    while (this.selectedItems.length > 0) {
-      this.selectedItems.pop()?.setSelected(false)
+    for (let i = 0; i < this.selectedItems.length; i++) {
+      const selectedItem = this.selectedItems[i]
+      this.deselectItem(selectedItem)
+      i--
     }
   }
 

@@ -19,6 +19,6 @@ export interface ISelectable {
 
   selectedGraphics: Container
   setSelected: (selected: boolean) => void
-  getSelectionPosition: () => { x: number, y: number }
+  getSelectionPosition: (options: { center?: boolean }) => { x: number, y: number }
   getSelectionBounds: () => { top: number, right: number, bottom: number, left: number }
 }
