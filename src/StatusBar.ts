@@ -302,4 +302,12 @@ export class StatusBar extends Container {
     }
     this.messageList.pivot.y = nextPivot
   }
+
+  cleanFromAll (): void {
+    while (this.messageList.children[0] != null) {
+      this.messageList.children[0].removeFromParent()
+    }
+    this.scrollToLastMessage = false
+    this.messageList.pivot.y = 0
+  }
 }

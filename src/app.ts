@@ -13,15 +13,18 @@ async function run (): Promise<void> {
     viewWidth: SceneManager.width,
     viewHeight: SceneManager.height
   })
-  await SceneManager.changeScene(loaderScene)
+  await SceneManager.changeScene({ name: 'loader', newScene: loaderScene })
   await loaderScene.initializeLoader()
   const { menuBackground } = loaderScene.getAssets()
-  await SceneManager.changeScene(new MenuScene({
-    app: SceneManager.app,
-    viewWidth: SceneManager.width,
-    viewHeight: SceneManager.height,
-    menuTexture: menuBackground
-  }))
+  await SceneManager.changeScene({
+    name: 'menu',
+    newScene: new MenuScene({
+      app: SceneManager.app,
+      viewWidth: SceneManager.width,
+      viewHeight: SceneManager.height,
+      menuTexture: menuBackground
+    })
+  })
 }
 
 run().catch((err) => {

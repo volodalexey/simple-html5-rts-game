@@ -115,11 +115,14 @@ export class MenuScene extends Container implements IScene {
   }
 
   goToCampaignScene = (): void => {
-    SceneManager.changeScene(new CampaignScene({
-      app: SceneManager.app,
-      viewWidth: SceneManager.width,
-      viewHeight: SceneManager.height
-    })).catch(console.error)
+    SceneManager.changeScene({
+      name: 'campaign',
+      newScene: new CampaignScene({
+        app: SceneManager.app,
+        viewWidth: SceneManager.width,
+        viewHeight: SceneManager.height
+      })
+    }).catch(console.error)
   }
 
   goToMultiplayerScene = (): void => {

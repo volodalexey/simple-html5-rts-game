@@ -22,6 +22,7 @@ export abstract class SceneManager {
   private static currentScene: IScene = new DefaultScene()
   private static resizeTimeoutId: NodeJS.Timeout
   private static readonly resizeTimeout = 300
+  private static readonly scenes = new Map<string, IScene>()
 
   public static get width (): number {
     return window.innerWidth
@@ -55,14 +56,24 @@ export abstract class SceneManager {
     SceneManager.app.ticker.add(SceneManager.updateHandler)
   }
 
-  public static async changeScene (newScene: IScene, options = { initialResize: true }): Promise<void> {
+  public static async changeScene ({ name, newScene, initialResize = true }: { name: string, newScene?: IScene, initialResize?: boolean }): Promise<void> {
+    if (newScene != null) {
+      if (!SceneManager.scenes.has(name)) {
+        SceneManager.scenes.set(name, newScene)
+      }
+    } else {
+      newScene = SceneManager.scenes.get(name)
+    }
+    if (newScene == null) {
+      throw new Error('Unable to detect new scene')
+    }
     SceneManager.app.stage.removeChild(SceneManager.currentScene)
-    SceneManager.currentScene.destroy()
+    // SceneManager.currentScene.destroy()
 
     SceneManager.currentScene = newScene
     SceneManager.app.stage.addChild(SceneManager.currentScene)
 
-    if (options.initialResize) {
+    if (initialResize) {
       SceneManager.resizeHandler()
     }
 

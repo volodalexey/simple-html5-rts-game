@@ -18,6 +18,9 @@ import { CannonBall } from './projectiles/CannonBall'
 import { Laser } from './projectiles/Laser'
 import { Rocket } from './projectiles/HeatSeeker'
 import { Order } from './Order'
+import { StartModal } from './StartModal'
+import { Firework } from './Particle'
+import { SceneManager } from './SceneManager'
 
 export interface IGameOptions {
   viewWidth: number
@@ -43,6 +46,7 @@ export class Game extends Container {
   public viewHeight: number
   public tileMap!: TileMap
   public statusBar!: StatusBar
+  public startModal!: StartModal
   public camera!: Camera
   public selectedItems: SelectableItem[] = []
   public dragSelectThreshold = 5
@@ -84,6 +88,10 @@ export class Game extends Container {
 
     this.statusBar = new StatusBar()
     this.addChild(this.statusBar)
+
+    this.startModal = new StartModal({ viewWidth, viewHeight })
+    this.startModal.hideModal()
+    this.addChild(this.startModal)
 
     this.camera = new Camera({ tileMap: this.tileMap })
   }
@@ -180,6 +188,9 @@ export class Game extends Container {
   }
 
   handlePointerDown = (e: FederatedPointerEvent): void => {
+    if (this.gameEnded) {
+      return
+    }
     const localPosition = this.toLocal(e)
     this.pointerDownX = localPosition.x
     this.pointerDownY = localPosition.y
@@ -187,6 +198,9 @@ export class Game extends Container {
   }
 
   handlePointerUp = (e: FederatedPointerEvent): void => {
+    if (this.gameEnded) {
+      return
+    }
     this.pointerDownX = this.pointerDownY = -1
     logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} up`)
     if (this.dragSelect.width === 0) {
@@ -229,6 +243,9 @@ export class Game extends Container {
   }
 
   handlePointerMove = (e: FederatedPointerEvent): void => {
+    if (this.gameEnded) {
+      return
+    }
     const localPosition = this.toLocal(e)
     logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} mX=${e.x} mY=${e.y}`)
     if (this.pointerDownX > -1 && this.pointerDownY > -1 &&
@@ -290,8 +307,9 @@ export class Game extends Container {
     this.runLevel({ mapImageSrc, mapSettingsSrc })
   }
 
-  endGame (message: string): void {
+  endGame (options: Parameters<StartModal['showModal']>[0]): void {
     this.gameEnded = true
+    this.startModal.showModal(options)
   }
 
   handleResize ({ viewWidth, viewHeight }: {
@@ -317,11 +335,16 @@ export class Game extends Container {
     this.statusBar.visible = true
 
     const calcWidth = availableWidth > occupiedWidth ? occupiedWidth : availableWidth
+    const calcHeight = availableHeight > occupiedHeight ? occupiedHeight : availableHeight
     this.statusBar.position.set(calcWidth / 2 - this.statusBar.width / 2, 0)
+    this.startModal.position.set(calcWidth / 2 - this.startModal.width / 2, calcHeight / 2 - this.startModal.height / 2)
   }
 
   handleUpdate (deltaMS: number): void {
     if (this.gameEnded) {
+      if (this.startModal.visible) {
+        this.startModal.handleUpdate(deltaMS)
+      }
       return
     }
     this.time += deltaMS
@@ -349,8 +372,9 @@ export class Game extends Container {
   }
 
   runLevel ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void {
-    this.tileMap.restart()
     this.tileMap.cleanFromAll()
+    this.statusBar.cleanFromAll()
+    this.startModal.cleanFromAll()
 
     this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc })
   }
@@ -533,6 +557,20 @@ export class Game extends Container {
         girl2Texture: textures['character-girl2.png'],
         man1Texture: textures['character-man1.png'],
         systemTexture: textures['character-system.png']
+      }
+    })
+
+    StartModal.prepareTextures({
+      textures: {
+        iconHomeTexture: textures['icon-home.png'],
+        iconRepeatTexture: textures['icon-repeat.png'],
+        iconNextTexture: textures['icon-next.png']
+      }
+    })
+
+    Firework.prepareTextures({
+      textures: {
+        texture: SceneManager.app.renderer.generateTexture(Firework.prepareGraphics())
       }
     })
   }

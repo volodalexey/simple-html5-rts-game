@@ -1025,6 +1025,21 @@
       "folder": ""
     },
     {
+      "name": "icon-home.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-home.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-next.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-next.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-repeat.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-repeat.png",
+      "folder": ""
+    },
+    {
       "name": "scout-tank-blue-down-left.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-down-left.png",
       "folder": ""

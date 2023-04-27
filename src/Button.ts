@@ -1,10 +1,11 @@
-import { Container, Graphics, Text } from 'pixi.js'
+import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js'
 
-interface IButtonOptions {
+export interface IButtonOptions {
   text: string
   btnWidth?: number
   btnHeight?: number
-  onClick: (attackBtn: Button) => void
+  btnRadius?: number
+  onClick?: (attackBtn: Button) => void
   paddingTop?: number
   paddingRight?: number
   paddingBottom?: number
@@ -18,10 +19,17 @@ interface IButtonOptions {
   buttonIdleAlpha?: number
   buttonHoverColor?: number
   buttonHoverAlpha?: number
+  initX?: number
+  initY?: number
+  iconTexture?: Texture
+  iconScale?: number
+  iconColor?: number
+  iconColorHover?: number
 }
 
 export class Button extends Container {
   public background!: Graphics
+  public icon!: Sprite
   public text!: Text
   public paddingTop !: number
   public paddingRight !: number
@@ -35,6 +43,8 @@ export class Button extends Container {
   public textColorHover !: number
   public shadowTextColor !: number
   public shadowThickness !: number
+  public iconColor !: number
+  public iconColorHover !: number
   public fontSize !: number
   public onClick!: IButtonOptions['onClick']
   constructor (options: IButtonOptions) {
@@ -52,23 +62,38 @@ export class Button extends Container {
     this.shadowTextColor = options.shadowTextColor ?? 0x000000
     this.shadowThickness = options.shadowThickness ?? 0
 
+    this.iconColor = options.iconColor ?? 0x000000
+    this.iconColorHover = options.iconColorHover ?? 0x000000
+
     this.buttonIdleColor = options.buttonIdleColor ?? 0x000000
     this.buttonIdleAlpha = options.buttonIdleAlpha ?? 1
-    this.buttonHoverColor = options.buttonHoverColor ?? 0x000000
+    this.buttonHoverColor = options.buttonHoverColor ?? options.buttonIdleColor ?? 0x000000
     this.buttonHoverAlpha = options.buttonHoverAlpha ?? 1
     this.setup(options)
     if (options.btnWidth != null && options.btnHeight != null) {
-      this.draw({ btnWidth: options.btnWidth, btnHeight: options.btnHeight })
+      this.draw({ btnWidth: options.btnWidth, btnHeight: options.btnHeight, btnRadius: options.btnRadius })
     } else {
-      this.draw({ btnWidth: this.text.width, btnHeight: this.text.height })
+      this.draw({ btnWidth: this.text.width, btnHeight: this.text.height, btnRadius: options.btnRadius })
     }
-    this.color({ bgColor: this.buttonIdleColor, alpha: this.buttonIdleAlpha, txtColor: this.textColor })
+    this.idleColor()
+    if (typeof options.initX === 'number') {
+      this.position.x = options.initX
+    }
+    if (typeof options.initY === 'number') {
+      this.position.y = options.initY
+    }
   }
 
-  setup ({ text: initText, btnWidth, btnHeight }: IButtonOptions): void {
+  setup ({ text: initText, btnWidth, btnHeight, iconTexture, iconScale = 0 }: IButtonOptions): void {
     const background = new Graphics()
     this.addChild(background)
     this.background = background
+    const { paddingLeft, paddingTop } = this
+    const icon = new Sprite(iconTexture)
+    icon.scale.set(iconScale)
+    icon.position.set(paddingLeft, paddingTop)
+    this.addChild(icon)
+    this.icon = icon
 
     const text = new Text(initText, {
       fontFamily: "'Courier New', Courier, monospace",
@@ -82,8 +107,12 @@ export class Button extends Container {
       strokeThickness: this.shadowThickness
     })
     if (btnWidth != null && btnHeight != null) {
-      text.anchor.set(0.5, 0.5)
-      text.position.set(btnWidth / 2, btnHeight / 2)
+      if (iconTexture != null) {
+        text.position.set(icon.x + icon.width + paddingLeft, paddingTop)
+      } else {
+        text.anchor.set(0.5, 0.5)
+        text.position.set(btnWidth / 2, btnHeight / 2)
+      }
     }
     this.addChild(text)
     this.text = text
@@ -93,39 +122,80 @@ export class Button extends Container {
 
   initEventLesteners (): void {
     this.on('pointertap', (e) => {
-      this.onClick(this)
+      if (typeof this.onClick === 'function') {
+        this.onClick(this)
+      }
     })
     this.on('pointerdown', (e) => {
       if (e.pointerType === 'touch') {
-        this.color({ bgColor: this.buttonHoverColor, alpha: this.buttonHoverAlpha, txtColor: this.textColorHover })
+        this.hoverColor()
       }
     })
     this.on('pointerenter', (e) => {
       if (e.pointerType === 'mouse') {
-        this.color({ bgColor: this.buttonHoverColor, alpha: this.buttonHoverAlpha, txtColor: this.textColorHover })
+        this.hoverColor()
       }
     })
     this.on('pointerleave', (e) => {
       if (e.pointerType === 'mouse') {
-        this.color({ bgColor: this.buttonIdleColor, alpha: this.buttonIdleAlpha, txtColor: this.textColor })
+        this.idleColor()
       }
     })
     this.on('pointerup', (e) => {
       if (e.pointerType === 'touch') {
-        this.color({ bgColor: this.buttonIdleColor, alpha: this.buttonIdleAlpha, txtColor: this.textColor })
+        this.idleColor()
       }
     })
   }
 
-  draw ({ btnWidth, btnHeight }: { btnWidth: number, btnHeight: number }): void {
+  draw ({ btnWidth, btnHeight, btnRadius = 0 }: { btnWidth: number, btnHeight: number, btnRadius?: number }): void {
     this.background.beginFill(0xffffff)
-    this.background.drawRect(0, 0, btnWidth, btnHeight)
+    this.background.drawRoundedRect(0, 0, btnWidth, btnHeight, btnRadius)
     this.background.endFill()
   }
 
-  color ({ alpha, bgColor, txtColor }: { alpha: number, bgColor: number, txtColor: number }): void {
+  color ({
+    alpha,
+    bgColor,
+    txtColor,
+    iconColor
+  }: {
+    alpha: number
+    bgColor: number
+    txtColor: number
+    iconColor: number
+  }): void {
     this.background.tint = bgColor
     this.background.alpha = alpha
     this.text.tint = txtColor
+    this.icon.tint = iconColor
+  }
+
+  idleColor ({
+    alpha = this.buttonIdleAlpha,
+    bgColor = this.buttonIdleColor,
+    txtColor = this.textColor,
+    iconColor = this.iconColor
+  }: {
+    alpha?: number
+    bgColor?: number
+    txtColor?: number
+    iconColor?: number
+  } = {}): void {
+    this.color({ alpha, bgColor, txtColor, iconColor })
+  }
+
+  hoverColor ({
+    alpha = this.buttonHoverAlpha,
+    bgColor = this.buttonHoverColor,
+    txtColor = this.textColorHover,
+    iconColor = this.iconColorHover
+  }: {
+    alpha?: number
+    bgColor?: number
+    txtColor?: number
+    iconColor?: number
+  } = {}): void {
+    this.color({ alpha, bgColor, txtColor, iconColor })
   }
 }

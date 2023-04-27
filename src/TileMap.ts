@@ -134,11 +134,8 @@ export class TileMap extends Container {
     logLayout(`x=${this.x} y=${this.y} w=${width} h=${height}`)
   }
 
-  restart (): void {
-    this.pivot.set(0, 0)
-  }
-
   cleanFromAll (): void {
+    this.pivot.set(0, 0)
     while (this.hitboxes.children[0] != null) {
       this.hitboxes.children[0].removeFromParent()
     }

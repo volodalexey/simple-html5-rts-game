@@ -68,7 +68,8 @@ export class CampaignScene extends Container implements IScene {
     startMission: 0
   }
 
-  public currentMission = CampaignScene.options.startMission
+  public currentMissionIdx = CampaignScene.options.startMission
+  public currentMission!: IMission
 
   constructor (options: ICampaignSceneOptions) {
     super()
@@ -97,7 +98,11 @@ export class CampaignScene extends Container implements IScene {
   handleUpdate (deltaMS: number): void {
     this.game.handleUpdate(deltaMS)
 
-    const mission = this.missions[this.currentMission]
+    if (this.game.gameEnded) {
+      return
+    }
+
+    const mission = this.currentMission
     for (let i = 0; i < mission.triggers.length; i++) {
       const trigger = mission.triggers[i]
       if (trigger.type === 'timed' && this.game.time >= trigger.time) {
@@ -116,7 +121,9 @@ export class CampaignScene extends Container implements IScene {
 
   startCurrentLevel (): void {
     this.missionStarted = true
-    const mission = this.missions[this.currentMission]
+    const mission = this.currentMission = Object.assign({}, this.missions[this.currentMissionIdx], {
+      triggers: this.missions[this.currentMissionIdx].triggers.slice()
+    })
 
     this.game.startGame({ mapImageSrc: mission.mapImageSrc, mapSettingsSrc: mission.mapSettingsSrc })
     this.game.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
@@ -180,7 +187,7 @@ export class CampaignScene extends Container implements IScene {
         triggers: [
           {
             type: 'timed',
-            time: 3000,
+            time: 1000,
             action: () => {
               this.game.showMessage({
                 character: EMessageCharacter.op,
@@ -204,7 +211,7 @@ export class CampaignScene extends Container implements IScene {
               return this.game.tileMap.isItemsDead([-1, -3, -4])
             },
             action: () => {
-              this.game.endGame('Mission Failed.\n\nTry again?')
+              this.endMission({ success: false })
             }
           },
           {
@@ -271,12 +278,34 @@ export class CampaignScene extends Container implements IScene {
               return false
             },
             action: () => {
-              this.game.endGame('Mission Accomplished!')
+              this.endMission({ success: true })
             }
           }
 
         ]
       }
     ]
+  }
+
+  endMission ({ success }: { success: boolean }): void {
+    const isLastMission = this.currentMissionIdx === this.missions.length - 1
+    this.game.endGame({
+      success,
+      message: success
+        ? (isLastMission
+            ? 'Mission Accomplished!\nThis was the last mission in the campaign.\nThank You for playing.'
+            : 'Mission Accomplished!\nReady for new mission?')
+        : 'Mission Failed.\nTry again?',
+      view: success ? (isLastMission ? 'home' : 'home-next') : 'home-repeat',
+      onLeftClick: () => {
+        SceneManager.changeScene({ name: 'menu' }).catch(console.error)
+      },
+      onRightClick: () => {
+        if (success && !isLastMission) {
+          this.currentMissionIdx++
+        }
+        this.startCurrentLevel()
+      }
+    })
   }
 }
