@@ -1,7 +1,6 @@
 import { Assets, Container, type IPointData, Sprite, type Texture } from 'pixi.js'
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
-import { logLayout } from './logger'
 import { manifest } from './LoaderScene'
 import { BaseBuilding } from './buildings/BaseBuilding'
 import { BaseVehicle } from './vehicles/BaseVehicle'
@@ -12,13 +11,8 @@ import { type Order } from './Order'
 export interface ITileMapOptions {
   viewWidth: number
   viewHeight: number
-}
-
-interface IBoundsData {
-  top: number
-  right: number
-  bottom: number
-  left: number
+  initX?: number
+  initY?: number
 }
 
 export class TileMap extends Container {
@@ -33,15 +27,18 @@ export class TileMap extends Container {
   public orders = new Container<Order>()
   public projectiles = new Container<BaseProjectile>()
   public background = new Sprite()
-  public viewWidth!: number
-  public viewHeight!: number
   public maxXPivot = 0
   public maxYPivot = 0
   constructor (options: ITileMapOptions) {
     super()
-    this.viewWidth = options.viewWidth
-    this.viewHeight = options.viewHeight
     this.setup()
+
+    if (typeof options.initX === 'number') {
+      this.position.x = options.initX
+    }
+    if (typeof options.initY === 'number') {
+      this.position.y = options.initY
+    }
   }
 
   setup (): void {
@@ -102,24 +99,18 @@ export class TileMap extends Container {
     this.currentMapPassableGrid = []
   }
 
-  getViewportBounds (): IBoundsData {
-    const { viewWidth, viewHeight } = this
-    const { pivot: { x, y } } = this
-    const bounds = {
-      top: y,
-      right: x + viewWidth,
-      bottom: y + viewHeight,
-      left: x
-    }
-    return bounds
-  }
-
   handleResize ({ viewWidth, viewHeight }: {
     viewWidth: number
     viewHeight: number
   }): void {
-    this.viewWidth = viewWidth
-    this.viewHeight = viewHeight
+    this.calcMaxPivot({ viewWidth, viewHeight })
+    this.checkMaxPivot()
+  }
+
+  calcMaxPivot ({ viewWidth, viewHeight }: {
+    viewWidth: number
+    viewHeight: number
+  }): void {
     const { width, height, scale } = this.background
     if (width > viewWidth) {
       this.maxXPivot = (width - viewWidth) / scale.x
@@ -131,7 +122,6 @@ export class TileMap extends Container {
     } else {
       this.maxYPivot = 0
     }
-    logLayout(`x=${this.x} y=${this.y} w=${width} h=${height}`)
   }
 
   cleanFromAll (): void {
@@ -229,5 +219,33 @@ export class TileMap extends Container {
       const activeItem = this.getItemByUid(uid, activeItems)
       return activeItem == null || activeItem.isDead()
     })
+  }
+
+  goTo ({ x, y }: { x: number, y: number }): void {
+    const { pivot } = this
+    pivot.x = x
+    pivot.y = y
+    this.checkMaxPivot()
+  }
+
+  goDiff ({ diffX, diffY }: { diffX: number, diffY: number }): void {
+    const { pivot } = this
+    pivot.x += diffX
+    pivot.y += diffY
+    this.checkMaxPivot()
+  }
+
+  checkMaxPivot (): void {
+    const { pivot } = this
+    if (pivot.x < 0) {
+      pivot.x = 0
+    } else if (pivot.x > this.maxXPivot) {
+      pivot.x = this.maxXPivot
+    }
+    if (pivot.y < 0) {
+      pivot.y = 0
+    } else if (pivot.y > this.maxYPivot) {
+      pivot.y = this.maxYPivot
+    }
   }
 }

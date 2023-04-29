@@ -21,6 +21,7 @@ import { Order } from './Order'
 import { StartModal } from './StartModal'
 import { Firework } from './Particle'
 import { SceneManager } from './SceneManager'
+import { TopBar } from './TopBar'
 
 export interface IGameOptions {
   viewWidth: number
@@ -45,7 +46,7 @@ export class Game extends Container {
   public viewWidth: number
   public viewHeight: number
   public tileMap!: TileMap
-  public statusBar!: StatusBar
+  public topBar!: TopBar
   public startModal!: StartModal
   public camera!: Camera
   public selectedItems: SelectableItem[] = []
@@ -79,21 +80,29 @@ export class Game extends Container {
     viewWidth,
     viewHeight
   }: IGameOptions): void {
+    const leftHeight = viewHeight - TopBar.options.initHeight
+    this.camera = new Camera({
+      viewWidth, viewHeight: leftHeight, initY: TopBar.options.initHeight
+    })
+    this.addChild(this.camera)
+
     this.tileMap = new TileMap({
-      viewWidth,
-      viewHeight
+      viewWidth, viewHeight: leftHeight, initY: TopBar.options.initHeight
     })
     this.addChild(this.tileMap)
+    this.tileMap.mask = this.camera
     this.addChild(this.dragSelect)
 
-    this.statusBar = new StatusBar()
-    this.addChild(this.statusBar)
+    this.topBar = new TopBar({
+      camera: this.camera,
+      onCameraGoTo: (options) => { this.tileMap.goTo(options) },
+      onCameraGoDiff: (options) => { this.tileMap.goDiff(options) }
+    })
+    this.addChild(this.topBar)
 
     this.startModal = new StartModal({ viewWidth, viewHeight })
     this.startModal.hideModal()
     this.addChild(this.startModal)
-
-    this.camera = new Camera({ tileMap: this.tileMap })
   }
 
   addEventLesteners (): void {
@@ -301,10 +310,22 @@ export class Game extends Container {
     item.setSelected(false)
   }
 
-  startGame = ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void => {
+  startGame = ({
+    mapImageSrc, mapSettingsSrc, startGridX = 0, startGridY = 0
+  }: {
+    mapImageSrc: string
+    mapSettingsSrc: string
+    startGridX?: number
+    startGridY?: number
+  }): void => {
     this.gameEnded = false
     this.time = 0
     this.runLevel({ mapImageSrc, mapSettingsSrc })
+    const { gridSize } = this.tileMap
+    this.topBar.miniMap.assignBackgroundTexture({ texture: this.tileMap.background.texture })
+    this.tileMap.calcMaxPivot({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
+    this.tileMap.goTo({ x: startGridX * gridSize, y: startGridY * gridSize })
+    this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
   }
 
   endGame (options: Parameters<StartModal['showModal']>[0]): void {
@@ -316,27 +337,32 @@ export class Game extends Container {
     viewWidth: number
     viewHeight: number
   }): void {
-    this.statusBar.handleResize({ viewWidth, viewHeight })
-    this.tileMap.handleResize({ viewWidth, viewHeight })
+    const { width: bgWidth, height: bgHeight } = this.tileMap.background
+    const maxWidth = viewWidth > bgWidth ? bgWidth : viewWidth
+    const leftHeight = viewHeight - this.topBar.height
+    this.camera.handleResize({
+      viewWidth: maxWidth,
+      viewHeight: leftHeight > bgHeight ? bgHeight : leftHeight
+    })
+    const { x: pX, y: pY } = this.tileMap.pivot
+    this.topBar.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight, camX: pX, camY: pY })
+    this.tileMap.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight })
 
     const availableWidth = viewWidth
     const availableHeight = viewHeight
-    const totalWidth = this.tileMap.background.width
-    const totalHeight = this.tileMap.background.height
+    const totalWidth = bgWidth
+    const totalHeight = this.topBar.height + bgHeight
     const occupiedWidth = totalWidth
     const occupiedHeight = totalHeight
     const x = availableWidth > occupiedWidth ? (availableWidth - occupiedWidth) / 2 : 0
     const y = availableHeight > occupiedHeight ? (availableHeight - occupiedHeight) / 2 : 0
     logLayout(`aw=${availableWidth} (ow=${occupiedWidth}) x=${x} ah=${availableHeight} (oh=${occupiedHeight}) y=${y}`)
-    this.statusBar.visible = false
     this.x = x
     this.y = y
     logLayout(`x=${x} y=${y}`)
-    this.statusBar.visible = true
 
     const calcWidth = availableWidth > occupiedWidth ? occupiedWidth : availableWidth
     const calcHeight = availableHeight > occupiedHeight ? occupiedHeight : availableHeight
-    this.statusBar.position.set(calcWidth / 2 - this.statusBar.width / 2, 0)
     this.startModal.position.set(calcWidth / 2 - this.startModal.width / 2, calcHeight / 2 - this.startModal.height / 2)
   }
 
@@ -348,7 +374,8 @@ export class Game extends Container {
       return
     }
     this.time += deltaMS
-    this.statusBar.handleUpdate(deltaMS)
+    const { x: pX, y: pY } = this.tileMap.pivot
+    this.topBar.handleUpdate({ deltaMS, camX: pX, camY: pY })
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
 
@@ -373,7 +400,7 @@ export class Game extends Container {
 
   runLevel ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void {
     this.tileMap.cleanFromAll()
-    this.statusBar.cleanFromAll()
+    this.topBar.statusBar.cleanFromAll()
     this.startModal.cleanFromAll()
 
     this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc })
@@ -605,6 +632,6 @@ export class Game extends Container {
     if (playSound) {
       AUDIO.play('message-received')
     }
-    this.statusBar.appendMessage({ character, message, time: this.time })
+    this.topBar.statusBar.appendMessage({ character, message, time: this.time })
   }
 }

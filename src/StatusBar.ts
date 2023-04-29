@@ -32,17 +32,21 @@ class StatusMessage extends Container {
     messageTextSize: 14
   }
 
+  public img!: Sprite
+  public msgText!: Text
+
   constructor (options: IStatusMessageOptions) {
     super()
     this.setupAndDraw(options)
   }
 
   setupAndDraw ({ texture, message, time, maxWidth = 0 }: IStatusMessageOptions): void {
-    const { padding, characterWidth, timeTextSize, timeTextColor, messageTextSize, messageTextColor } = StatusMessage.options
+    const { characterWidth, timeTextSize, timeTextColor } = StatusMessage.options
     const img = new Sprite(texture)
-    this.addChild(img)
     img.width = characterWidth
     img.height = img.scale.x * img.height
+    this.addChild(img)
+    this.img = img
 
     const timeText = new Text(StatusBar.getTimeText(time), {
       fontSize: timeTextSize,
@@ -51,15 +55,30 @@ class StatusMessage extends Container {
     timeText.position.set(img.x, img.height)
     this.addChild(timeText)
 
+    this.reAppendMessage({ maxWidth, message })
+  }
+
+  reAppendMessage ({ maxWidth, message }: { maxWidth: number, message?: string }): void {
+    if (this.msgText != null) {
+      message = this.msgText.text
+      this.msgText.destroy()
+    }
+    const { padding, messageTextSize, messageTextColor } = StatusMessage.options
     const msgText = new Text(message, {
       fontSize: messageTextSize,
       fill: messageTextColor,
       wordWrap: true,
-      wordWrapWidth: maxWidth - img.width - padding * 2
+      wordWrapWidth: maxWidth - this.img.width - padding * 2
     })
-    msgText.position.set(img.width + padding, 0)
+    msgText.position.set(this.img.width + padding, 0)
     this.addChild(msgText)
+    this.msgText = msgText
   }
+}
+
+export interface IStatusBarOptions {
+  initWidth: number
+  initHeight: number
 }
 
 export class StatusBar extends Container {
@@ -74,8 +93,6 @@ export class StatusBar extends Container {
   }
 
   static options = {
-    initWidth: 500,
-    initHeight: 100,
     outerBorderColor: 0x485b6c,
     outerBorderWidth: 3,
     innerBorderColor: 0x181716,
@@ -88,16 +105,18 @@ export class StatusBar extends Container {
     padding: 10
   }
 
-  public messageBox!: Container
-  public messageList!: Container
+  public graphicsBox!: Graphics
+  public graphicsBoxShadow!: Graphics
+  public messageList!: Container<StatusMessage>
+  public messageListMask!: Graphics
 
   public scrollToLastMessage = false
   public pointerDown = false
 
-  constructor () {
+  constructor (options: IStatusBarOptions) {
     super()
     this.setup()
-    this.draw()
+    this.draw(options)
 
     this.addEventLesteners()
   }
@@ -111,23 +130,29 @@ export class StatusBar extends Container {
   }
 
   setup (): void {
-    const messageBox = new Container()
-    this.addChild(messageBox)
-    this.messageBox = messageBox
+    const graphicsBox = new Graphics()
+    this.addChild(graphicsBox)
+    this.graphicsBox = graphicsBox
 
-    const messageList = new Container()
-    this.addChild(messageList)
+    const graphicsBoxShadow = new Graphics()
+    graphicsBox.addChild(graphicsBoxShadow)
+    this.graphicsBoxShadow = graphicsBoxShadow
+
+    const messageListMask = new Graphics()
+    graphicsBox.addChild(messageListMask)
+    this.messageListMask = messageListMask
+
+    const messageList = new Container<StatusMessage>()
+    graphicsBox.addChild(messageList)
     this.messageList = messageList
   }
 
-  draw (): void {
+  draw ({ initWidth, initHeight }: IStatusBarOptions): void {
     const {
       options: {
         backgroundColor,
         outerBorderColor,
         outerBorderWidth,
-        initWidth,
-        initHeight,
         innerBorderColor,
         innerBorderWidth,
         innerBorderRadius,
@@ -142,63 +167,62 @@ export class StatusBar extends Container {
     let leftWidth = initWidth
     let leftHeight = initHeight
 
-    const outerBorder = new Graphics()
-    outerBorder.beginFill(outerBorderColor)
-    outerBorder.drawRect(offsetX, offsetY, leftWidth, leftHeight)
-    outerBorder.endFill()
-    this.messageBox.addChild(outerBorder)
+    this.graphicsBox.clear()
+    this.graphicsBox.beginFill(outerBorderColor)
+    this.graphicsBox.drawRect(offsetX, offsetY, leftWidth, leftHeight)
+    this.graphicsBox.endFill()
 
     offsetX += outerBorderWidth
     offsetY += outerBorderWidth
     leftWidth -= outerBorderWidth * 2
     leftHeight -= outerBorderWidth * 2
 
-    const innerBorder = new Graphics()
-    innerBorder.beginFill(innerBorderColor)
-    innerBorder.drawRoundedRect(offsetX, offsetY, leftWidth, leftHeight, innerBorderRadius)
-    innerBorder.endFill()
-    this.messageBox.addChild(innerBorder)
+    this.graphicsBox.beginFill(innerBorderColor)
+    this.graphicsBox.drawRoundedRect(offsetX, offsetY, leftWidth, leftHeight, innerBorderRadius)
+    this.graphicsBox.endFill()
 
     offsetX += innerBorderWidth
     offsetY += innerBorderWidth
     leftWidth -= innerBorderWidth * 2
     leftHeight -= innerBorderWidth * 2
 
-    const bgRect = new Graphics()
-    bgRect.beginFill(backgroundColor)
-    bgRect.drawRoundedRect(offsetX, offsetY, leftWidth, leftHeight, innerBorderRadius)
-    bgRect.endFill()
-    this.messageBox.addChild(bgRect)
+    this.graphicsBox.beginFill(backgroundColor)
+    this.graphicsBox.drawRoundedRect(offsetX, offsetY, leftWidth, leftHeight, innerBorderRadius)
+    this.graphicsBox.endFill()
 
-    const shadow = new Graphics()
-    shadow.lineStyle({
+    this.graphicsBoxShadow.clear()
+    this.graphicsBoxShadow.position.set(offsetX, offsetY)
+    this.graphicsBoxShadow.lineStyle({
       width: shadowWidth,
       color: shadowColor
     })
-    shadow.drawRoundedRect(offsetX, offsetY, leftWidth, leftHeight, innerBorderRadius)
-    shadow.endFill()
-    shadow.alpha = shadowAlpha
-    this.messageBox.addChild(shadow)
+    this.graphicsBoxShadow.drawRoundedRect(0, 0, leftWidth, leftHeight, innerBorderRadius)
+    this.graphicsBoxShadow.endFill()
+    this.graphicsBoxShadow.alpha = shadowAlpha
 
     offsetX += innerBorderRadius
     offsetY += innerBorderRadius
     leftWidth -= innerBorderRadius * 2
     leftHeight -= innerBorderRadius * 2
 
-    const mask = new Graphics()
-    mask.beginFill(backgroundColor)
-    mask.drawRoundedRect(offsetX, offsetY, leftWidth, leftHeight, innerBorderRadius)
-    mask.endFill()
-    this.messageBox.addChild(mask)
-    this.messageList.mask = mask
+    this.messageListMask.position.set(offsetX, offsetY)
+    this.drawMask({ width: leftWidth, height: leftHeight })
+    this.messageList.mask = this.messageListMask
     this.messageList.position.set(offsetX, offsetY)
   }
 
-  handleResize ({ viewWidth, viewHeight }: {
-    viewWidth: number
-    viewHeight: number
-  }): void {
-
+  drawMask ({ width, height }: { width: number, height: number }): void {
+    const {
+      options: {
+        backgroundColor,
+        innerBorderRadius
+      }
+    } = StatusBar
+    this.messageListMask.clear()
+    this.messageListMask.beginFill(backgroundColor)
+    this.messageListMask.drawRoundedRect(0, 0, width, height, innerBorderRadius)
+    this.messageListMask.endFill()
+    this.messageList.mask = this.messageListMask
   }
 
   appendMessage ({ character, message, time }: { character: EMessageCharacter, message: string, time: number }): void {
@@ -219,12 +243,11 @@ export class StatusBar extends Container {
     }
     if (this.messageList.mask != null) {
       const { padding } = StatusBar.options
-      const mask = (this.messageList.mask as Container)
       const statusMessage = new StatusMessage({
         texture,
         message,
         time,
-        maxWidth: mask.width - padding
+        maxWidth: this.maxMessageWidth
       })
       statusMessage.position.set(padding, this.messageList.height === 0 ? padding : this.messageList.height + padding * 2)
       this.messageList.addChild(statusMessage)
@@ -309,5 +332,28 @@ export class StatusBar extends Container {
     }
     this.scrollToLastMessage = false
     this.messageList.pivot.y = 0
+  }
+
+  get maxMessageWidth (): number {
+    return (this.messageList.mask as Graphics).width - StatusBar.options.padding * 2
+  }
+
+  setLimit ({ width, height }: { width: number, height: number }): void {
+    const { padding } = StatusBar.options
+    const messages: StatusMessage[] = []
+    for (let i = 0; i < this.messageList.children.length; i++) {
+      const msg = this.messageList.children[i]
+      msg.removeFromParent()
+      messages.push(msg)
+      i--
+    }
+    this.draw({ initWidth: width, initHeight: height })
+    messages.forEach(msg => {
+      msg.position.set(padding, this.messageList.height === 0 ? padding : this.messageList.height + padding * 2)
+      msg.reAppendMessage({ maxWidth: this.maxMessageWidth })
+      this.messageList.addChild(msg)
+    })
+    this.messageList.pivot.y = 0
+    this.scrollToLastMessage = true
   }
 }

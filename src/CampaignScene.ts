@@ -125,9 +125,7 @@ export class CampaignScene extends Container implements IScene {
       triggers: this.missions[this.currentMissionIdx].triggers.slice()
     })
 
-    this.game.startGame({ mapImageSrc: mission.mapImageSrc, mapSettingsSrc: mission.mapSettingsSrc })
-    this.game.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
-    this.game.camera.goTo({ x: mission.startGridX * this.game.tileMap.gridSize, y: mission.startGridY * this.game.tileMap.gridSize })
+    this.game.startGame(mission)
 
     mission.items.forEach(({ Constructor, initGridX, initGridY, ...rest }) => {
       this.game.tileMap.addItem(new Constructor({

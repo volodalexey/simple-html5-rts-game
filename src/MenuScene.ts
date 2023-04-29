@@ -121,7 +121,8 @@ export class MenuScene extends Container implements IScene {
         app: SceneManager.app,
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height
-      })
+      }),
+      initialResize: false
     }).catch(console.error)
   }
 
