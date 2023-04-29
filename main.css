@@ -1,0 +1,24 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+canvas {
+  display: block;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.error-message,
+.error-stack {
+  color: red;
+  font-size: 2rem;
+}
