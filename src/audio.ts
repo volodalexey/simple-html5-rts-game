@@ -16,6 +16,18 @@ import messageAudio from './assets/audio/message.mp3'
 import roger1Audio from './assets/audio/roger1.mp3'
 import roger2Audio from './assets/audio/roger2.mp3'
 import yupAudio from './assets/audio/yup.mp3'
+import vultureAttack0Audio from './assets/audio/vulture-attack-0.mp3'
+import vultureYes0Audio from './assets/audio/vulture-yes-0.mp3'
+import vultureYes1Audio from './assets/audio/vulture-yes-1.mp3'
+import vultureYes2Audio from './assets/audio/vulture-yes-2.mp3'
+import vultureYes3Audio from './assets/audio/vulture-yes-3.mp3'
+import tankAttack0Audio from './assets/audio/tank-attack-0.mp3'
+import tankAttack1Audio from './assets/audio/tank-attack-1.mp3'
+import tankAttack2Audio from './assets/audio/tank-attack-2.mp3'
+import tankYes0Audio from './assets/audio/tank-yes-0.mp3'
+import tankYes1Audio from './assets/audio/tank-yes-1.mp3'
+import tankYes2Audio from './assets/audio/tank-yes-2.mp3'
+import tankYes3Audio from './assets/audio/tank-yes-3.mp3'
 
 export const AUDIO = {
   bullet1: new Howl({
@@ -69,9 +81,46 @@ export const AUDIO = {
   yup: new Howl({
     src: yupAudio
   }),
+  vultureAttack0: new Howl({
+    src: vultureAttack0Audio
+  }),
+  vultureYes0: new Howl({
+    src: vultureYes0Audio
+  }),
+  vultureYes1: new Howl({
+    src: vultureYes1Audio
+  }),
+  vultureYes2: new Howl({
+    src: vultureYes2Audio
+  }),
+  vultureYes3: new Howl({
+    src: vultureYes3Audio
+  }),
+  tankAttack0: new Howl({
+    src: tankAttack0Audio
+  }),
+  tankAttack1: new Howl({
+    src: tankAttack1Audio
+  }),
+  tankAttack2: new Howl({
+    src: tankAttack2Audio
+  }),
+  tankYes0: new Howl({
+    src: tankYes0Audio
+  }),
+  tankYes1: new Howl({
+    src: tankYes1Audio
+  }),
+  tankYes2: new Howl({
+    src: tankYes2Audio
+  }),
+  tankYes3: new Howl({
+    src: tankYes3Audio
+  }),
   play (name: '' | 'acknowledge-attacking' | 'acknowledge-moving'
   | 'bullet' | 'bullet-hit' | 'rocket' | 'laser' | 'cannon-ball' | 'cannon-hit'
-  | 'message-received'): void {
+  | 'message-received' | 'scout-tank-attack' | 'scout-tank-yes'
+  | 'heavy-tank-attack' | 'heavy-tank-yes'): void {
     let sounds: Howl[] = []
     if (name === 'acknowledge-attacking') {
       sounds = [this.engaging]
@@ -91,8 +140,17 @@ export const AUDIO = {
       sounds = [this.cannonHit]
     } else if (name === 'message-received') {
       sounds = [this.message]
+    } else if (name === 'scout-tank-attack') {
+      sounds = [this.vultureAttack0]
+    } else if (name === 'scout-tank-yes') {
+      sounds = [this.vultureYes0, this.vultureYes1, this.vultureYes2, this.vultureYes3]
+    } else if (name === 'heavy-tank-attack') {
+      sounds = [this.tankAttack0, this.tankAttack1, this.tankAttack2]
+    } else if (name === 'heavy-tank-yes') {
+      sounds = [this.tankYes0, this.tankYes1, this.tankYes2, this.tankYes3]
     }
     if (sounds.length > 0) {
+      sounds.forEach(s => s.stop())
       sounds[Math.floor(Math.random() * sounds.length)].play()
     }
   }

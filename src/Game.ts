@@ -162,7 +162,6 @@ export class Game extends Container {
         // then command them to attack the clicked item
         if (uids.length > 0) {
           this.processCommand(uids, { type: 'attack', toUid: underPointerItem.uid })
-          AUDIO.play('acknowledge-attacking')
         }
       }
     } else {
@@ -180,7 +179,6 @@ export class Game extends Container {
       if (uids.length > 0) {
         const { gridSize } = this.tileMap
         this.processCommand(uids, { type: 'move', to: { gridX: point.x / gridSize, gridY: point.y / gridSize }, collisionCount: 0 })
-        AUDIO.play('acknowledge-moving')
       }
     }
 
@@ -619,6 +617,23 @@ export class Game extends Container {
       // if uid is a valid item, set the order for the item
       if (item != null) {
         item.orders = Object.assign({}, orders)
+        if (orders.type === 'move') {
+          if (item instanceof ScoutTank) {
+            AUDIO.play('scout-tank-yes')
+          } else if (item instanceof HeavyTank) {
+            AUDIO.play('heavy-tank-yes')
+          } else {
+            AUDIO.play('acknowledge-moving')
+          }
+        } else if (orders.type === 'attack') {
+          if (item instanceof ScoutTank) {
+            AUDIO.play('scout-tank-attack')
+          } else if (item instanceof HeavyTank) {
+            AUDIO.play('heavy-tank-attack')
+          } else {
+            AUDIO.play('acknowledge-attacking')
+          }
+        }
         if (toObject != null && item.orders.type !== 'stand') {
           item.orders.to = toObject
         }
