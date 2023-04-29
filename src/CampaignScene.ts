@@ -8,6 +8,7 @@ import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
 import { EMessageCharacter } from './StatusBar'
+import { type IOrder } from './interfaces/IOrder'
 
 interface IMissionItem {
   Constructor: typeof Base | typeof HeavyTank | typeof ScoutTank | typeof Transport
@@ -19,11 +20,7 @@ interface IMissionItem {
   life?: number
   selectable?: boolean
   ordersable?: boolean
-  orders?: {
-    type: 'patrol'
-    from: { gridX: number, gridY: number }
-    to: { gridX: number, gridY: number }
-  }
+  orders?: IOrder
 }
 
 interface ITimedTrigger {
@@ -159,17 +156,14 @@ export class CampaignScene extends Container implements IScene {
       {
         name: 'Rescue',
         briefing: 'In the months since the great war, mankind has fallen into chaos. Billions are dead with cities in ruins.\nSmall groups of survivors band together to try and survive as best as they can.\nWe are trying to reach out to all the survivors in this sector before we join back with the main colony.',
-
         mapImageSrc: 'level1Background',
         mapSettingsSrc: 'level1Settings',
         startGridX: 36,
         startGridY: 0,
-
         cash: {
           blue: 0,
           green: 0
         },
-
         items: [
           /* Slightly damaged base */
           { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
@@ -185,11 +179,10 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, orders: { type: 'patrol', from: { gridX: 34, gridY: 20 }, to: { gridX: 42, gridY: 25 } } },
           { Constructor: ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 21, orders: { type: 'patrol', from: { gridX: 14, gridY: 0 }, to: { gridX: 14, gridY: 14 } } }
         ],
-
         triggers: [
           {
             type: 'timed',
-            time: 1000,
+            time: 3000,
             action: () => {
               this.game.showMessage({
                 character: EMessageCharacter.op,
@@ -283,7 +276,54 @@ export class CampaignScene extends Container implements IScene {
               this.endMission({ success: true })
             }
           }
-
+        ]
+      },
+      {
+        name: 'Assault',
+        briefing: 'Thanks to the supplies from the convoy, we now have the base up and running.\n The rebels nearby are proving to be a problem. We need to take them out. \n First set up the base defences. Then find and destroy all rebels in the area.\n The colony will be sending us reinforcements to help us out.',
+        mapImageSrc: 'level1Background',
+        mapSettingsSrc: 'level1Settings',
+        startGridX: 36,
+        startGridY: 0,
+        cash: {
+          blue: 0,
+          green: 0
+        },
+        items: [
+          { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
+          { Constructor: HeavyTank, initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, orders: { type: 'sentry' } },
+          /* The first wave of attacks */
+          { Constructor: ScoutTank, initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
+          { Constructor: ScoutTank, initGridX: 53, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
+          /* Enemies patrolling the area */
+          { Constructor: ScoutTank, initGridX: 5, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 5, gridY: 5 }, to: { gridX: 20, gridY: 20 } } },
+          { Constructor: ScoutTank, initGridX: 5, initGridY: 15, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 5, gridY: 15 }, to: { gridX: 20, gridY: 30 } } },
+          { Constructor: ScoutTank, initGridX: 25, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 25, gridY: 5 }, to: { gridX: 25, gridY: 20 } } },
+          { Constructor: ScoutTank, initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 35, gridY: 5 }, to: { gridX: 35, gridY: 30 } } },
+          /* The Evil Rebel Base */
+          { Constructor: Base, initGridX: 5, initGridY: 36, team: Team.green, uid: -11 }
+        ],
+        triggers: [
+          {
+            type: 'timed',
+            time: 8000,
+            action: () => {
+              const { tileMap } = this.game
+              const hero = tileMap.getItemByUid(-2)
+              if (hero != null) {
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'Commander!! Reinforcements have arrived from the colony.'
+                })
+                tileMap.addItem(new ScoutTank({
+                  game: this.game, initX: tileMap.gridSize * 58, initY: tileMap.gridSize * 22, team: Team.blue, orders: { type: 'guard', to: hero }
+                }))
+                tileMap.addItem(new ScoutTank({
+                  game: this.game, initX: tileMap.gridSize * 60, initY: tileMap.gridSize * 21, team: Team.blue, orders: { type: 'guard', to: hero }
+                }))
+              }
+            }
+          }
         ]
       }
     ]

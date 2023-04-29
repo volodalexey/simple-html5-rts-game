@@ -4,7 +4,7 @@ import { type IMoveable } from '../interfaces/IMoveable'
 import { EVectorDirection, Vector } from '../Vector'
 import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
-import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid } from '../common'
+import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../common'
 import { logProjectileBounds } from '../logger'
 
 export interface IBaseProjectileTextures {
@@ -26,12 +26,14 @@ export interface IBaseProjectileOptions {
   initX: number
   initY: number
   target: BaseActiveItem
+  uid?: number
 }
 
 export class BaseProjectile extends Container implements IItem, IMoveable {
   static reloadTime = 0
 
   public game: Game
+  public uid: number
   public type = EItemType.bullets
   public ordersable = true
   public range = 0
@@ -61,6 +63,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
 
   constructor (options: IBaseProjectileOptions) {
     super()
+    this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.orders = { type: 'fire', to: options.target }
     this.setup(options)

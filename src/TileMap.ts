@@ -22,7 +22,7 @@ export class TileMap extends Container {
   public mapGridWidth !: number
   public mapGridHeight !: number
   public currentMapTerrainGrid: GridArray = []
-  public rebuildRequired = true
+  public rebuildRequired = false
   private _currentMapPassableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()

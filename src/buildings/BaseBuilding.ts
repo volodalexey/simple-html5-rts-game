@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
-import { type BaseActiveItem, type Team } from '../common'
+import { generateUid, type BaseActiveItem, type Team } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { EItemType, type IItem } from '../interfaces/IItem'
@@ -39,6 +39,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     radius: 0,
     strokeWidth: 0,
     strokeColor: 0,
+    strokeSecondColor: 0,
     offset: {
       x: 0,
       y: 0
@@ -80,7 +81,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   public Projectile!: typeof Bullet
 
   public game: Game
-  public uid?: number
+  public uid: number
   public type = EItemType.buildings
   public ordersable = true
   public team: Team
@@ -94,8 +95,8 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
 
   constructor (options: IBaseBuildingOptions) {
     super()
+    this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
-    this.uid = options.uid
     this.team = options.team
     this.orders = options.orders ?? { type: 'stand' }
     if (options.life != null) {
@@ -144,12 +145,35 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   }
 
   drawSelection (): void {
-    const { offset, strokeColor, width, height } = this.drawSelectionOptions
+    const { offset, strokeWidth, strokeColor, strokeSecondColor, width, height } = this.drawSelectionOptions
     this.selectedGraphics.position.set(offset.x, offset.y)
     const selection = new Graphics()
     this.selectedGraphics.addChild(selection)
+    const halfWidth = width / 2
+    const halfHeight = height / 2
     selection.beginFill(strokeColor)
-    selection.drawRect(0, 0, width, height)
+    selection.drawRect(0, 0, halfWidth, strokeWidth)
+    selection.endFill()
+    selection.beginFill(strokeSecondColor)
+    selection.drawRect(halfWidth, 0, halfWidth, strokeWidth)
+    selection.endFill()
+    selection.beginFill(strokeColor)
+    selection.drawRect(width - strokeWidth, 0, strokeWidth, halfHeight)
+    selection.endFill()
+    selection.beginFill(strokeSecondColor)
+    selection.drawRect(width - strokeWidth, halfHeight, strokeWidth, halfHeight)
+    selection.endFill()
+    selection.beginFill(strokeColor)
+    selection.drawRect(halfWidth, height - strokeWidth, halfWidth, strokeWidth)
+    selection.endFill()
+    selection.beginFill(strokeSecondColor)
+    selection.drawRect(0, height - strokeWidth, halfWidth, strokeWidth)
+    selection.endFill()
+    selection.beginFill(strokeColor)
+    selection.drawRect(0, halfHeight, strokeWidth, halfHeight)
+    selection.endFill()
+    selection.beginFill(strokeSecondColor)
+    selection.drawRect(0, 0, strokeWidth, halfHeight)
     selection.endFill()
     this.selectedGraphics.alpha = 0
   }

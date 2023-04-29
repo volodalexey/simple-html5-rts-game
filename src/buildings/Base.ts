@@ -25,7 +25,8 @@ export class Base extends BaseBuilding {
     height: 44,
     radius: 0,
     strokeWidth: 2,
-    strokeColor: 0xffffff,
+    strokeColor: 0,
+    strokeSecondColor: 0xffffff,
     offset: {
       x: -2,
       y: 18

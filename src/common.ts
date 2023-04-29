@@ -113,3 +113,9 @@ export function checkCollision (a: IBound, b: IBound): number {
   }
   return 0
 }
+
+let uid = 1000
+
+export function generateUid (): number {
+  return ++uid
+}

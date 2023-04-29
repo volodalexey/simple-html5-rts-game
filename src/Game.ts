@@ -319,6 +319,7 @@ export class Game extends Container {
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
     this.topBar.miniMap.assignBackgroundTexture({ texture: this.tileMap.background.texture })
+    this.tileMap.rebuildRequired = true
     this.tileMap.calcMaxPivot({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
     this.tileMap.goTo({ x: startGridX * gridSize, y: startGridY * gridSize })
     this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })

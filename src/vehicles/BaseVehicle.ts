@@ -1,6 +1,6 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../Vector'
-import { findAngle, type Team, angleDiff, wrapDirection, type BaseActiveItem, findAngleGrid } from '../common'
+import { findAngle, type Team, angleDiff, wrapDirection, type BaseActiveItem, findAngleGrid, generateUid } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { type IAttackable } from '../interfaces/IAttackable'
@@ -80,7 +80,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   }
 
   public game: Game
-  public uid?: number
+  public uid: number
   public type = EItemType.vehicles
   public ordersable = true
   public hitPoints = 0
@@ -117,8 +117,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
 
   constructor (options: IBaseVehicleOptions) {
     super()
+    this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
-    this.uid = options.uid
     this.team = options.team
     this.orders = options.orders ?? { type: 'stand' }
     this.setup(options)
@@ -297,9 +297,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     const cy = radius + strokeWidth
     for (let i = 0; i < segmentsCount; i++) {
       selection.beginFill(i % 2 === 0 ? strokeColor : strokeSecondColor)
-      selection.moveTo(cx, cy)
+      selection.arc(cx, cy, radius, segment * i, segment * (i + 1))
       selection.arc(cx, cy, radius + strokeWidth, segment * i, segment * (i + 1))
-      selection.lineTo(cx, cy)
       selection.endFill()
     }
     this.selectedGraphics.alpha = 0
@@ -473,7 +472,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           }
         } else {
           const toGrid = this.orders.to.getGridXY()
-          const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
+          const distanceFromDestinationSquared = Math.pow(Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2), 0.5)
           const moving = this.moveTo(toGrid, distanceFromDestinationSquared)
           if (!moving) {
             // Pathfinding couldn't find a path so stop
