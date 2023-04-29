@@ -84,7 +84,7 @@ export class Button extends Container {
     }
   }
 
-  setup ({ text: initText, btnWidth, btnHeight, iconTexture, iconScale = 0 }: IButtonOptions): void {
+  setup ({ text: initText, btnWidth, btnHeight, iconTexture, iconScale = 1 }: IButtonOptions): void {
     const background = new Graphics()
     this.addChild(background)
     this.background = background

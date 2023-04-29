@@ -1,7 +1,7 @@
-import { type Application, Container, Sprite, type Texture } from 'pixi.js'
+import { type Application, Container, Sprite, type Texture, type Spritesheet, Assets } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
 import { logLayout } from './logger'
-import { Button } from './Button'
+import { Button, type IButtonOptions } from './Button'
 import { TileMap } from './TileMap'
 import { CampaignScene } from './CampaignScene'
 
@@ -21,9 +21,13 @@ export class MenuScene extends Container implements IScene {
 
   static options = {
     choices: {
-      offset: {
+      mainOffset: {
         x: 50,
         y: 320
+      },
+      missionOffset: {
+        x: 50,
+        y: 50
       }
     }
   }
@@ -32,6 +36,8 @@ export class MenuScene extends Container implements IScene {
     super()
 
     this.setup(options)
+
+    this.drawMainOptions()
 
     setTimeout(() => {
       void TileMap.idleLoad().catch(console.error)
@@ -44,10 +50,21 @@ export class MenuScene extends Container implements IScene {
     this.background = background
 
     this.addChild(this.choices)
-    const { offset } = MenuScene.options.choices
-    this.choices.position.set(offset.x, offset.y)
+  }
 
-    const style = {
+  clearFromAll (): void {
+    while (this.choices.children.length > 0) {
+      this.choices.children[0].removeFromParent()
+    }
+  }
+
+  drawMainOptions = (): void => {
+    this.clearFromAll()
+    const { mainOffset } = MenuScene.options.choices
+    this.choices.position.set(mainOffset.x, mainOffset.y)
+
+    const style: IButtonOptions = {
+      text: '',
       fontSize: 48,
       textColor: 0xffffff,
       textColorHover: 0xffff00,
@@ -57,19 +74,62 @@ export class MenuScene extends Container implements IScene {
       buttonHoverAlpha: 0
     }
     const campaignButton = new Button({
-      text: 'Campaign',
-      onClick: this.goToCampaignScene,
-      ...style
+      onClick: this.drawMissionOptions,
+      ...style,
+      text: 'Campaign'
     })
     this.choices.addChild(campaignButton)
 
     const vsCPUButton = new Button({
-      text: 'Versus CPU',
       onClick: this.goToMultiplayerScene,
-      ...style
+      ...style,
+      text: 'Versus CPU'
     })
     this.choices.addChild(vsCPUButton)
     vsCPUButton.position.set(0, campaignButton.height)
+  }
+
+  drawMissionOptions = (): void => {
+    this.clearFromAll()
+    const { missionOffset } = MenuScene.options.choices
+    this.choices.position.set(missionOffset.x, missionOffset.y)
+
+    const spritesheet: Spritesheet = Assets.get('spritesheet')
+    const { textures } = spritesheet
+
+    const style: IButtonOptions = {
+      text: '',
+      fontSize: 32,
+      textColor: 0xffffff,
+      textColorHover: 0xffff00,
+      shadowTextColor: 0x800080,
+      shadowThickness: 2,
+      buttonIdleAlpha: 0,
+      buttonHoverAlpha: 0
+    }
+    const homeButton = new Button({
+      iconTexture: textures['icon-home.png'],
+      onClick: this.drawMainOptions,
+      ...style,
+      text: 'Home',
+      btnWidth: 200,
+      btnHeight: 50,
+      iconScale: 1,
+      iconColor: 0xffffff,
+      iconColorHover: 0xffff00,
+      fontSize: 48
+    })
+    this.choices.addChild(homeButton);
+
+    [0].forEach(missionIdx => {
+      const vsCPUButton = new Button({
+        onClick: () => { this.goToCampaignScene(missionIdx) },
+        ...style,
+        text: `Mission ${missionIdx + 1}`
+      })
+      vsCPUButton.position.set(0, this.choices.height)
+      this.choices.addChild(vsCPUButton)
+    })
   }
 
   handleResize ({ viewWidth, viewHeight }: {
@@ -114,13 +174,14 @@ export class MenuScene extends Container implements IScene {
   handleUpdate (deltaMS: number): void {
   }
 
-  goToCampaignScene = (): void => {
+  goToCampaignScene = (missionIdx?: number): void => {
     SceneManager.changeScene({
       name: 'campaign',
       newScene: new CampaignScene({
         app: SceneManager.app,
         viewWidth: SceneManager.width,
-        viewHeight: SceneManager.height
+        viewHeight: SceneManager.height,
+        missionIdx
       }),
       initialResize: false
     }).catch(console.error)

@@ -57,6 +57,7 @@ interface ICampaignSceneOptions {
   app: Application
   viewWidth: number
   viewHeight: number
+  missionIdx?: number
 }
 
 export class CampaignScene extends Container implements IScene {
@@ -73,6 +74,9 @@ export class CampaignScene extends Container implements IScene {
 
   constructor (options: ICampaignSceneOptions) {
     super()
+    if (typeof options.missionIdx === 'number') {
+      this.currentMissionIdx = options.missionIdx
+    }
 
     this.setup(options)
   }
