@@ -111,7 +111,7 @@ export class StatusBar extends Container {
   public messageListMask!: Graphics
 
   public scrollToLastMessage = false
-  public pointerDown = false
+  public pointerDownY = -1
 
   constructor (options: IStatusBarOptions) {
     super()
@@ -285,33 +285,36 @@ export class StatusBar extends Container {
     this.on('wheel', this.handleWheel)
   }
 
-  handlePointerDown = (): void => {
-    this.pointerDown = true
-    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} down`)
+  handlePointerDown = (e: FederatedPointerEvent): void => {
+    const localPosition = this.messageList.toLocal(e)
+    this.pointerDownY = localPosition.y
+    logPointerEvent(`StatusBar.pointerDownY=${this.pointerDownY} down`)
   }
 
   handlePointerUp = (): void => {
-    this.pointerDown = false
-    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} up`)
+    this.pointerDownY = -1
+    logPointerEvent(`StatusBar.pointerDownY=${this.pointerDownY} up`)
   }
 
   handlePointerLeave = (): void => {
-    this.pointerDown = false
-    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} leave`)
+    this.pointerDownY = -1
+    logPointerEvent(`StatusBar.pointerDownY=${this.pointerDownY} leave`)
   }
 
   handlePointerMove = (e: FederatedPointerEvent): void => {
-    logPointerEvent(`StatusBar.pointerDown=${this.pointerDown} move`)
-    if (this.pointerDown) {
-      logPointerEvent(`e.movementY=${e.movementY}`)
-      let nextPivot = this.messageList.pivot.y - e.movementY
+    logPointerEvent(`StatusBar.pointerDownY=${this.pointerDownY} move`)
+    if (this.pointerDownY > -1) {
+      const localPosition = this.messageList.toLocal(e)
+      logPointerEvent(`localPositionX=${localPosition.x} localPositionY=${localPosition.y}`)
+      const nextPivot = this.pointerDownY - localPosition.y
+      this.messageList.pivot.y += nextPivot
       const { maxPivot } = this
-      if (nextPivot <= 0) {
-        nextPivot = 0
-      } else if (nextPivot > maxPivot) {
-        nextPivot = maxPivot
+      const { pivot } = this.messageList
+      if (pivot.y <= 0) {
+        pivot.y = 0
+      } else if (pivot.y > maxPivot) {
+        pivot.y = maxPivot
       }
-      this.messageList.pivot.y = nextPivot
     }
   }
 
