@@ -94,9 +94,7 @@ export class Game extends Container {
     this.addChild(this.dragSelect)
 
     this.topBar = new TopBar({
-      camera: this.camera,
-      onCameraGoTo: (options) => { this.tileMap.goTo(options) },
-      onCameraGoDiff: (options) => { this.tileMap.goDiff(options) }
+      game: this
     })
     this.addChild(this.topBar)
 

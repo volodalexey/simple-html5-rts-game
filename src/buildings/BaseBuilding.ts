@@ -275,7 +275,7 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   removeAndDestroy (): void {
     this.game.deselectItem(this)
     this.removeFromParent()
-    this.game.tileMap.currentMapPassableGrid = []
+    this.game.tileMap.rebuildRequired = true
   }
 
   drawLifeBar (): void {

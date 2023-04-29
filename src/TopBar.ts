@@ -1,12 +1,10 @@
 import { Container } from 'pixi.js'
 import { StatusBar } from './StatusBar'
-import { type IMiniMapOptions, MiniMap } from './MiniMap'
-import { type Camera } from './Camera'
+import { MiniMap } from './MiniMap'
+import { type Game } from './Game'
 
 interface ITopBarOptions {
-  camera: Camera
-  onCameraGoTo: IMiniMapOptions['onCameraGoTo']
-  onCameraGoDiff: IMiniMapOptions['onCameraGoDiff']
+  game: Game
 }
 
 export class TopBar extends Container {
@@ -25,7 +23,7 @@ export class TopBar extends Container {
     this.setup(options)
   }
 
-  setup ({ camera, onCameraGoTo, onCameraGoDiff }: ITopBarOptions): void {
+  setup ({ game }: ITopBarOptions): void {
     const { statusBarWidth, miniMapWidth, initHeight } = TopBar.options
     this.statusBar = new StatusBar({
       initWidth: statusBarWidth,
@@ -34,11 +32,9 @@ export class TopBar extends Container {
     this.addChild(this.statusBar)
 
     this.miniMap = new MiniMap({
-      camera,
+      game,
       initWidth: miniMapWidth,
-      initHeight,
-      onCameraGoTo,
-      onCameraGoDiff
+      initHeight
     })
     this.addChild(this.miniMap)
     this.miniMap.position.set(this.statusBar.width, 0)

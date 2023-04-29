@@ -609,9 +609,6 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     this.lastMovementGridX = 0
     this.lastMovementGridY = 0
     const { tileMap, turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
-    if (tileMap.currentMapPassableGrid.length === 0) {
-      tileMap.rebuildPassableGrid()
-    }
     const thisGrid = this.getGridXY({ center: true })
 
     // First find path to destination
@@ -620,7 +617,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     const start = { gridX: Math.floor(thisGrid.gridX), gridY: Math.floor(thisGrid.gridY) }
     const end = { gridX: destX, gridY: destY }
 
-    const grid = tileMap.currentMapPassableGrid.map(g => g.slice())
+    const grid = tileMap.currentCopyMapPassableGrid
     // Allow destination to be "movable" so that algorithm can find a path
     if (destination.type === EItemType.buildings || destination.type === EItemType.terrain) {
       grid[destY][destX] = 0

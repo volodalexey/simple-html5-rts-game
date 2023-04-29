@@ -15,12 +15,16 @@ export interface ITileMapOptions {
   initY?: number
 }
 
+type GridArray = Array<Array<1 | 0>>
+
 export class TileMap extends Container {
   public gridSize !: number
   public mapGridWidth !: number
   public mapGridHeight !: number
-  public currentMapTerrainGrid: Array<Array<1 | 0>> = []
-  public currentMapPassableGrid: Array<Array<1 | 0>> = []
+  public currentMapTerrainGrid: GridArray = []
+  public rebuildRequired = true
+  private _currentMapPassableGrid: GridArray = []
+  private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()
   public buildings = new Container<BaseBuilding>()
   public vehicles = new Container<BaseVehicle>()
@@ -96,7 +100,7 @@ export class TileMap extends Container {
       const obstruction = this.hitboxes.children[i]
       this.currentMapTerrainGrid[obstruction.initGridY][obstruction.initGridX] = 1
     }
-    this.currentMapPassableGrid = []
+    this._currentMapPassableGrid = []
   }
 
   handleResize ({ viewWidth, viewHeight }: {
@@ -190,8 +194,32 @@ export class TileMap extends Container {
     })
   }
 
+  get currentMapPassableGrid (): GridArray {
+    if (this.rebuildRequired) {
+      this.rebuildPassableGrid()
+      this.rebuildRequired = false
+    }
+    return this._currentMapPassableGrid
+  }
+
+  get currentCopyMapPassableGrid (): GridArray {
+    const { currentMapPassableGrid } = this
+    this._currentCopyMapPassableGrid.length = currentMapPassableGrid.length
+    for (let i = 0; i < currentMapPassableGrid.length; i++) {
+      if (!Array.isArray(this._currentCopyMapPassableGrid[i])) {
+        this._currentCopyMapPassableGrid[i] = new Array(currentMapPassableGrid[i].length)
+      } else {
+        this._currentCopyMapPassableGrid[i].length = currentMapPassableGrid[i].length
+      }
+      for (let j = 0; j < currentMapPassableGrid[i].length; j++) {
+        this._currentCopyMapPassableGrid[i][j] = currentMapPassableGrid[i][j]
+      }
+    }
+    return this._currentCopyMapPassableGrid
+  }
+
   rebuildPassableGrid (): void {
-    this.currentMapPassableGrid = this.currentMapTerrainGrid.map(g => g.slice())
+    this._currentMapPassableGrid = this.currentMapTerrainGrid.map(g => g.slice())
     for (let i = this.buildings.children.length - 1; i >= 0; i--) {
       const item = this.buildings.children[i]
       const { passableGrid } = item
@@ -199,7 +227,7 @@ export class TileMap extends Container {
       for (let y = passableGrid.length - 1; y >= 0; y--) {
         for (let x = passableGrid[y].length - 1; x >= 0; x--) {
           if (passableGrid[y][x] !== 0) {
-            this.currentMapPassableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
+            this._currentMapPassableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
           }
         }
       }

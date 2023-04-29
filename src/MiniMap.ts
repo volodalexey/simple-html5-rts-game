@@ -1,13 +1,13 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, type Texture } from 'pixi.js'
-import { type Camera } from './Camera'
 import { logPointerEvent } from './logger'
+import { type Game } from './Game'
+import { Team } from './common'
+import { EItemType } from './interfaces/IItem'
 
 export interface IMiniMapOptions {
-  camera: Camera
+  game: Game
   initWidth: number
   initHeight: number
-  onCameraGoTo: (options: { x: number, y: number }) => void
-  onCameraGoDiff: (options: { diffX: number, diffY: number }) => void
 }
 
 export class MiniMap extends Container {
@@ -16,27 +16,27 @@ export class MiniMap extends Container {
     backgroundColor: 0x485b6c,
     borderWidth: 2,
     cameraRectColor: 0xc1a517,
-    cameraRectThickness: 2
+    cameraRectThickness: 2,
+    itemBlueTeamClor: 0x0000ff,
+    itemGreeTeamClor: 0x00ff00
   }
 
-  public onCameraGoTo !: IMiniMapOptions['onCameraGoTo']
-  public onCameraGoDiff !: IMiniMapOptions['onCameraGoDiff']
+  public game!: Game
+  public rebuildRequired = true
   public pointerDownX = -1
   public pointerDownY = -1
-  public camera!: Camera
   public border = new Graphics()
   public backgroundContainer = new Container()
   public background = new Sprite()
   public cameraRect = new Graphics()
+  public activeItems = new Container<Graphics>()
   public initWidth!: number
   public initHeight!: number
   constructor (options: IMiniMapOptions) {
     super()
-    this.camera = options.camera
+    this.game = options.game
     this.initWidth = options.initWidth
     this.initHeight = options.initHeight
-    this.onCameraGoTo = options.onCameraGoTo
-    this.onCameraGoDiff = options.onCameraGoDiff
 
     this.setup()
 
@@ -49,6 +49,7 @@ export class MiniMap extends Container {
     this.addChild(this.border)
 
     this.background.addChild(this.cameraRect)
+    this.background.addChild(this.activeItems)
     this.backgroundContainer.addChild(this.background)
     const { borderWidth } = MiniMap.options
     this.backgroundContainer.position.set(borderWidth, borderWidth)
@@ -88,7 +89,7 @@ export class MiniMap extends Container {
         // only if click outside of camera rectangular
         const goX = localPosition.x - this.cameraRect.x
         const goY = localPosition.y - this.cameraRect.y
-        this.onCameraGoTo({ x: goX, y: goY })
+        this.game.tileMap.goTo({ x: goX, y: goY })
       }
     }
   }
@@ -102,7 +103,7 @@ export class MiniMap extends Container {
     if (this.pointerDownX > -1 && this.pointerDownY > -1) {
       const localPosition = this.background.toLocal(e)
       logPointerEvent(`MiniMap pdX=${this.pointerDownX} pdX=${this.pointerDownY} mX=${localPosition.x} mY=${localPosition.y}`)
-      this.onCameraGoDiff({ diffX: localPosition.x - this.pointerDownX, diffY: localPosition.y - this.pointerDownY })
+      this.game.tileMap.goDiff({ diffX: localPosition.x - this.pointerDownX, diffY: localPosition.y - this.pointerDownY })
       this.pointerDownX = localPosition.x
       this.pointerDownY = localPosition.y
     }
@@ -126,6 +127,7 @@ export class MiniMap extends Container {
     camY?: number
   }): void {
     this.updateCameraRect({ camX, camY })
+    this.updateItems()
   }
 
   handleResize ({ viewWidth, viewHeight, camX, camY }: {
@@ -166,7 +168,7 @@ export class MiniMap extends Container {
     const { cameraRectColor, cameraRectThickness } = MiniMap.options
     this.cameraRect.clear()
     this.cameraRect.beginFill(cameraRectColor)
-    const { width, height } = this.camera
+    const { width, height } = this.game.camera
     const { scale: { x: sx, y: sy } } = this.background
     const scaledBorderWidthX = cameraRectThickness / sx
     const scaledBorderWidthY = cameraRectThickness / sy
@@ -179,5 +181,44 @@ export class MiniMap extends Container {
 
   updateCameraRect ({ camX = 0, camY = 0 }: { camX?: number, camY?: number }): void {
     this.cameraRect.position.set(camX, camY)
+  }
+
+  updateItems (): void {
+    if (this.rebuildRequired) {
+      this.drawItems()
+      // this.rebuildRequired = false
+    }
+  }
+
+  drawItems (): void {
+    while (this.activeItems.children.length > 0) {
+      this.activeItems.children[0].removeFromParent()
+    }
+    const { width, height } = this.background.texture
+    const bgBounds = { top: 0, right: 0 + width, bottom: 0 + height, left: 0 }
+    const { itemBlueTeamClor, itemGreeTeamClor } = MiniMap.options
+    const { activeItems } = this.game.tileMap
+    for (let i = 0; i < activeItems.length; i++) {
+      const activeItem = activeItems[i]
+      const graphics = new Graphics()
+      graphics.beginFill(activeItem.team === Team.blue ? itemBlueTeamClor : itemGreeTeamClor)
+      const itemBounds = activeItem.getSelectionBounds()
+      if ((itemBounds.left < bgBounds.left && itemBounds.right < bgBounds.left) ||
+        (itemBounds.left > bgBounds.right && itemBounds.right > bgBounds.right) ||
+        (itemBounds.top < bgBounds.top && itemBounds.bottom < bgBounds.top) ||
+        (itemBounds.top > bgBounds.bottom && itemBounds.bottom > bgBounds.bottom)) {
+        // item outside of map bounds
+        // skip draw on mini-map
+        continue
+      }
+      if (activeItem.type === EItemType.buildings) {
+        graphics.drawRect(0, 0, itemBounds.right - itemBounds.left, itemBounds.bottom - itemBounds.top)
+      } else if (activeItem.type === EItemType.vehicles || activeItem.type === EItemType.aircraft) {
+        graphics.drawCircle(0, 0, (itemBounds.right - itemBounds.left) / 2)
+      }
+      graphics.endFill()
+      graphics.position.set(itemBounds.left, itemBounds.top)
+      this.activeItems.addChild(graphics)
+    }
   }
 }
