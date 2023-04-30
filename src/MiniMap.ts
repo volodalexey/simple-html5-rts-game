@@ -69,7 +69,7 @@ export class MiniMap extends Container {
   }
 
   addEventLesteners (): void {
-    this.background.interactive = true
+    this.background.eventMode = 'static'
     this.background.on('pointerdown', this.handlePointerDown)
     this.background.on('pointerup', this.handlePointerUp)
     this.background.on('pointermove', this.handlePointerMove)
@@ -87,8 +87,8 @@ export class MiniMap extends Container {
         // do nothing
       } else {
         // only if click outside of camera rectangular
-        const goX = localPosition.x - this.cameraRect.x
-        const goY = localPosition.y - this.cameraRect.y
+        const goX = localPosition.x - this.cameraRect.width * 0.5
+        const goY = localPosition.y - this.cameraRect.height * 0.5
         this.game.tileMap.goTo({ x: goX, y: goY })
       }
     }
@@ -169,13 +169,16 @@ export class MiniMap extends Container {
     this.cameraRect.clear()
     this.cameraRect.beginFill(cameraRectColor)
     const { width, height } = this.game.camera
-    const { scale: { x: sx, y: sy } } = this.background
-    const scaledBorderWidthX = cameraRectThickness / sx
-    const scaledBorderWidthY = cameraRectThickness / sy
-    this.cameraRect.drawRect(0, 0, width, height)
+    const { scale: { x: tmSX, y: tmSY } } = this.game.tileMap
+    const cameraWidth = width / tmSX
+    const cameraHeight = height / tmSY
+    const { scale: { x: bgSX, y: bgSY } } = this.background
+    const scaledBorderWidthX = cameraRectThickness / bgSX
+    const scaledBorderWidthY = cameraRectThickness / bgSY
+    this.cameraRect.drawRect(0, 0, cameraWidth, cameraHeight)
     this.cameraRect.endFill()
     this.cameraRect.beginHole()
-    this.cameraRect.drawRect(scaledBorderWidthX, scaledBorderWidthY, width - scaledBorderWidthX * 2, height - scaledBorderWidthY * 2)
+    this.cameraRect.drawRect(scaledBorderWidthX, scaledBorderWidthY, cameraWidth - scaledBorderWidthX * 2, cameraHeight - scaledBorderWidthY * 2)
     this.cameraRect.endHole()
   }
 

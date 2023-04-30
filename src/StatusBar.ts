@@ -277,7 +277,7 @@ export class StatusBar extends Container {
   }
 
   addEventLesteners (): void {
-    this.interactive = true
+    this.eventMode = 'static'
     this.on('pointerdown', this.handlePointerDown)
     this.on('pointermove', this.handlePointerMove)
     this.on('pointerup', this.handlePointerUp)
@@ -342,6 +342,9 @@ export class StatusBar extends Container {
   }
 
   setLimit ({ width, height }: { width: number, height: number }): void {
+    if (this.width === width) {
+      return
+    }
     const { padding } = StatusBar.options
     const messages: StatusMessage[] = []
     for (let i = 0; i < this.messageList.children.length; i++) {

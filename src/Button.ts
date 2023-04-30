@@ -49,7 +49,7 @@ export class Button extends Container {
   public onClick!: IButtonOptions['onClick']
   constructor (options: IButtonOptions) {
     super()
-    this.interactive = true
+    this.eventMode = 'static'
     this.cursor = 'pointer'
     this.onClick = options.onClick
     this.paddingTop = options.paddingTop ?? 20

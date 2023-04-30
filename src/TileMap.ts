@@ -7,10 +7,10 @@ import { BaseVehicle } from './vehicles/BaseVehicle'
 import { type BaseMoveableItem, type BaseActiveItem, type BaseItem } from './common'
 import { BaseProjectile } from './projectiles/BaseProjectile'
 import { type Order } from './Order'
+import { type Game } from './Game'
 
 export interface ITileMapOptions {
-  viewWidth: number
-  viewHeight: number
+  game: Game
   initX?: number
   initY?: number
 }
@@ -18,6 +18,7 @@ export interface ITileMapOptions {
 type GridArray = Array<Array<1 | 0>>
 
 export class TileMap extends Container {
+  public game !: Game
   public gridSize !: number
   public mapGridWidth !: number
   public mapGridHeight !: number
@@ -31,10 +32,20 @@ export class TileMap extends Container {
   public orders = new Container<Order>()
   public projectiles = new Container<BaseProjectile>()
   public background = new Sprite()
+  public minXPivot = 0
   public maxXPivot = 0
+  public minYPivot = 0
   public maxYPivot = 0
+  public minScale = 0
+  public maxScale = 0
+
+  static options = {
+    maxScaleRatio: 5
+  }
+
   constructor (options: ITileMapOptions) {
     super()
+    this.game = options.game
     this.setup()
 
     if (typeof options.initX === 'number') {
@@ -62,11 +73,17 @@ export class TileMap extends Container {
       }))
   }
 
-  initLevel ({ mapImageSrc, mapSettingsSrc }: { mapImageSrc: string, mapSettingsSrc: string }): void {
+  initLevel ({ mapImageSrc, mapSettingsSrc, viewWidth, viewHeight }: {
+    mapImageSrc: string
+    mapSettingsSrc: string
+    viewWidth: number
+    viewHeight: number
+  }): void {
     const background: Texture = Assets.get(mapImageSrc)
     const settings: IMapSettings = Assets.get(mapSettingsSrc)
 
     this.background.texture = background
+    this.background.scale.set(1, 1)
 
     const hitboxesPoints = MapSettings.mapTilesToPositions({
       mapSettings: settings,
@@ -101,30 +118,61 @@ export class TileMap extends Container {
       this.currentMapTerrainGrid[obstruction.initGridY][obstruction.initGridX] = 1
     }
     this._currentMapPassableGrid = []
+
+    this.rebuildRequired = true
+    this.calcScaleLimits()
+    this.calcPivotLimits()
   }
 
   handleResize ({ viewWidth, viewHeight }: {
     viewWidth: number
     viewHeight: number
   }): void {
-    this.calcMaxPivot({ viewWidth, viewHeight })
-    this.checkMaxPivot()
+    this.calcScaleLimits()
+    this.checkScaleLimits()
+    this.calcPivotLimits()
+    this.checkPivotLimits()
   }
 
-  calcMaxPivot ({ viewWidth, viewHeight }: {
-    viewWidth: number
-    viewHeight: number
-  }): void {
-    const { width, height, scale } = this.background
+  calcPivotLimits (): void {
+    const { width: viewWidth, height: viewHeight } = this.game.camera
+    const { scale } = this
+    const { width: bgWidth, height: bgHeight } = this.background
+    const width = bgWidth * scale.x
+    const height = bgHeight * scale.y
     if (width > viewWidth) {
       this.maxXPivot = (width - viewWidth) / scale.x
     } else {
       this.maxXPivot = 0
     }
+    this.minXPivot = 0
     if (height > viewHeight) {
       this.maxYPivot = (height - viewHeight) / scale.y
     } else {
       this.maxYPivot = 0
+    }
+    this.minYPivot = 0
+  }
+
+  calcScaleLimits (): void {
+    const { width: viewWidth, height: viewHeight } = this.game.camera
+    const { maxScaleRatio } = TileMap.options
+    const { width, height } = this.background
+    this.minScale = 1
+    this.maxScale = maxScaleRatio * Math.min(width / viewWidth, height / viewHeight)
+  }
+
+  checkScaleLimits (): void {
+    const { scale } = this
+    if (scale.x < this.minScale) {
+      scale.x = this.minScale
+    } else if (scale.x > this.maxScale) {
+      scale.x = this.maxScale
+    }
+    if (scale.y < this.minScale) {
+      scale.y = this.minScale
+    } else if (scale.y > this.maxScale) {
+      scale.y = this.maxScale
     }
   }
 
@@ -253,27 +301,62 @@ export class TileMap extends Container {
     const { pivot } = this
     pivot.x = x
     pivot.y = y
-    this.checkMaxPivot()
+    this.checkPivotLimits()
   }
 
   goDiff ({ diffX, diffY }: { diffX: number, diffY: number }): void {
     const { pivot } = this
     pivot.x += diffX
     pivot.y += diffY
-    this.checkMaxPivot()
+    this.checkPivotLimits()
   }
 
-  checkMaxPivot (): void {
+  checkPivotLimits (): void {
     const { pivot } = this
-    if (pivot.x < 0) {
-      pivot.x = 0
+    if (pivot.x < this.minXPivot) {
+      pivot.x = this.minXPivot
     } else if (pivot.x > this.maxXPivot) {
       pivot.x = this.maxXPivot
     }
-    if (pivot.y < 0) {
-      pivot.y = 0
+    if (pivot.y < this.minYPivot) {
+      pivot.y = this.minYPivot
     } else if (pivot.y > this.maxYPivot) {
       pivot.y = this.maxYPivot
     }
+  }
+
+  zoom ({ scaleFactor, sX = 0, sY = 0 }: { scaleFactor: number, sX?: number, sY?: number }): void {
+    const absScaleFactor = Math.abs(scaleFactor)
+    const { pivot: { x: curPivotX, y: curPivotY }, scale: { x: curScaleX } } = this
+    const curDiffX = sX - curPivotX
+    const curDiffY = sY - curPivotY
+    let newScale
+    if (scaleFactor >= 0) {
+      newScale = curScaleX * absScaleFactor
+    } else {
+      newScale = curScaleX / absScaleFactor
+    }
+    if (newScale < this.minScale) {
+      newScale = this.minScale
+    } else if (newScale > this.maxScale) {
+      newScale = this.maxScale
+    }
+    const scaleDiff = curScaleX / newScale
+    let newDiffX, newDiffY
+    if (scaleFactor >= 0) {
+      newDiffX = curDiffX * scaleDiff
+      newDiffY = curDiffY * scaleDiff
+    } else {
+      newDiffX = curDiffX * scaleDiff
+      newDiffY = curDiffY * scaleDiff
+    }
+    // new-pivot = old-pivot + old-camera-to-point - new-camera-top-point
+    const newPivotX = curPivotX + (scaleFactor >= 0 ? 1 : -1) * Math.abs(curDiffX - newDiffX)
+    const newPivotY = curPivotY + (scaleFactor >= 0 ? 1 : -1) * Math.abs(curDiffY - newDiffY)
+    this.scale.set(newScale, newScale)
+    this.pivot.set(newPivotX, newPivotY)
+    this.checkScaleLimits()
+    this.calcPivotLimits()
+    this.checkPivotLimits()
   }
 }

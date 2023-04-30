@@ -1,4 +1,4 @@
-import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphics, type IPointData } from 'pixi.js'
+import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphics, type IPointData, type FederatedWheelEvent } from 'pixi.js'
 import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
@@ -52,9 +52,18 @@ export class Game extends Container {
   public selectedItems: SelectableItem[] = []
   public dragSelectThreshold = 5
   public dragSelect = new Graphics()
-  public doubleTapMaxTime = 300
-  public pointerDownX = -1
-  public pointerDownY = -1
+  static options = {
+    doubleTapMaxTime: 300,
+    wheelScaleFactor: 1.5,
+    pinchScaleFactor: 1
+  }
+
+  public pointerMainDownId = -1
+  public pointerMainDownX = -1
+  public pointerMainDownY = -1
+  public pointerSecondDownId = -1
+  public pointerSecondDownX = -1
+  public pointerSecondDownY = -1
   public previousPointerTapEvent?: {
     type: FederatedPointerEvent['pointerType']
     pointerId: FederatedPointerEvent['pointerId']
@@ -87,7 +96,7 @@ export class Game extends Container {
     this.addChild(this.camera)
 
     this.tileMap = new TileMap({
-      viewWidth, viewHeight: leftHeight, initY: TopBar.options.initHeight
+      game: this, initY: TopBar.options.initHeight
     })
     this.addChild(this.tileMap)
     this.tileMap.mask = this.camera
@@ -104,11 +113,12 @@ export class Game extends Container {
   }
 
   addEventLesteners (): void {
-    this.tileMap.interactive = true
+    this.tileMap.eventMode = 'static'
     this.tileMap.on('pointerdown', this.handlePointerDown)
     this.tileMap.on('pointerup', this.handlePointerUp)
     this.tileMap.on('pointermove', this.handlePointerMove)
     this.tileMap.on('pointerleave', this.handlePointerLeave)
+    this.tileMap.on('wheel', this.handleWheel)
   }
 
   handlePointerTap = (e: FederatedPointerEvent): void => {
@@ -123,7 +133,7 @@ export class Game extends Container {
       (underPointerItem.type === EItemType.vehicles || underPointerItem.type === EItemType.aircraft)) {
       const isPreviousMouse = previousPointerTapEvent.pointerType === 'mouse' && e.pointerType === 'mouse' && previousPointerTapEvent.pointerId === e.pointerId
       const isPreviousTouch = previousPointerTapEvent.pointerType === 'touch' && e.pointerType === 'touch' && previousPointerTapEvent.pointerId + 1 === e.pointerId
-      if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < this.doubleTapMaxTime) {
+      if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < Game.options.doubleTapMaxTime) {
         if (Math.abs(e.globalX - previousPointerTapEvent.globalX) < 10 && Math.abs(e.globalY - previousPointerTapEvent.globalY) < 10) {
           logPointerEvent('Game pointerdoubletap')
           this.clearSelection()
@@ -197,17 +207,25 @@ export class Game extends Container {
       return
     }
     const localPosition = this.toLocal(e)
-    this.pointerDownX = localPosition.x
-    this.pointerDownY = localPosition.y
-    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} down`)
+    if (this.pointerMainDownId > -1) {
+      this.pointerSecondDownId = e.pointerId
+      this.pointerSecondDownX = localPosition.x
+      this.pointerSecondDownY = localPosition.y
+    } else {
+      this.pointerMainDownId = e.pointerId
+      this.pointerMainDownX = localPosition.x
+      this.pointerMainDownY = localPosition.y
+    }
+    logPointerEvent(`Game pdX=${localPosition.x} pdX=${localPosition.y} down`)
   }
 
   handlePointerUp = (e: FederatedPointerEvent): void => {
     if (this.gameEnded) {
       return
     }
-    this.pointerDownX = this.pointerDownY = -1
-    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} up`)
+    this.pointerSecondDownId = this.pointerSecondDownX = this.pointerSecondDownY = -1
+    this.pointerMainDownId = this.pointerMainDownX = this.pointerSecondDownY = -1
+    logPointerEvent('Game pointer up')
     if (this.dragSelect.width === 0) {
       this.handlePointerTap(e)
     } else {
@@ -241,9 +259,14 @@ export class Game extends Container {
     this.dragSelect.clear()
   }
 
-  handlePointerLeave = (): void => {
-    this.pointerDownX = this.pointerDownY = -1
-    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} leave`)
+  handlePointerLeave = (e: FederatedPointerEvent): void => {
+    if (e.pointerId === this.pointerSecondDownId) {
+      this.pointerSecondDownId = this.pointerSecondDownX = this.pointerSecondDownY = -1
+      logPointerEvent('Game pointer second leave')
+    } else {
+      this.pointerMainDownId = this.pointerMainDownX = this.pointerSecondDownY = -1
+      logPointerEvent('Game pointer main leave')
+    }
     this.dragSelect.clear()
   }
 
@@ -252,29 +275,66 @@ export class Game extends Container {
       return
     }
     const localPosition = this.toLocal(e)
-    logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} mX=${e.x} mY=${e.y}`)
-    if (this.pointerDownX > -1 && this.pointerDownY > -1 &&
-      Math.abs(localPosition.x - this.pointerDownX) > this.dragSelectThreshold &&
-      Math.abs(localPosition.y - this.pointerDownY) > this.dragSelectThreshold) {
-      this.drawDragSelect(localPosition)
+    const isMain = e.pointerId === this.pointerMainDownId
+    logPointerEvent(`Game pointer ${isMain ? 'main' : 'unknown'} move`)
+    if (isMain) {
+      if (this.pointerSecondDownId === -1 &&
+        this.pointerMainDownX > -1 && this.pointerMainDownY > -1 &&
+        Math.abs(localPosition.x - this.pointerMainDownX) > this.dragSelectThreshold &&
+        Math.abs(localPosition.y - this.pointerMainDownY) > this.dragSelectThreshold) {
+        this.drawDragSelect(localPosition)
+      }
+    } else if (this.pointerMainDownId > -1 && this.pointerSecondDownId > -1) {
+      if (this.dragSelect.width > 0) {
+        this.dragSelect.clear()
+      }
+      const fromX = isMain ? this.pointerSecondDownX : this.pointerMainDownX
+      const fromY = isMain ? this.pointerSecondDownY : this.pointerMainDownY
+      const toOldX = isMain ? this.pointerMainDownX : this.pointerSecondDownX
+      const toOldY = isMain ? this.pointerMainDownY : this.pointerSecondDownY
+      const toNewX = localPosition.x
+      const toNewY = localPosition.y
+      const distanceOld = Math.hypot(fromY - toOldY, fromX - toOldX)
+      const distance = Math.hypot(fromY - toNewY, fromX - toNewX)
+      const scaleFactor = distance / distanceOld * Game.options.pinchScaleFactor
+      const middleX = Math.min(fromX, toNewX) + (fromX - toNewX) * 0.5
+      const middleY = Math.min(fromY, toNewY) + (fromY - toNewY) * 0.5
+      const globalMiddle = this.toGlobal({ x: middleX, y: middleY })
+      const tileMapMiddle = this.tileMap.toLocal(globalMiddle)
+      this.tileMap.zoom({ scaleFactor: scaleFactor < 1 ? 1 / scaleFactor * -1 : scaleFactor, sX: tileMapMiddle.x, sY: tileMapMiddle.y })
+      this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
+      if (isMain) {
+        this.pointerMainDownX = localPosition.x
+        this.pointerMainDownY = localPosition.y
+      } else {
+        this.pointerSecondDownX = localPosition.x
+        this.pointerSecondDownY = localPosition.y
+      }
     }
   }
 
   drawDragSelect (currentPosition: IPointData): void {
     this.dragSelect.clear()
-    const width = Math.abs(currentPosition.x - this.pointerDownX)
-    const height = Math.abs(currentPosition.y - this.pointerDownY)
+    const width = Math.abs(currentPosition.x - this.pointerMainDownX)
+    const height = Math.abs(currentPosition.y - this.pointerMainDownY)
     if (width > 0 && height > 0) {
       this.dragSelect.lineStyle({
         width: 1,
         color: 0xffff00
       })
-      const x = Math.min(currentPosition.x, this.pointerDownX)
-      const y = Math.min(currentPosition.y, this.pointerDownY)
+      const x = Math.min(currentPosition.x, this.pointerMainDownX)
+      const y = Math.min(currentPosition.y, this.pointerMainDownY)
       this.dragSelect.position.set(x, y)
       this.dragSelect.drawRect(0, 0, width, height)
       this.dragSelect.endFill()
     }
+  }
+
+  handleWheel = (e: FederatedWheelEvent): void => {
+    const localPosition = this.tileMap.toLocal(e)
+    const scaleModifier = -1 * Math.sign(e.deltaY) * Game.options.wheelScaleFactor
+    this.tileMap.zoom({ scaleFactor: scaleModifier, sX: localPosition.x, sY: localPosition.y })
+    this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
   }
 
   isItemSelected (item: SelectableItem): boolean {
@@ -319,8 +379,6 @@ export class Game extends Container {
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
     this.topBar.miniMap.assignBackgroundTexture({ texture: this.tileMap.background.texture })
-    this.tileMap.rebuildRequired = true
-    this.tileMap.calcMaxPivot({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
     this.tileMap.goTo({ x: startGridX * gridSize, y: startGridY * gridSize })
     this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
   }
@@ -342,8 +400,8 @@ export class Game extends Container {
       viewHeight: leftHeight > bgHeight ? bgHeight : leftHeight
     })
     const { x: pX, y: pY } = this.tileMap.pivot
-    this.topBar.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight, camX: pX, camY: pY })
     this.tileMap.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight })
+    this.topBar.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight, camX: pX, camY: pY })
 
     const availableWidth = viewWidth
     const availableHeight = viewHeight
@@ -400,7 +458,7 @@ export class Game extends Container {
     this.topBar.statusBar.cleanFromAll()
     this.startModal.cleanFromAll()
 
-    this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc })
+    this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc, viewWidth: this.camera.width, viewHeight: this.camera.height })
   }
 
   clearSelection (): void {

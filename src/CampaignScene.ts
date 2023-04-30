@@ -280,7 +280,7 @@ export class CampaignScene extends Container implements IScene {
       },
       {
         name: 'Assault',
-        briefing: 'Thanks to the supplies from the convoy, we now have the base up and running.\n The rebels nearby are proving to be a problem. We need to take them out. \n First set up the base defences. Then find and destroy all rebels in the area.\n The colony will be sending us reinforcements to help us out.',
+        briefing: 'Thanks to the supplies from the convoy, we now have the base up and running.\nThe rebels nearby are proving to be a problem. We need to take them out. \nFirst set up the base defences. Then find and destroy all rebels in the area.\nThe colony will be sending us reinforcements to help us out.',
         mapImageSrc: 'level1Background',
         mapSettingsSrc: 'level1Settings',
         startGridX: 36,
