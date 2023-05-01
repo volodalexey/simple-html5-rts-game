@@ -6,6 +6,7 @@ export interface IMoveable {
   moveTurning: boolean
   turnSpeed: number
   hardCollision: boolean
+  collisionCount: number
   colliding: boolean
   lastMovementGridX: number
   lastMovementGridY: number

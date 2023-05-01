@@ -71,7 +71,7 @@ export class Order extends Graphics {
     switch (selectedItem.orders.type) {
       case 'move': {
         from = selectedItemPosition
-        to = { x: selectedItem.orders.to.gridX * tileMap.gridSize, y: selectedItem.orders.to.gridY * tileMap.gridSize }
+        to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
         break
       }
       case 'attack': case 'guard': {
@@ -84,8 +84,8 @@ export class Order extends Graphics {
         break
       }
       case 'patrol': {
-        from = { x: selectedItem.orders.from.gridX * tileMap.gridSize, y: selectedItem.orders.from.gridY * tileMap.gridSize }
-        to = { x: selectedItem.orders.to.gridX * tileMap.gridSize, y: selectedItem.orders.to.gridY * tileMap.gridSize }
+        from = { x: selectedItem.orders.fromPoint.gridX * tileMap.gridSize, y: selectedItem.orders.fromPoint.gridY * tileMap.gridSize }
+        to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
         break
       }
     }

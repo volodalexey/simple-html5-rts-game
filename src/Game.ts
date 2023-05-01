@@ -3,7 +3,7 @@ import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
 import { logLayout, logPointerEvent } from './logger'
-import { type SelectableItem, type Team } from './common'
+import { Team, type SelectableItem } from './common'
 import { Base } from './buildings/Base'
 import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
@@ -35,7 +35,11 @@ export class Game extends Container {
   public time = 0
   public type!: IGameOptions['type']
   public team!: IGameOptions['team']
-  public cash = 0
+  public cash = {
+    [Team.blue]: 0,
+    [Team.green]: 0
+  }
+
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
   public speedAdjustmentWhileTurningFactor = 0.4
@@ -188,7 +192,7 @@ export class Game extends Container {
       // then command them to move to the clicked location
       if (uids.length > 0) {
         const { gridSize } = this.tileMap
-        this.processCommand(uids, { type: 'move', to: { gridX: point.x / gridSize, gridY: point.y / gridSize }, collisionCount: 0 })
+        this.processCommand(uids, { type: 'move', toPoint: { gridX: point.x / gridSize, gridY: point.y / gridSize } })
       }
     }
 
@@ -693,7 +697,7 @@ export class Game extends Container {
             AUDIO.play('acknowledge-attacking')
           }
         }
-        if (toObject != null && item.orders.type !== 'stand') {
+        if (toObject != null && (item.orders.type === 'attack' || item.orders.type === 'guard')) {
           item.orders.to = toObject
         }
       }

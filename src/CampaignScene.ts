@@ -29,6 +29,12 @@ interface ITimedTrigger {
   action: () => void
 }
 
+interface IIntervalTrigger {
+  type: 'interval'
+  interval: number
+  action: () => void
+}
+
 interface IConditionalTrigger {
   type: 'conditional'
   action: () => void
@@ -47,7 +53,7 @@ interface IMission {
     green: number
   }
   items: IMissionItem[]
-  triggers: Array<ITimedTrigger | IConditionalTrigger>
+  triggers: Array<ITimedTrigger | IConditionalTrigger | IIntervalTrigger>
 }
 
 interface ICampaignSceneOptions {
@@ -137,7 +143,8 @@ export class CampaignScene extends Container implements IScene {
       }))
     })
 
-    this.game.cash = mission.cash.blue
+    this.game.cash[Team.blue] = mission.cash.blue
+    this.game.cash[Team.green] = mission.cash.green
 
     this.game.showMessage({
       character: EMessageCharacter.system,
@@ -176,8 +183,8 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: Transport, initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, ordersable: false },
 
           /* Two damaged enemy scout-tanks patroling the area */
-          { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, orders: { type: 'patrol', from: { gridX: 34, gridY: 20 }, to: { gridX: 42, gridY: 26 } } },
-          { Constructor: ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 21, orders: { type: 'patrol', from: { gridX: 14, gridY: 0 }, to: { gridX: 14, gridY: 14 } } }
+          { Constructor: ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, orders: { type: 'patrol', fromPoint: { gridX: 34, gridY: 20 }, toPoint: { gridX: 42, gridY: 26 } } },
+          { Constructor: ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 21, orders: { type: 'patrol', fromPoint: { gridX: 14, gridY: 0 }, toPoint: { gridX: 14, gridY: 14 } } }
         ],
         triggers: [
           {
@@ -296,10 +303,10 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: ScoutTank, initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
           { Constructor: ScoutTank, initGridX: 53, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
           /* Enemies patrolling the area */
-          { Constructor: ScoutTank, initGridX: 5, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 5, gridY: 5 }, to: { gridX: 20, gridY: 20 } } },
-          { Constructor: ScoutTank, initGridX: 5, initGridY: 15, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 5, gridY: 15 }, to: { gridX: 20, gridY: 30 } } },
-          { Constructor: ScoutTank, initGridX: 25, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 25, gridY: 5 }, to: { gridX: 25, gridY: 20 } } },
-          { Constructor: ScoutTank, initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', from: { gridX: 35, gridY: 5 }, to: { gridX: 35, gridY: 30 } } },
+          { Constructor: ScoutTank, initGridX: 5, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 5, gridY: 5 }, toPoint: { gridX: 20, gridY: 20 } } },
+          { Constructor: ScoutTank, initGridX: 5, initGridY: 15, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 5, gridY: 15 }, toPoint: { gridX: 20, gridY: 30 } } },
+          { Constructor: ScoutTank, initGridX: 25, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 25, gridY: 5 }, toPoint: { gridX: 25, gridY: 20 } } },
+          { Constructor: ScoutTank, initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 35, gridY: 5 }, toPoint: { gridX: 35, gridY: 30 } } },
           /* The Evil Rebel Base */
           { Constructor: Base, initGridX: 5, initGridY: 36, team: Team.green, uid: -11 }
         ],
@@ -311,6 +318,7 @@ export class CampaignScene extends Container implements IScene {
               const { tileMap } = this.game
               const hero = tileMap.getItemByUid(-2)
               if (hero != null) {
+                // Send in reinforcements to defend the base from the first wave
                 this.game.showMessage({
                   character: EMessageCharacter.op,
                   message: 'Commander!! Reinforcements have arrived from the colony.'
@@ -322,6 +330,93 @@ export class CampaignScene extends Container implements IScene {
                   game: this.game, initX: tileMap.gridSize * 60, initY: tileMap.gridSize * 21, team: Team.blue, orders: { type: 'guard', to: hero }
                 }))
               }
+            }
+          },
+          {
+            type: 'timed',
+            time: 25000,
+            action: () => {
+              // Supply extra cash
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
+              })
+              this.game.cash[Team.blue] = 1500
+            }
+          },
+          {
+            type: 'timed',
+            time: 25000,
+            action: () => {
+              // Supply extra cash
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
+              })
+              this.game.cash[Team.blue] = 1500
+            }
+          },
+          {
+            type: 'interval',
+            interval: 1000,
+            action: () => {
+              // Construct a couple of bad guys to hunt the player every time enemy has enough money
+              if (this.game.cash[Team.green] > 1000) {
+                // game.sendCommand([-12, -13], { type: 'construct-unit', details: { type: 'vehicles', name: 'scout-tank', orders: { type: 'hunt' } } })
+              }
+            }
+          },
+          {
+            type: 'interval',
+            interval: 180000,
+            action: () => {
+              // Send in some reinforcements every three minutes
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander!! More Reinforcments have arrived.'
+              })
+              const { tileMap } = this.game
+              tileMap.addItem(new ScoutTank({
+                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 55, gridY: 21 } }
+              }))
+              tileMap.addItem(new HeavyTank({
+                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 23, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 56, gridY: 23 } }
+              }))
+            }
+          },
+          {
+            type: 'timed',
+            time: 300000,
+            action: () => {
+              // Send in air support after 5 minutes
+              this.game.showMessage({
+                character: EMessageCharacter.pilot,
+                message: 'Close Air Support en route. Will try to do what I can.'
+              })
+              const { tileMap } = this.game
+              tileMap.addItem(new HeavyTank({
+                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, ordersable: false, team: Team.blue, orders: { type: 'hunt' }
+              }))
+            }
+          },
+          {
+            type: 'conditional',
+            condition: () => {
+              //  Lose if our base gets destroyed
+              return this.game.tileMap.isItemsDead(-1)
+            },
+            action: () => {
+              this.endMission({ success: false })
+            }
+          },
+          {
+            type: 'conditional',
+            condition: () => {
+              // Win if enemy base gets at least half destroyed
+              return this.game.tileMap.isItemsDead(-1)
+            },
+            action: () => {
+              this.endMission({ success: true })
             }
           }
         ]

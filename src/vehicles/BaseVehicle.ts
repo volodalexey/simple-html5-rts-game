@@ -107,6 +107,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public moveTurning = false
   public turnSpeed = 0
   public hardCollision = false
+  public collisionCount = 0
   public colliding = false
   public lastMovementGridX = 0
   public lastMovementGridY = 0
@@ -374,8 +375,9 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     const thisGrid = this.getGridXY({ center: true })
     switch (this.orders.type) {
       case 'move': {
+        this.collisionCount = 0
         // Move towards destination until distance from destination is less than vehicle radius
-        const distanceFromDestinationSquared = (Math.pow(this.orders.to.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.to.gridY - thisGrid.gridY, 2))
+        const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
           // Stop when within one radius of the destination
           this.orders = { type: 'stand' }
@@ -387,19 +389,19 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
         } else {
           if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
             // Count collsions within 5 radius distance of goal
-            if (this.orders.collisionCount === 0) {
-              this.orders.collisionCount = 1
+            if (this.collisionCount === 0) {
+              this.collisionCount = 1
             } else {
-              this.orders.collisionCount++
+              this.collisionCount++
             }
             // Stop if more than 30 collisions occur
-            if (this.orders.collisionCount > 30) {
+            if (this.collisionCount > 30) {
               this.orders = { type: 'stand' }
               return
             }
           }
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
-          const moving = this.moveTo(this.orders.to, distanceFromDestination)
+          const moving = this._moveTo(this.orders.toPoint, distanceFromDestination)
           // Pathfinding couldn't find a path so stop
           if (!moving) {
             this.orders = { type: 'stand' }
@@ -442,7 +444,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           return
         }
         const toGrid = this.orders.to.getGridXY({ center: true })
-        if ((Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)) < Math.pow(this.sight, 2)) {
+        const distanceFromDestination = Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)
+        if (distanceFromDestination < Math.pow(this.sight, 2)) {
           // Turn towards target and then start attacking when within range of the target
           const newDirection = findAngleGrid({
             from: toGrid, to: thisGrid, directions: this.vector.directions
@@ -476,9 +479,8 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
             }
           }
         } else {
-          const toGrid = this.orders.to.getGridXY({ center: true })
-          const distanceFromDestinationSquared = Math.pow(Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2), 0.5)
-          const moving = this.moveTo(toGrid, distanceFromDestinationSquared)
+          const distanceFromDestinationSquared = Math.pow(distanceFromDestination, 0.5)
+          const moving = this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
           if (!moving) {
             // Pathfinding couldn't find a path so stop
             // e.g. enemy is in hard collide state
@@ -494,13 +496,13 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
           this.orders = { type: 'attack', to: target, nextOrder: this.orders }
           return
         }
-        const distanceFromDestinationSquared = (Math.pow(this.orders.to.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.to.gridY - thisGrid.gridY, 2))
+        const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.sight / tileMap.gridSize, 2)) {
-          const to = this.orders.to
-          this.orders.to = this.orders.from
-          this.orders.from = to
+          const to = this.orders.toPoint
+          this.orders.toPoint = this.orders.fromPoint
+          this.orders.fromPoint = to
         } else {
-          this.moveTo(this.orders.to, distanceFromDestinationSquared)
+          this._moveTo(this.orders.toPoint, distanceFromDestinationSquared)
         }
         break
       }
@@ -533,7 +535,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
             this.orders = { type: 'attack', to: target, nextOrder: this.orders }
           } else {
             const toGrid = this.orders.to.getGridXY({ center: true })
-            this.moveTo(toGrid, distanceFromDestinationSquared)
+            this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
           }
         }
       }
@@ -609,7 +611,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     return collisionObjects
   }
 
-  moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
+  _moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
     this.lastMovementGridX = 0
     this.lastMovementGridY = 0
     const { tileMap, turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game

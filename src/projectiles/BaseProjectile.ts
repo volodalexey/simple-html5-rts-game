@@ -44,6 +44,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
   public turnSpeed = 0
   public moveTurning = false
   public hardCollision = false
+  public collisionCount = 0
   public colliding = false
   public lastMovementGridX = 0
   public lastMovementGridY = 0
@@ -263,7 +264,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
             this.removeFromParent()
           }
         } else {
-          this.moveTo(this.orders.to)
+          this._moveTo(this.orders.to)
         }
         break
       }
@@ -274,7 +275,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
     this.processOrders()
   }
 
-  moveTo (destination: BaseActiveItem): void {
+  _moveTo (destination: BaseActiveItem): void {
     const thisGrid = this.getGridXY({ center: true })
     // Weapons like the heatseeker can turn slowly towards target while moving
     if (this.turnSpeed > 0) {

@@ -5,8 +5,7 @@ export type IOrder = IMoveOrder | IFireOrder | IAttackOrder | IPatrolOrder | ISt
 
 interface IMoveOrder {
   type: 'move'
-  to: IPointGridData
-  collisionCount: number
+  toPoint: IPointGridData
 }
 
 export interface IFireOrder {
@@ -29,8 +28,8 @@ export interface IPointGridData {
 
 interface IPatrolOrder {
   type: 'patrol'
-  from: IPointGridData
-  to: IPointGridData
+  fromPoint: IPointGridData
+  toPoint: IPointGridData
 }
 
 interface IStandOrder {
@@ -39,12 +38,10 @@ interface IStandOrder {
 
 interface ISentryOrder {
   type: 'sentry'
-  to?: IPointGridData
 }
 
 interface IHuntOrder {
   type: 'hunt'
-  to?: IPointGridData
 }
 
 interface IGuardOrder {
@@ -57,5 +54,5 @@ interface IGuardOrder {
 interface IDeployOrder {
   type: 'deploy'
   toUid?: number
-  to?: IPointGridData
+  toPoint?: IPointGridData
 }
