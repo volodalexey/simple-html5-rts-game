@@ -412,8 +412,8 @@ export class CampaignScene extends Container implements IScene {
           {
             type: 'conditional',
             condition: () => {
-              // Win if enemy base gets at least half destroyed
-              return this.game.tileMap.isItemsDead(-1)
+              // Win if enemy base gets destroyed
+              return this.game.tileMap.isItemsDead(-11)
             },
             action: () => {
               this.endMission({ success: true })

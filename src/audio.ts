@@ -1,7 +1,12 @@
 import { Howl } from 'howler'
 import bullet1Audio from './assets/audio/bullet1.mp3'
 import bullet2Audio from './assets/audio/bullet2.mp3'
-import bulletHitAudio from './assets/audio/bullet-hit.mp3'
+import bulletHit0Audio from './assets/audio/bullet-hit-0.mp3'
+import bulletHit1Audio from './assets/audio/bullet-hit-1.mp3'
+import bulletHit2Audio from './assets/audio/bullet-hit-2.mp3'
+import bulletHit3Audio from './assets/audio/bullet-hit-3.mp3'
+import bulletHit4Audio from './assets/audio/bullet-hit-4.mp3'
+import bulletHit5Audio from './assets/audio/bullet-hit-5.mp3'
 import cannon1Audio from './assets/audio/cannon1.mp3'
 import cannon2Audio from './assets/audio/cannon2.mp3'
 import cannonHitAudio from './assets/audio/cannon-hit.mp3'
@@ -36,8 +41,23 @@ export const AUDIO = {
   bullet2: new Howl({
     src: bullet2Audio
   }),
-  bulletHit: new Howl({
-    src: bulletHitAudio
+  bulletHit0: new Howl({
+    src: bulletHit0Audio
+  }),
+  bulletHit1: new Howl({
+    src: bulletHit1Audio
+  }),
+  bulletHit2: new Howl({
+    src: bulletHit2Audio
+  }),
+  bulletHit3: new Howl({
+    src: bulletHit3Audio
+  }),
+  bulletHit4: new Howl({
+    src: bulletHit4Audio
+  }),
+  bulletHit5: new Howl({
+    src: bulletHit5Audio
   }),
   cannon1: new Howl({
     src: cannon1Audio
@@ -129,7 +149,7 @@ export const AUDIO = {
     } else if (name === 'bullet') {
       sounds = [this.bullet1, this.bullet2]
     } else if (name === 'bullet-hit') {
-      sounds = [this.bulletHit]
+      sounds = [this.bulletHit0, this.bulletHit1, this.bulletHit2, this.bulletHit3, this.bulletHit4, this.bulletHit5]
     } else if (name === 'rocket') {
       sounds = [this.heatseeker1, this.heatseeker2]
     } else if (name === 'laser') {

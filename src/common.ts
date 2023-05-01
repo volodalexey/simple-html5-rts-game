@@ -95,20 +95,20 @@ interface IBound {
   left: number
 }
 
-export function checkCollision (a: IBound, b: IBound): number {
-  const rightmostLeft = a.left < b.left ? b.left : a.left
-  const leftmostRight = a.right > b.right ? b.right : a.right
+export function checkCollision (a: IBound, b: IBound, compareWith: 'a' | 'b' = 'a'): number {
+  const rightmostLeft = Math.max(b.left, a.left)
+  const leftmostRight = Math.min(b.right, a.right)
 
   if (leftmostRight <= rightmostLeft) {
     return 0
   }
 
-  const bottommostTop = a.top < b.top ? b.top : a.top
-  const topmostBottom = a.bottom > b.bottom ? b.bottom : a.bottom
+  const bottommostTop = Math.max(b.top, a.top)
+  const topmostBottom = Math.min(b.bottom, a.bottom)
 
   if (topmostBottom > bottommostTop) {
     const squareIntersection = (leftmostRight - rightmostLeft) * (topmostBottom - bottommostTop)
-    const squareTarget = (b.right - b.left) * (b.bottom - b.top)
+    const squareTarget = compareWith === 'a' ? (a.right - a.left) * (a.bottom - a.top) : (b.right - b.left) * (b.bottom - b.top)
     return squareIntersection / squareTarget
   }
   return 0

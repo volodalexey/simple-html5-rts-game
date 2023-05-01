@@ -33,6 +33,6 @@ export class Bullet extends BaseProjectile {
   }
 
   playHitSound (): void {
-    AUDIO.bulletHit.play()
+    AUDIO.play('bullet-hit')
   }
 }
