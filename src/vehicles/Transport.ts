@@ -1,4 +1,5 @@
 import { Team } from '../common'
+import { Bullet } from '../projectiles/Bullet'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type ITransportOptions = Pick<
@@ -43,6 +44,7 @@ export class Transport extends Vehicle {
   public cost = 400
   public hitPoints = 100
   public turnSpeed = 2
+  public Projectile = Bullet
 
   constructor (options: ITransportOptions) {
     super({
