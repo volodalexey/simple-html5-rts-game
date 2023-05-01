@@ -303,8 +303,14 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
     const cy = radius + strokeWidth
     for (let i = 0; i < segmentsCount; i++) {
       selection.beginFill(i % 2 === 0 ? strokeColor : strokeSecondColor)
-      selection.arc(cx, cy, radius, segment * i, segment * (i + 1))
-      selection.arc(cx, cy, radius + strokeWidth, segment * i, segment * (i + 1))
+      const angleStart = segment * i
+      const angleEnd = segment * (i + 1)
+      const radiusStroke = radius + strokeWidth
+      selection.moveTo(cx + radius * Math.cos(angleStart), cy + radius * Math.sin(angleStart))
+      selection.lineTo(cx + radiusStroke * Math.cos(angleStart), cy + radiusStroke * Math.sin(angleStart))
+      selection.arc(cx, cy, radiusStroke, angleStart, angleEnd)
+      selection.lineTo(cx + radius * Math.cos(angleEnd), cy + radius * Math.sin(angleEnd))
+      selection.arc(cx, cy, radius, angleEnd, angleStart, true)
       selection.endFill()
     }
     this.selectedGraphics.alpha = 0
