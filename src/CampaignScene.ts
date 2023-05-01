@@ -302,7 +302,7 @@ export class CampaignScene extends Container implements IScene {
         },
         items: [
           { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
-          { Constructor: GroundTurret, initGridX: 53, initGridY: 17, direction: EVectorDirection.upLeft, team: Team.blue },
+          { Constructor: GroundTurret, initGridX: 53, initGridY: 17, direction: EVectorDirection.up, team: Team.blue },
           { Constructor: HeavyTank, initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, orders: { type: 'sentry' } },
           /* The first wave of attacks */
           { Constructor: ScoutTank, initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },

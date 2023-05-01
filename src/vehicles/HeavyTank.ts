@@ -34,7 +34,18 @@ export class HeavyTank extends Vehicle {
     emptyColor: 0xff0000,
     offset: {
       x: 3,
-      y: -6
+      y: -8
+    }
+  }
+
+  public drawReloadBarOptions = {
+    alpha: 1,
+    width: 26,
+    height: 2,
+    fillColor: 0xc1a517,
+    offset: {
+      x: 3,
+      y: -3
     }
   }
 
@@ -60,6 +71,8 @@ export class HeavyTank extends Vehicle {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+    this.drawReloadBar()
+    this.updateReload()
     this.updateAnimation()
 
     this.checkDrawVehicleBounds()

@@ -17,6 +17,7 @@ import { type Laser } from '../projectiles/Laser'
 import { type Rocket } from '../projectiles/HeatSeeker'
 import { logVehicleBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
+import { ReloadBar } from '../ReloadBar'
 
 export interface IVehicleTextures {
   upTextures: Texture[]
@@ -85,6 +86,17 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
+  public drawReloadBarOptions = {
+    alpha: 0,
+    width: 0,
+    height: 0,
+    fillColor: 0,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
   public game: Game
   public uid: number
   public type = EItemType.vehicles
@@ -92,6 +104,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public hitPoints = 0
   public life = 0
   public lifeBar!: LifeBar
+  public reloadBar!: ReloadBar
   public team: Team
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
@@ -187,6 +200,9 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
 
     this.lifeBar = new LifeBar(this.drawLifeBarOptions)
     this.addChild(this.lifeBar)
+
+    this.reloadBar = new ReloadBar(this.drawReloadBarOptions)
+    this.addChild(this.reloadBar)
   }
 
   setSelected (selected: boolean): void {
@@ -560,6 +576,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
     }
     this.processOrders()
+    this.updateReload()
     this.zIndex = this.y + this.height
   }
 
@@ -755,5 +772,16 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   removeAndDestroy (): void {
     this.game.deselectItem(this)
     this.removeFromParent()
+  }
+
+  drawReloadBar (): void {
+    this.reloadBar.draw(this.drawReloadBarOptions)
+    const { offset } = this.drawReloadBarOptions
+    this.reloadBar.position.set(offset.x, offset.y)
+  }
+
+  updateReload (): void {
+    const { reloadTime } = this.Projectile
+    this.reloadBar.updateReload((reloadTime - this.reloadTimeLeft) / reloadTime)
   }
 }

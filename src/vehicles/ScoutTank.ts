@@ -38,6 +38,17 @@ export class ScoutTank extends Vehicle {
     }
   }
 
+  public drawReloadBarOptions = {
+    alpha: 1,
+    width: 22,
+    height: 2,
+    fillColor: 0xc1a517,
+    offset: {
+      x: 0,
+      y: -2
+    }
+  }
+
   public radius = 11
   public speed = 20
   public sight = 4
@@ -60,6 +71,8 @@ export class ScoutTank extends Vehicle {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+    this.drawReloadBar()
+    this.updateReload()
     this.updateAnimation()
 
     this.checkDrawVehicleBounds()

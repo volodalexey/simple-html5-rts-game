@@ -73,7 +73,18 @@ export class GroundTurret extends Building implements IBuildable, ITurnable {
     emptyColor: 0xff0000,
     offset: {
       x: 8,
-      y: 0
+      y: -2
+    }
+  }
+
+  public drawReloadBarOptions = {
+    alpha: 1,
+    width: 22,
+    height: 2,
+    fillColor: 0xc1a517,
+    offset: {
+      x: 8,
+      y: 3
     }
   }
 
@@ -123,6 +134,8 @@ export class GroundTurret extends Building implements IBuildable, ITurnable {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+    this.drawReloadBar()
+    this.updateReload()
     this.updateAnimation()
 
     this.checkDrawBuildingBounds()
@@ -295,6 +308,7 @@ export class GroundTurret extends Building implements IBuildable, ITurnable {
       this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
     }
     this.processOrders()
+    this.updateReload()
     this.zIndex = this.y + this.height
   }
 }
