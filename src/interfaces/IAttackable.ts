@@ -1,10 +1,9 @@
 import { type BaseActiveItem } from '../common'
-import { type BaseProjectile } from '../projectiles/BaseProjectile'
+import { type Projectile } from '../projectiles/Projectile'
 
 export interface IAttackable {
-  sight: number
   radius: number
-  Projectile: typeof BaseProjectile
+  Projectile: typeof Projectile
   canAttack: boolean
   canAttackLand: boolean
   canAttackAir: boolean

@@ -1,14 +1,14 @@
 import { Team } from '../common'
-import { BaseVehicle, type IBaseVehicleOptions, type IBaseVehicleTextures } from './BaseVehicle'
+import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type ITransportOptions = Pick<
-IBaseVehicleOptions,
-Exclude<keyof IBaseVehicleOptions, 'textures'>
+IVehicleOptions,
+Exclude<keyof IVehicleOptions, 'textures'>
 >
 
-export class Transport extends BaseVehicle {
-  static blueTextures: IBaseVehicleTextures
-  static greenTextures: IBaseVehicleTextures
+export class Transport extends Vehicle {
+  static blueTextures: IVehicleTextures
+  static greenTextures: IVehicleTextures
 
   public drawSelectionOptions = {
     width: 0,
@@ -63,8 +63,8 @@ export class Transport extends BaseVehicle {
     blueTextures,
     greenTextures
   }: {
-    blueTextures: IBaseVehicleTextures
-    greenTextures: IBaseVehicleTextures
+    blueTextures: IVehicleTextures
+    greenTextures: IVehicleTextures
   }): void {
     Transport.blueTextures = blueTextures
     Transport.greenTextures = greenTextures

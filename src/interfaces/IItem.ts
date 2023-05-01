@@ -10,6 +10,7 @@ export enum EItemType {
 
 export interface IItem {
   uid: number
+  sight: number
   type: EItemType
   ordersable: boolean
   getGridXY: () => { gridX: number, gridY: number }

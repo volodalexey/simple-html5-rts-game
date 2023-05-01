@@ -2,10 +2,10 @@ import { Assets, Container, type IPointData, Sprite, type Texture } from 'pixi.j
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { manifest } from './LoaderScene'
-import { BaseBuilding } from './buildings/BaseBuilding'
-import { BaseVehicle } from './vehicles/BaseVehicle'
+import { Building } from './buildings/Building'
+import { Vehicle } from './vehicles/Vehicle'
 import { type BaseMoveableItem, type BaseActiveItem, type BaseItem } from './common'
-import { BaseProjectile } from './projectiles/BaseProjectile'
+import { Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
 
@@ -27,10 +27,10 @@ export class TileMap extends Container {
   private _currentMapPassableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()
-  public buildings = new Container<BaseBuilding>()
-  public vehicles = new Container<BaseVehicle>()
+  public buildings = new Container<Building>()
+  public vehicles = new Container<Vehicle>()
   public orders = new Container<Order>()
-  public projectiles = new Container<BaseProjectile>()
+  public projectiles = new Container<Projectile>()
   public background = new Sprite()
   public minXPivot = 0
   public maxXPivot = 0
@@ -203,11 +203,11 @@ export class TileMap extends Container {
   }
 
   addItem (item: BaseItem): void {
-    if (item instanceof BaseBuilding) {
+    if (item instanceof Building) {
       this.buildings.addChild(item)
-    } else if (item instanceof BaseVehicle) {
+    } else if (item instanceof Vehicle) {
       this.vehicles.addChild(item)
-    } else if (item instanceof BaseProjectile) {
+    } else if (item instanceof Projectile) {
       this.projectiles.addChild(item)
     }
   }

@@ -1,13 +1,13 @@
 import { AUDIO } from '../audio'
-import { BaseProjectile, type IBaseProjectileOptions, type IBaseProjectileTextures } from './BaseProjectile'
+import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
 export type IFireBallOptions = Pick<
-IBaseProjectileOptions,
-Exclude<keyof IBaseProjectileOptions, 'textures'>
+IProjectileOptions,
+Exclude<keyof IProjectileOptions, 'textures'>
 >
 
-export class Laser extends BaseProjectile {
-  static textures: IBaseProjectileTextures
+export class Laser extends Projectile {
+  static textures: IProjectileTextures
   static reloadTime = 30
 
   public speed = 60
@@ -26,7 +26,7 @@ export class Laser extends BaseProjectile {
   static prepareTextures ({
     textures
   }: {
-    textures: IBaseProjectileTextures
+    textures: IProjectileTextures
   }): void {
     Laser.textures = textures
   }

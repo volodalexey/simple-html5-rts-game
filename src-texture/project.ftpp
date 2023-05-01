@@ -790,6 +790,186 @@
       "folder": ""
     },
     {
+      "name": "ground-turret-blue-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-down.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-left.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-right.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-healthy-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-healthy-up.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-0.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-1.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-2.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-3.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-4.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-5.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-6.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-7.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-7.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-blue-teleport-8.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-blue-teleport-8.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-down.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-left.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-right.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-healthy-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-healthy-up.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-0.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-1.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-2.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-3.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-4.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-5.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-6.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-7.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-7.png",
+      "folder": ""
+    },
+    {
+      "name": "ground-turret-green-teleport-8.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/ground-turret-green-teleport-8.png",
+      "folder": ""
+    },
+    {
       "name": "harvester-blue-down-left.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/harvester-blue-down-left.png",
       "folder": ""
@@ -1040,6 +1220,216 @@
       "folder": ""
     },
     {
+      "name": "oil-derrick-blue-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-00.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-00.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-01.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-01.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-02.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-02.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-03.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-03.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-04.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-04.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-05.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-05.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-06.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-06.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-07.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-07.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-08.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-08.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-09.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-09.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-10.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-10.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-11.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-11.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-12.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-12.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-13.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-13.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-14.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-14.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-15.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-15.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-deploy-16.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-deploy-16.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-healthy-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-healthy-0.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-healthy-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-healthy-1.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-blue-healthy-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-blue-healthy-2.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-00.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-00.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-01.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-01.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-02.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-02.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-03.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-03.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-04.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-04.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-05.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-05.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-06.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-06.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-07.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-07.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-08.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-08.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-09.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-09.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-10.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-10.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-11.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-11.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-12.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-12.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-13.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-13.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-14.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-14.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-15.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-15.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-deploy-16.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-deploy-16.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-healthy-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-healthy-0.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-healthy-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-healthy-1.png",
+      "folder": ""
+    },
+    {
+      "name": "oil-derrick-green-healthy-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/oil-derrick-green-healthy-2.png",
+      "folder": ""
+    },
+    {
       "name": "scout-tank-blue-down-left.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-blue-down-left.png",
       "folder": ""
@@ -1117,6 +1507,326 @@
     {
       "name": "scout-tank-green-up.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-up.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-00.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-00.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-01.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-01.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-02.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-02.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-03.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-03.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-04.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-04.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-05.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-05.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-06.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-06.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-07.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-07.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-08.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-08.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-09.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-09.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-10.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-10.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-11.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-11.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-12.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-12.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-13.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-13.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-14.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-14.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-15.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-15.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-16.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-16.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-closing-17.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-closing-17.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-healthy-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-healthy-0.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-healthy-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-healthy-1.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-healthy-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-healthy-2.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-healthy-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-healthy-3.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-0.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-1.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-2.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-3.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-4.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-5.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-6.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-7.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-7.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-blue-teleport-8.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-blue-teleport-8.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-00.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-00.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-01.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-01.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-02.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-02.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-03.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-03.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-04.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-04.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-05.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-05.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-06.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-06.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-07.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-07.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-08.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-08.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-09.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-09.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-10.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-10.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-11.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-11.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-12.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-12.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-13.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-13.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-14.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-14.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-15.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-15.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-16.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-16.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-closing-17.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-closing-17.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-damaged.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-damaged.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-healthy-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-healthy-0.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-healthy-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-healthy-1.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-healthy-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-healthy-2.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-healthy-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-healthy-3.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-0.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-0.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-1.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-1.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-2.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-2.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-3.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-3.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-4.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-4.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-5.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-5.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-6.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-6.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-7.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-7.png",
+      "folder": ""
+    },
+    {
+      "name": "starport-green-teleport-8.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/starport-green-teleport-8.png",
       "folder": ""
     },
     {

@@ -7,7 +7,7 @@ import { type IOrder } from '../interfaces/IOrder'
 import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../common'
 import { logProjectileBounds } from '../logger'
 
-export interface IBaseProjectileTextures {
+export interface IProjectileTextures {
   upTextures: Texture[]
   upRightTextures: Texture[]
   rightTextures: Texture[]
@@ -19,9 +19,9 @@ export interface IBaseProjectileTextures {
   explodeTextures: Texture[]
 }
 
-export interface IBaseProjectileOptions {
+export interface IProjectileOptions {
   game: Game
-  textures: IBaseProjectileTextures
+  textures: IProjectileTextures
   direction: EVectorDirection
   initX: number
   initY: number
@@ -29,11 +29,12 @@ export interface IBaseProjectileOptions {
   uid?: number
 }
 
-export class BaseProjectile extends Container implements IItem, IMoveable {
+export class Projectile extends Container implements IItem, IMoveable {
   static reloadTime = 0
 
   public game: Game
   public uid: number
+  public sight = 0
   public type = EItemType.bullets
   public ordersable = true
   public range = 0
@@ -62,7 +63,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
   public explodeAnimation!: AnimatedSprite
   public spritesContainer = new Container<AnimatedSprite>()
 
-  constructor (options: IBaseProjectileOptions) {
+  constructor (options: IProjectileOptions) {
     super()
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
@@ -87,7 +88,7 @@ export class BaseProjectile extends Container implements IItem, IMoveable {
       upLeftTextures,
       explodeTextures
     }
-  }: IBaseProjectileOptions): void {
+  }: IProjectileOptions): void {
     this.addChild(this.spritesContainer)
 
     const upAnimation = new AnimatedSprite(upTextures)

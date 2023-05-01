@@ -1,15 +1,15 @@
 import { Team } from '../common'
 import { CannonBall } from '../projectiles/CannonBall'
-import { BaseVehicle, type IBaseVehicleOptions, type IBaseVehicleTextures } from './BaseVehicle'
+import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type IHeavyTankOptions = Pick<
-IBaseVehicleOptions,
-Exclude<keyof IBaseVehicleOptions, 'textures'>
+IVehicleOptions,
+Exclude<keyof IVehicleOptions, 'textures'>
 >
 
-export class HeavyTank extends BaseVehicle {
-  static blueTextures: IBaseVehicleTextures
-  static greenTextures: IBaseVehicleTextures
+export class HeavyTank extends Vehicle {
+  static blueTextures: IVehicleTextures
+  static greenTextures: IVehicleTextures
 
   public drawSelectionOptions = {
     width: 0,
@@ -68,8 +68,8 @@ export class HeavyTank extends BaseVehicle {
     blueTextures,
     greenTextures
   }: {
-    blueTextures: IBaseVehicleTextures
-    greenTextures: IBaseVehicleTextures
+    blueTextures: IVehicleTextures
+    greenTextures: IVehicleTextures
   }): void {
     HeavyTank.blueTextures = blueTextures
     HeavyTank.greenTextures = greenTextures

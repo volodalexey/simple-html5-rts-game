@@ -1,13 +1,13 @@
 import { AUDIO } from '../audio'
-import { BaseProjectile, type IBaseProjectileOptions, type IBaseProjectileTextures } from './BaseProjectile'
+import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
 export type IBulletOptions = Pick<
-IBaseProjectileOptions,
-Exclude<keyof IBaseProjectileOptions, 'textures'>
+IProjectileOptions,
+Exclude<keyof IProjectileOptions, 'textures'>
 >
 
-export class Bullet extends BaseProjectile {
-  static textures: IBaseProjectileTextures
+export class Bullet extends Projectile {
+  static textures: IProjectileTextures
   static reloadTime = 2
   static shootAudio = ''
 
@@ -27,7 +27,7 @@ export class Bullet extends BaseProjectile {
   static prepareTextures ({
     textures
   }: {
-    textures: IBaseProjectileTextures
+    textures: IProjectileTextures
   }): void {
     Bullet.textures = textures
   }

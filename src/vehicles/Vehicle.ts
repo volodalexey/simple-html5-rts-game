@@ -17,7 +17,7 @@ import { type Laser } from '../projectiles/Laser'
 import { type Rocket } from '../projectiles/HeatSeeker'
 import { logVehicleBounds } from '../logger'
 
-export interface IBaseVehicleTextures {
+export interface IVehicleTextures {
   upTextures: Texture[]
   upRightTextures: Texture[]
   rightTextures: Texture[]
@@ -28,13 +28,13 @@ export interface IBaseVehicleTextures {
   upLeftTextures: Texture[]
 }
 
-export interface IBaseVehicleOptions {
+export interface IVehicleOptions {
   game: Game
   uid?: number
   initX: number
   initY: number
   team: Team
-  textures: IBaseVehicleTextures
+  textures: IVehicleTextures
   direction?: EVectorDirection
   life?: number
   selectable?: boolean
@@ -53,7 +53,7 @@ interface IPathPoint {
   y: number
 }
 
-export class BaseVehicle extends Container implements IItem, ISelectable, ILifeable, IAttackable, IMoveable, IBuildable {
+export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IAttackable, IMoveable, IBuildable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Container()
@@ -121,7 +121,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
   public reloadTimeLeft = 0
   public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
 
-  constructor (options: IBaseVehicleOptions) {
+  constructor (options: IVehicleOptions) {
     super()
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
@@ -151,7 +151,7 @@ export class BaseVehicle extends Container implements IItem, ISelectable, ILifea
       leftTextures,
       upLeftTextures
     }
-  }: IBaseVehicleOptions): void {
+  }: IVehicleOptions): void {
     this.addChild(this.selectedGraphics)
     this.addChild(this.spritesContainer)
 

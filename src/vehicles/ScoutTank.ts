@@ -1,15 +1,15 @@
 import { Team } from '../common'
 import { Bullet } from '../projectiles/Bullet'
-import { BaseVehicle, type IBaseVehicleOptions, type IBaseVehicleTextures } from './BaseVehicle'
+import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type IScoutTankOptions = Pick<
-IBaseVehicleOptions,
-Exclude<keyof IBaseVehicleOptions, 'textures'>
+IVehicleOptions,
+Exclude<keyof IVehicleOptions, 'textures'>
 >
 
-export class ScoutTank extends BaseVehicle {
-  static blueTextures: IBaseVehicleTextures
-  static greenTextures: IBaseVehicleTextures
+export class ScoutTank extends Vehicle {
+  static blueTextures: IVehicleTextures
+  static greenTextures: IVehicleTextures
 
   public drawSelectionOptions = {
     width: 0,
@@ -68,8 +68,8 @@ export class ScoutTank extends BaseVehicle {
     blueTextures,
     greenTextures
   }: {
-    blueTextures: IBaseVehicleTextures
-    greenTextures: IBaseVehicleTextures
+    blueTextures: IVehicleTextures
+    greenTextures: IVehicleTextures
   }): void {
     ScoutTank.blueTextures = blueTextures
     ScoutTank.greenTextures = greenTextures

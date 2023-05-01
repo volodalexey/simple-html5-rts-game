@@ -9,9 +9,13 @@ import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
 import { EMessageCharacter } from './StatusBar'
 import { type IOrder } from './interfaces/IOrder'
+import { GroundTurret } from './buildings/GroundTurret'
+import { type OilDerrick } from './buildings/OilDerrick'
+import { type Starport } from './buildings/Starport'
 
 interface IMissionItem {
-  Constructor: typeof Base | typeof HeavyTank | typeof ScoutTank | typeof Transport
+  Constructor: typeof Base | typeof GroundTurret | typeof OilDerrick | typeof Starport |
+    typeof HeavyTank | typeof ScoutTank | typeof Transport
   initGridX: number
   initGridY: number
   team: Team
@@ -298,6 +302,7 @@ export class CampaignScene extends Container implements IScene {
         },
         items: [
           { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
+          { Constructor: GroundTurret, initGridX: 53, initGridY: 17, team: Team.blue, uid: -1 },
           { Constructor: HeavyTank, initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, orders: { type: 'sentry' } },
           /* The first wave of attacks */
           { Constructor: ScoutTank, initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
@@ -307,8 +312,11 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: ScoutTank, initGridX: 5, initGridY: 15, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 5, gridY: 15 }, toPoint: { gridX: 20, gridY: 30 } } },
           { Constructor: ScoutTank, initGridX: 25, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 25, gridY: 5 }, toPoint: { gridX: 25, gridY: 20 } } },
           { Constructor: ScoutTank, initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 35, gridY: 5 }, toPoint: { gridX: 35, gridY: 30 } } },
-          /* The Evil Rebel Base */
-          { Constructor: Base, initGridX: 5, initGridY: 36, team: Team.green, uid: -11 }
+          /* The Enemy Rebel Base */
+          { Constructor: Base, initGridX: 5, initGridY: 36, team: Team.green, uid: -11 },
+          { Constructor: GroundTurret, initGridX: 5, initGridY: 28, team: Team.green },
+          { Constructor: GroundTurret, initGridX: 7, initGridY: 33, team: Team.green },
+          { Constructor: GroundTurret, initGridX: 8, initGridY: 37, team: Team.green }
         ],
         triggers: [
           {

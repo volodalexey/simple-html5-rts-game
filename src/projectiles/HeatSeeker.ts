@@ -1,13 +1,13 @@
 import { AUDIO } from '../audio'
-import { BaseProjectile, type IBaseProjectileOptions, type IBaseProjectileTextures } from './BaseProjectile'
+import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
 export type IHeatSeekerOptions = Pick<
-IBaseProjectileOptions,
-Exclude<keyof IBaseProjectileOptions, 'textures'>
+IProjectileOptions,
+Exclude<keyof IProjectileOptions, 'textures'>
 >
 
-export class Rocket extends BaseProjectile {
-  static textures: IBaseProjectileTextures
+export class Rocket extends Projectile {
+  static textures: IProjectileTextures
   static reloadTime = 40
 
   public speed = 25
@@ -27,7 +27,7 @@ export class Rocket extends BaseProjectile {
   static prepareTextures ({
     textures
   }: {
-    textures: IBaseProjectileTextures
+    textures: IProjectileTextures
   }): void {
     Rocket.textures = textures
   }

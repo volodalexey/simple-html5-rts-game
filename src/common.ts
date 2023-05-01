@@ -1,18 +1,18 @@
 import { type EVectorDirection } from './Vector'
-import { type BaseBuilding } from './buildings/BaseBuilding'
+import { type Building } from './buildings/Building'
 import { type IItem } from './interfaces/IItem'
 import { type ISelectable } from './interfaces/ISelectable'
-import { type BaseProjectile } from './projectiles/BaseProjectile'
-import { type BaseVehicle } from './vehicles/BaseVehicle'
+import { type Projectile } from './projectiles/Projectile'
+import { type Vehicle } from './vehicles/Vehicle'
 
 export enum Team {
   blue = 'blue',
   green = 'green'
 }
 
-export type BaseItem = BaseBuilding | BaseVehicle | BaseProjectile
-export type BaseActiveItem = BaseBuilding | BaseVehicle
-export type BaseMoveableItem = BaseVehicle
+export type BaseItem = Building | Vehicle | Projectile
+export type BaseActiveItem = Building | Vehicle
+export type BaseMoveableItem = Vehicle
 export type SelectableItem = ISelectable & IItem
 
 /**

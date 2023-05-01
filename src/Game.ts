@@ -22,6 +22,9 @@ import { StartModal } from './StartModal'
 import { Firework } from './Particle'
 import { SceneManager } from './SceneManager'
 import { TopBar } from './TopBar'
+import { GroundTurret } from './buildings/GroundTurret'
+import { OilDerrick } from './buildings/OilDerrick'
+import { Starport } from './buildings/Starport'
 
 export interface IGameOptions {
   viewWidth: number
@@ -486,6 +489,63 @@ export class Game extends Container {
         healthyTextures: animations['base-green-healthy'],
         damagedTextures: [textures['base-green-damaged.png']],
         constructingTextures: animations['base-green-contructing']
+      }
+    })
+
+    GroundTurret.prepareTextures({
+      blueTextures: {
+        healthyTextures: [textures['ground-turret-blue-healthy-up.png']],
+        upTextures: [textures['ground-turret-blue-healthy-up.png']],
+        upRightTextures: [textures['ground-turret-blue-healthy-up-right.png']],
+        rightTextures: [textures['ground-turret-blue-healthy-right.png']],
+        downRightTextures: [textures['ground-turret-blue-healthy-down-right.png']],
+        downTextures: [textures['ground-turret-blue-healthy-down.png']],
+        downLeftTextures: [textures['ground-turret-blue-healthy-down-left.png']],
+        leftTextures: [textures['ground-turret-blue-healthy-left.png']],
+        upLeftTextures: [textures['ground-turret-blue-healthy-up-left.png']],
+        damagedTextures: [textures['ground-turret-blue-damaged.png']],
+        teleportTextures: animations['ground-turret-blue-teleport']
+      },
+      greenTextures: {
+        healthyTextures: [textures['ground-turret-green-healthy-up.png']],
+        upTextures: [textures['ground-turret-green-healthy-up.png']],
+        upRightTextures: [textures['ground-turret-green-healthy-up-right.png']],
+        rightTextures: [textures['ground-turret-green-healthy-right.png']],
+        downRightTextures: [textures['ground-turret-green-healthy-down-right.png']],
+        downTextures: [textures['ground-turret-green-healthy-down.png']],
+        downLeftTextures: [textures['ground-turret-green-healthy-down-left.png']],
+        leftTextures: [textures['ground-turret-green-healthy-left.png']],
+        upLeftTextures: [textures['ground-turret-green-healthy-up-left.png']],
+        damagedTextures: [textures['ground-turret-green-damaged.png']],
+        teleportTextures: animations['ground-turret-green-teleport']
+      }
+    })
+
+    OilDerrick.prepareTextures({
+      blueTextures: {
+        healthyTextures: animations['oil-derrick-blue-healthy'],
+        damagedTextures: [textures['oil-derrick-blue-damaged.png']],
+        deployTextures: animations['oil-derrick-blue-deploy']
+      },
+      greenTextures: {
+        healthyTextures: animations['oil-derrick-green-healthy'],
+        damagedTextures: [textures['oil-derrick-green-damaged.png']],
+        deployTextures: animations['oil-derrick-green-deploy']
+      }
+    })
+
+    Starport.prepareTextures({
+      blueTextures: {
+        healthyTextures: animations['starport-blue-healthy'],
+        damagedTextures: [textures['starport-blue-damaged.png']],
+        teleportTextures: animations['starport-blue-teleport'],
+        closingTextures: animations['starport-blue-closing']
+      },
+      greenTextures: {
+        healthyTextures: animations['starport-green-healthy'],
+        damagedTextures: [textures['starport-green-damaged.png']],
+        teleportTextures: animations['starport-green-teleport'],
+        closingTextures: animations['starport-green-closing']
       }
     })
 

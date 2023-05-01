@@ -10,26 +10,25 @@ import { logBuildingBounds } from '../logger'
 import { type IAttackable } from '../interfaces/IAttackable'
 import { type Bullet } from '../projectiles/Bullet'
 
-export interface IBaseBuildingTextures {
+export interface IBuildingTextures {
   healthyTextures: Texture[]
   damagedTextures: Texture[]
-  constructingTextures: Texture[]
 }
 
-export interface IBaseBuildingOptions {
+export interface IBuildingOptions {
   game: Game
   uid?: number
   initX: number
   initY: number
   team: Team
-  textures: IBaseBuildingTextures
+  textures: IBuildingTextures
   life?: number
   selectable?: boolean
   ordersable?: boolean
   orders?: IOrder
 }
 
-export class BaseBuilding extends Container implements IItem, ISelectable, ILifeable, IAttackable {
+export class Building extends Container implements IItem, ISelectable, ILifeable, IAttackable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Container()
@@ -87,13 +86,11 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   public team: Team
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite
-  public constructingAnimation!: AnimatedSprite
   public currentAnimation!: AnimatedSprite
   public healthyAnimationSpeed = 0.1
   public damagedAnimationSpeed = 0.1
-  public constructingAnimationSpeed = 0.1
 
-  constructor (options: IBaseBuildingOptions) {
+  constructor (options: IBuildingOptions) {
     super()
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
@@ -116,14 +113,13 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
   setup ({
     textures: {
       healthyTextures,
-      damagedTextures,
-      constructingTextures
+      damagedTextures
     }
-  }: IBaseBuildingOptions): void {
+  }: IBuildingOptions): void {
     this.addChild(this.selectedGraphics)
     this.addChild(this.spritesContainer)
 
-    const { healthyAnimationSpeed, damagedAnimationSpeed, constructingAnimationSpeed } = this
+    const { healthyAnimationSpeed, damagedAnimationSpeed } = this
 
     const healthyAnimation = new AnimatedSprite(healthyTextures)
     healthyAnimation.animationSpeed = healthyAnimationSpeed
@@ -134,11 +130,6 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
     damagedAnimation.animationSpeed = damagedAnimationSpeed
     this.spritesContainer.addChild(damagedAnimation)
     this.damagedAnimation = damagedAnimation
-
-    const constructingAnimation = new AnimatedSprite(constructingTextures)
-    constructingAnimation.animationSpeed = constructingAnimationSpeed
-    this.spritesContainer.addChild(constructingAnimation)
-    this.constructingAnimation = constructingAnimation
 
     this.lifeBar = new LifeBar(this.drawLifeBarOptions)
     this.addChild(this.lifeBar)
@@ -192,9 +183,6 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
         break
       case BaseAnimation.damaged:
         newAnimation = this.damagedAnimation
-        break
-      case BaseAnimation.constructing:
-        newAnimation = this.constructingAnimation
         break
     }
     if (newAnimation === this.currentAnimation) {
@@ -357,5 +345,4 @@ export class BaseBuilding extends Container implements IItem, ISelectable, ILife
 export enum BaseAnimation {
   healthy = 'healthy',
   damaged = 'damaged',
-  constructing = 'constructing',
 }
