@@ -60,6 +60,7 @@ export class HeavyTank extends Vehicle {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+    this.updateAnimation()
 
     this.checkDrawVehicleBounds()
   }

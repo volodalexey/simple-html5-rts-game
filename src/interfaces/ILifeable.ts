@@ -18,6 +18,7 @@ export interface ILifeable {
     }
   }
   isAlive: () => boolean
+  isHealthy: () => boolean
   isDead: () => boolean
   subLife: (damage: number) => void
 }

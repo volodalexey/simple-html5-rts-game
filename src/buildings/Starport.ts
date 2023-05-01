@@ -20,6 +20,17 @@ export class Starport extends Building implements IBuildable {
     return team === Team.blue ? Starport.blueTextures : Starport.greenTextures
   }
 
+  static prepareTextures ({
+    blueTextures,
+    greenTextures
+  }: {
+    blueTextures: IStarportTextures
+    greenTextures: IStarportTextures
+  }): void {
+    Starport.blueTextures = blueTextures
+    Starport.greenTextures = greenTextures
+  }
+
   public drawSelectionOptions = {
     width: 42,
     height: 58,
@@ -96,16 +107,5 @@ export class Starport extends Building implements IBuildable {
     closingAnimation.animationSpeed = this.closingAnimationSpeed
     this.spritesContainer.addChild(closingAnimation)
     this.closingAnimation = closingAnimation
-  }
-
-  static prepareTextures ({
-    blueTextures,
-    greenTextures
-  }: {
-    blueTextures: IStarportTextures
-    greenTextures: IStarportTextures
-  }): void {
-    Starport.blueTextures = blueTextures
-    Starport.greenTextures = greenTextures
   }
 }

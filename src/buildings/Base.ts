@@ -18,6 +18,17 @@ export class Base extends Building {
     return team === Team.blue ? Base.blueTextures : Base.greenTextures
   }
 
+  static prepareTextures ({
+    blueTextures,
+    greenTextures
+  }: {
+    blueTextures: IBaseTextures
+    greenTextures: IBaseTextures
+  }): void {
+    Base.blueTextures = blueTextures
+    Base.greenTextures = greenTextures
+  }
+
   public drawSelectionOptions = {
     width: 44,
     height: 44,
@@ -84,16 +95,5 @@ export class Base extends Building {
     constructingAnimation.animationSpeed = this.constructingAnimationSpeed
     this.spritesContainer.addChild(constructingAnimation)
     this.constructingAnimation = constructingAnimation
-  }
-
-  static prepareTextures ({
-    blueTextures,
-    greenTextures
-  }: {
-    blueTextures: IBaseTextures
-    greenTextures: IBaseTextures
-  }): void {
-    Base.blueTextures = blueTextures
-    Base.greenTextures = greenTextures
   }
 }

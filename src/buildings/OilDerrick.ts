@@ -19,6 +19,17 @@ export class OilDerrick extends Building implements IBuildable {
     return team === Team.blue ? OilDerrick.blueTextures : OilDerrick.greenTextures
   }
 
+  static prepareTextures ({
+    blueTextures,
+    greenTextures
+  }: {
+    blueTextures: IOilDerrickTextures
+    greenTextures: IOilDerrickTextures
+  }): void {
+    OilDerrick.blueTextures = blueTextures
+    OilDerrick.greenTextures = greenTextures
+  }
+
   public drawSelectionOptions = {
     width: 40,
     height: 22,
@@ -84,16 +95,5 @@ export class OilDerrick extends Building implements IBuildable {
     deployAnimation.animationSpeed = this.deployAnimationSpeed
     this.spritesContainer.addChild(deployAnimation)
     this.deployAnimation = deployAnimation
-  }
-
-  static prepareTextures ({
-    blueTextures,
-    greenTextures
-  }: {
-    blueTextures: IOilDerrickTextures
-    greenTextures: IOilDerrickTextures
-  }): void {
-    OilDerrick.blueTextures = blueTextures
-    OilDerrick.greenTextures = greenTextures
   }
 }

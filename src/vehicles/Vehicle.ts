@@ -16,6 +16,7 @@ import { type CannonBall } from '../projectiles/CannonBall'
 import { type Laser } from '../projectiles/Laser'
 import { type Rocket } from '../projectiles/HeatSeeker'
 import { logVehicleBounds } from '../logger'
+import { type ITurnable } from '../interfaces/ITurnable'
 
 export interface IVehicleTextures {
   upTextures: Texture[]
@@ -53,7 +54,7 @@ interface IPathPoint {
   y: number
 }
 
-export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IAttackable, IMoveable, IBuildable {
+export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IAttackable, IMoveable, ITurnable, IBuildable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Container()
@@ -109,8 +110,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
-  public lastMovementGridX = 0
-  public lastMovementGridY = 0
   public orders: IOrder
   public sight = 0
   public radius = 0
@@ -130,7 +129,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.setup(options)
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
-      this.switchAnimation(options.direction)
     }
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
@@ -261,6 +259,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     })
   }
 
+  updateAnimation (): void {
+    this.switchAnimation(this.vector.direction)
+  }
+
   switchAnimation (direction: EVectorDirection): void {
     let newAnimation
     const step = 0.5
@@ -328,6 +330,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
 
   isAlive (): boolean {
     return this.life > 0
+  }
+
+  isHealthy (): boolean {
+    return this.life >= this.hitPoints * 0.4
   }
 
   isDead (): boolean {
@@ -546,7 +552,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
         }
       }
     }
-    this.switchAnimation(this.vector.direction)
+    this.updateAnimation()
   }
 
   handleUpdate (deltaMS: number): void {
@@ -620,8 +626,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   }
 
   _moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
-    this.lastMovementGridX = 0
-    this.lastMovementGridY = 0
     const { tileMap, turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
 
@@ -735,10 +739,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
 
     const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
-    this.lastMovementGridX = -(movement * Math.sin(angleRadians))
-    this.lastMovementGridY = -(movement * Math.cos(angleRadians))
-    const newGridX = thisGrid.gridX + this.lastMovementGridX
-    const newGridY = thisGrid.gridY + this.lastMovementGridY
+    const lastMovementGridX = -(movement * Math.sin(angleRadians))
+    const lastMovementGridY = -(movement * Math.cos(angleRadians))
+    const newGridX = thisGrid.gridX + lastMovementGridX
+    const newGridY = thisGrid.gridY + lastMovementGridY
     this.setPositionByGridXY({
       gridX: newGridX,
       gridY: newGridY,

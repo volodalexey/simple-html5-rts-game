@@ -9,6 +9,9 @@ import { LifeBar } from '../LifeBar'
 import { logBuildingBounds } from '../logger'
 import { type IAttackable } from '../interfaces/IAttackable'
 import { type Bullet } from '../projectiles/Bullet'
+import { type CannonBall } from '../projectiles/CannonBall'
+import { type Laser } from '../projectiles/Laser'
+import { type Rocket } from '../projectiles/HeatSeeker'
 
 export interface IBuildingTextures {
   healthyTextures: Texture[]
@@ -77,7 +80,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   public canAttackAir = false
   public cost = 0
   public reloadTimeLeft = 0
-  public Projectile!: typeof Bullet
+  public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
 
   public game: Game
   public uid: number
@@ -106,8 +109,6 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
       this.ordersable = options.ordersable
     }
     this.setup(options)
-
-    this.updateAnimation()
   }
 
   setup ({
@@ -175,13 +176,13 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     })
   }
 
-  switchAnimation (animation: BaseAnimation): void {
+  switchAnimation (animation: BuildingAnimation): void {
     let newAnimation
     switch (animation) {
-      case BaseAnimation.healthy:
+      case BuildingAnimation.healthy:
         newAnimation = this.healthyAnimation
         break
-      case BaseAnimation.damaged:
+      case BuildingAnimation.damaged:
         newAnimation = this.damagedAnimation
         break
     }
@@ -195,10 +196,10 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   }
 
   updateAnimation (): void {
-    if (this.life > this.hitPoints * 0.4) {
-      this.switchAnimation(BaseAnimation.healthy)
-    } else if (this.life > 0) {
-      this.switchAnimation(BaseAnimation.damaged)
+    if (this.isHealthy()) {
+      this.switchAnimation(BuildingAnimation.healthy)
+    } else if (this.isAlive()) {
+      this.switchAnimation(BuildingAnimation.damaged)
     }
   }
 
@@ -270,6 +271,10 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     return this.life > 0
   }
 
+  isHealthy (): boolean {
+    return this.life >= this.hitPoints * 0.4
+  }
+
   isDead (): boolean {
     return !this.isAlive()
   }
@@ -318,13 +323,13 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   }
 
   findTargetInSight (addSight = 0): BaseActiveItem | undefined {
-    const thisGrid = this.getGridXY()
+    const thisGrid = this.getGridXY({ center: true })
     const targetsByDistance: Record<string, BaseActiveItem[]> = {}
     const items = this.game.tileMap.activeItems.children
     for (let i = items.length - 1; i >= 0; i--) {
       const item = items[i]
       if (this.isValidTarget(item)) {
-        const itemGrid = item.getGridXY()
+        const itemGrid = item.getGridXY({ center: true })
         const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
         if (distance < Math.pow(this.sight + addSight, 2)) {
           if (!Array.isArray(targetsByDistance[distance])) {
@@ -343,7 +348,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   }
 }
 
-export enum BaseAnimation {
+export enum BuildingAnimation {
   healthy = 'healthy',
   damaged = 'damaged',
 }
