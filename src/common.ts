@@ -12,7 +12,6 @@ export enum Team {
 
 export type BaseItem = Building | Vehicle | Projectile
 export type BaseActiveItem = Building | Vehicle
-export type BaseMoveableItem = Vehicle
 export type SelectableItem = ISelectable & IItem
 
 /**

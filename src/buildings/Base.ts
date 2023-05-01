@@ -40,7 +40,7 @@ export class Base extends Building {
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 1,
+      x: 0,
       y: -4
     }
   }

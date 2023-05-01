@@ -141,10 +141,13 @@ export const AUDIO = {
   | 'bullet' | 'bullet-hit' | 'rocket' | 'laser' | 'cannon-ball' | 'cannon-hit'
   | 'message-received' | 'scout-tank-attack' | 'scout-tank-yes'
   | 'heavy-tank-attack' | 'heavy-tank-yes'): void {
+    let stopPrevious = false
     let sounds: Howl[] = []
     if (name === 'acknowledge-attacking') {
+      stopPrevious = true
       sounds = [this.engaging]
     } else if (name === 'acknowledge-moving') {
+      stopPrevious = true
       sounds = [this.yup, this.roger1, this.roger2]
     } else if (name === 'bullet') {
       sounds = [this.bullet1, this.bullet2]
@@ -161,17 +164,24 @@ export const AUDIO = {
     } else if (name === 'message-received') {
       sounds = [this.message]
     } else if (name === 'scout-tank-attack') {
+      stopPrevious = true
       sounds = [this.vultureAttack0]
     } else if (name === 'scout-tank-yes') {
+      stopPrevious = true
       sounds = [this.vultureYes0, this.vultureYes1, this.vultureYes2, this.vultureYes3]
     } else if (name === 'heavy-tank-attack') {
+      stopPrevious = true
       sounds = [this.tankAttack0, this.tankAttack1, this.tankAttack2]
     } else if (name === 'heavy-tank-yes') {
+      stopPrevious = true
       sounds = [this.tankYes0, this.tankYes1, this.tankYes2, this.tankYes3]
     }
     if (sounds.length > 0) {
-      sounds.forEach(s => s.stop())
-      sounds[Math.floor(Math.random() * sounds.length)].play()
+      if (stopPrevious) {
+        sounds.forEach(s => s.stop())
+      }
+      const sound = sounds[Math.floor(Math.random() * sounds.length)]
+      sound.play()
     }
   }
 }

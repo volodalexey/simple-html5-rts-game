@@ -201,8 +201,8 @@ export class MiniMap extends Container {
     const bgBounds = { top: 0, right: 0 + width, bottom: 0 + height, left: 0 }
     const { itemBlueTeamClor, itemGreeTeamClor } = MiniMap.options
     const { activeItems } = this.game.tileMap
-    for (let i = 0; i < activeItems.length; i++) {
-      const activeItem = activeItems[i]
+    for (let i = 0; i < activeItems.children.length; i++) {
+      const activeItem = activeItems.children[i]
       const graphics = new Graphics()
       graphics.beginFill(activeItem.team === Team.blue ? itemBlueTeamClor : itemGreeTeamClor)
       const itemBounds = activeItem.getSelectionBounds()

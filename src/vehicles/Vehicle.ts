@@ -354,7 +354,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   findTargetInSight (addSight = 0): BaseActiveItem | undefined {
     const thisGrid = this.getGridXY({ center: true })
     const targetsByDistance: Record<string, BaseActiveItem[]> = {}
-    const items = this.game.tileMap.activeItems
+    const items = this.game.tileMap.activeItems.children
     for (let i = items.length - 1; i >= 0; i--) {
       const item = items[i]
       if (this.isValidTarget(item)) {
@@ -554,6 +554,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
     }
     this.processOrders()
+    this.zIndex = this.y + this.height
   }
 
   checkCollisionObjects (grid: Array<Array<0 | 1>>, distanceFromDestination: number): Array<{
@@ -598,8 +599,9 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       }
     }
 
-    for (let i = tileMap.vehicles.children.length - 1; i >= 0; i--) {
-      const vehicle = tileMap.vehicles.children[i]
+    const { moveableItems } = tileMap
+    for (let i = moveableItems.length - 1; i >= 0; i--) {
+      const vehicle = moveableItems[i]
       const vehicleGrid = vehicle.getGridXY({ center: true })
       // Test vehicles that are less than 3 squares away for collisions
       if (vehicle !== this && Math.abs(vehicleGrid.gridX - thisGrid.gridX) < 3 && Math.abs(vehicleGrid.gridY - thisGrid.gridY) < 3) {

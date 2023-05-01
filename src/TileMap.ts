@@ -2,12 +2,13 @@ import { Assets, Container, type IPointData, Sprite, type Texture } from 'pixi.j
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { manifest } from './LoaderScene'
-import { Building } from './buildings/Building'
-import { Vehicle } from './vehicles/Vehicle'
-import { type BaseMoveableItem, type BaseActiveItem, type BaseItem } from './common'
-import { Projectile } from './projectiles/Projectile'
+import { type Building } from './buildings/Building'
+import { type Vehicle } from './vehicles/Vehicle'
+import { type BaseActiveItem, type BaseItem } from './common'
+import { type Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
+import { EItemType } from './interfaces/IItem'
 
 export interface ITileMapOptions {
   game: Game
@@ -27,8 +28,7 @@ export class TileMap extends Container {
   private _currentMapPassableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()
-  public buildings = new Container<Building>()
-  public vehicles = new Container<Vehicle>()
+  public activeItems = new Container<Building | Vehicle>()
   public orders = new Container<Order>()
   public projectiles = new Container<Projectile>()
   public background = new Sprite()
@@ -59,9 +59,8 @@ export class TileMap extends Container {
   setup (): void {
     this.addChild(this.background)
     this.addChild(this.hitboxes)
-    this.addChild(this.buildings)
+    this.addChild(this.activeItems)
     this.addChild(this.orders)
-    this.addChild(this.vehicles)
     this.addChild(this.projectiles)
   }
 
@@ -181,11 +180,8 @@ export class TileMap extends Container {
     while (this.hitboxes.children[0] != null) {
       this.hitboxes.children[0].removeFromParent()
     }
-    while (this.vehicles.children[0] != null) {
-      this.vehicles.children[0].removeFromParent()
-    }
-    while (this.buildings.children[0] != null) {
-      this.buildings.children[0].removeFromParent()
+    while (this.activeItems.children[0] != null) {
+      this.activeItems.children[0].removeFromParent()
     }
     while (this.projectiles.children[0] != null) {
       this.projectiles.children[0].removeFromParent()
@@ -200,35 +196,34 @@ export class TileMap extends Container {
     for (const item of items) {
       item.handleUpdate(deltaMS)
     }
+    this.game.tileMap.activeItems.sortChildren()
   }
 
   addItem (item: BaseItem): void {
-    if (item instanceof Building) {
-      this.buildings.addChild(item)
-    } else if (item instanceof Vehicle) {
-      this.vehicles.addChild(item)
-    } else if (item instanceof Projectile) {
-      this.projectiles.addChild(item)
+    if (item.type === EItemType.buildings || item.type === EItemType.vehicles) {
+      this.activeItems.addChild(item as BaseActiveItem)
+    } else if (item.type === EItemType.bullets) {
+      this.projectiles.addChild(item as Projectile)
     }
   }
 
-  get activeItems (): BaseActiveItem[] {
-    return [...this.buildings.children, ...this.vehicles.children]
+  get moveableItems (): Vehicle[] {
+    return [...this.activeItems.children.filter((item): item is Vehicle => item.type === EItemType.vehicles)]
   }
 
-  get moveableItems (): BaseMoveableItem[] {
-    return [...this.vehicles.children]
+  get staticItems (): Building[] {
+    return [...this.activeItems.children.filter((item): item is Building => item.type === EItemType.buildings)]
   }
 
   get allItems (): BaseItem[] {
-    return [...this.buildings.children, ...this.vehicles.children, ...this.projectiles.children]
+    return [...this.activeItems.children, ...this.projectiles.children]
   }
 
   itemUnderPointer (point: IPointData): BaseActiveItem | undefined {
     // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
     //   return;
     // }
-    return this.activeItems.find(activeItem => {
+    return this.activeItems.children.find(activeItem => {
       const itemBounds = activeItem.getSelectionBounds()
       if (activeItem.isAlive() &&
         point.x >= itemBounds.left &&
@@ -268,8 +263,9 @@ export class TileMap extends Container {
 
   rebuildPassableGrid (): void {
     this._currentMapPassableGrid = this.currentMapTerrainGrid.map(g => g.slice())
-    for (let i = this.buildings.children.length - 1; i >= 0; i--) {
-      const item = this.buildings.children[i]
+    const { staticItems } = this
+    for (let i = staticItems.length - 1; i >= 0; i--) {
+      const item = staticItems[i]
       const { passableGrid } = item
       const itemGrid = item.getGridXY()
       for (let y = passableGrid.length - 1; y >= 0; y--) {
@@ -283,7 +279,7 @@ export class TileMap extends Container {
   }
 
   getItemByUid (uid: number, activeItems?: BaseActiveItem[]): BaseActiveItem | undefined {
-    return (activeItems ?? this.activeItems).find(item => item.uid === uid)
+    return (activeItems ?? this.activeItems.children).find(item => item.uid === uid)
   }
 
   isItemsDead (uids: number[] | number): boolean {
@@ -292,7 +288,7 @@ export class TileMap extends Container {
     }
     const { activeItems } = this
     return uids.some(uid => {
-      const activeItem = this.getItemByUid(uid, activeItems)
+      const activeItem = this.getItemByUid(uid, activeItems.children)
       return activeItem == null || activeItem.isDead()
     })
   }

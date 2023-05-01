@@ -21,15 +21,15 @@ export class Starport extends Building implements IBuildable {
   }
 
   public drawSelectionOptions = {
-    width: 40,
-    height: 55,
+    width: 42,
+    height: 58,
     radius: 0,
     strokeWidth: 2,
     strokeColor: 0,
     strokeSecondColor: 0xffffff,
     offset: {
-      x: -2,
-      y: 5
+      x: -1,
+      y: 3
     }
   }
 
@@ -37,7 +37,7 @@ export class Starport extends Building implements IBuildable {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 40,
+    width: 38,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,

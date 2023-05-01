@@ -302,7 +302,7 @@ export class CampaignScene extends Container implements IScene {
         },
         items: [
           { Constructor: Base, initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
-          { Constructor: GroundTurret, initGridX: 53, initGridY: 17, team: Team.blue, uid: -1 },
+          { Constructor: GroundTurret, initGridX: 53, initGridY: 17, team: Team.blue },
           { Constructor: HeavyTank, initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, orders: { type: 'sentry' } },
           /* The first wave of attacks */
           { Constructor: ScoutTank, initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
@@ -338,18 +338,6 @@ export class CampaignScene extends Container implements IScene {
                   game: this.game, initX: tileMap.gridSize * 60, initY: tileMap.gridSize * 21, team: Team.blue, orders: { type: 'guard', to: hero }
                 }))
               }
-            }
-          },
-          {
-            type: 'timed',
-            time: 25000,
-            action: () => {
-              // Supply extra cash
-              this.game.showMessage({
-                character: EMessageCharacter.op,
-                message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
-              })
-              this.game.cash[Team.blue] = 1500
             }
           },
           {

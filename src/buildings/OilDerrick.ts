@@ -21,14 +21,14 @@ export class OilDerrick extends Building implements IBuildable {
 
   public drawSelectionOptions = {
     width: 40,
-    height: 20,
+    height: 22,
     radius: 0,
     strokeWidth: 2,
     strokeColor: 0,
     strokeSecondColor: 0xffffff,
     offset: {
-      x: -2,
-      y: 5
+      x: 0,
+      y: 39
     }
   }
 
@@ -36,12 +36,12 @@ export class OilDerrick extends Building implements IBuildable {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 40,
+    width: 36,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 1,
+      x: 2,
       y: -4
     }
   }

@@ -306,6 +306,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
 
   handleUpdate (deltaMS: number): void {
     this.processOrders()
+    this.zIndex = this.y + this.height
   }
 
   isValidTarget (item: BaseActiveItem): boolean {
@@ -319,7 +320,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   findTargetInSight (addSight = 0): BaseActiveItem | undefined {
     const thisGrid = this.getGridXY()
     const targetsByDistance: Record<string, BaseActiveItem[]> = {}
-    const items = this.game.tileMap.activeItems
+    const items = this.game.tileMap.activeItems.children
     for (let i = items.length - 1; i >= 0; i--) {
       const item = items[i]
       if (this.isValidTarget(item)) {

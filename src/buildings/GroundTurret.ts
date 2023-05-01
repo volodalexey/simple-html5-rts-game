@@ -29,15 +29,15 @@ export class GroundTurret extends Building implements IBuildable, IAttackable {
   }
 
   public drawSelectionOptions = {
-    width: 20,
-    height: 18,
+    width: 26,
+    height: 23,
     radius: 0,
     strokeWidth: 2,
     strokeColor: 0,
     strokeSecondColor: 0xffffff,
     offset: {
-      x: -2,
-      y: 5
+      x: 6,
+      y: 9
     }
   }
 
@@ -45,12 +45,12 @@ export class GroundTurret extends Building implements IBuildable, IAttackable {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 40,
+    width: 22,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 1,
+      x: 8,
       y: -4
     }
   }
