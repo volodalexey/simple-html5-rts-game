@@ -13,6 +13,7 @@ import { GroundTurret } from './buildings/GroundTurret'
 import { type OilDerrick } from './buildings/OilDerrick'
 import { Starport } from './buildings/Starport'
 import { Harvester } from './vehicles/Harvester'
+import { type Trigger, type ITrigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger } from './Trigger'
 
 interface IMissionItem {
   Constructor: typeof Base | typeof GroundTurret | typeof OilDerrick | typeof Starport |
@@ -28,24 +29,6 @@ interface IMissionItem {
   orders?: IOrder
 }
 
-interface ITimedTrigger {
-  type: 'timed'
-  time: number
-  action: () => void
-}
-
-interface IIntervalTrigger {
-  type: 'interval'
-  interval: number
-  action: () => void
-}
-
-interface IConditionalTrigger {
-  type: 'conditional'
-  action: () => void
-  condition: () => boolean
-}
-
 interface IMission {
   name: string
   briefing: string
@@ -58,7 +41,7 @@ interface IMission {
     green: number
   }
   items: IMissionItem[]
-  triggers: Array<ITimedTrigger | IConditionalTrigger | IIntervalTrigger>
+  triggers: ITrigger[]
 }
 
 interface ICampaignSceneOptions {
@@ -78,7 +61,7 @@ export class CampaignScene extends Container implements IScene {
   }
 
   public currentMissionIdx = CampaignScene.options.startMission
-  public currentMission!: IMission
+  public triggers: Trigger[] = []
 
   constructor (options: ICampaignSceneOptions) {
     super()
@@ -114,18 +97,30 @@ export class CampaignScene extends Container implements IScene {
       return
     }
 
-    const mission = this.currentMission
-    for (let i = 0; i < mission.triggers.length; i++) {
-      const trigger = mission.triggers[i]
-      if (trigger.type === 'timed' && this.game.time >= trigger.time) {
-        trigger.action()
-        mission.triggers.splice(i, 1)
-        i--
-      } else if (trigger.type === 'conditional') {
-        if (trigger.condition()) {
-          trigger.action()
-          mission.triggers.splice(i, 1)
-          i--
+    for (let i = 0; i < this.triggers.length; i++) {
+      const trigger = this.triggers[i]
+      switch (trigger.type) {
+        case ETriggerType.timed: {
+          if (this.game.time >= (trigger as TimedTrigger).time) {
+            trigger.action()
+            this.triggers.splice(i, 1)
+            i--
+          }
+          break
+        }
+        case ETriggerType.conditional: {
+          if ((trigger as ConditionalTrigger).condition()) {
+            trigger.action()
+            this.triggers.splice(i, 1)
+            i--
+          }
+          break
+        }
+        case ETriggerType.interval: {
+          if ((trigger as IntervalTrigger).isElapsed(deltaMS)) {
+            trigger.action()
+          }
+          break
         }
       }
     }
@@ -133,9 +128,8 @@ export class CampaignScene extends Container implements IScene {
 
   startCurrentLevel (): void {
     this.missionStarted = true
-    const mission = this.currentMission = Object.assign({}, this.missions[this.currentMissionIdx], {
-      triggers: this.missions[this.currentMissionIdx].triggers.slice()
-    })
+    const mission = this.missions[this.currentMissionIdx]
+    this.triggers = mission.triggers.map(triggerDescription => createTrigger(triggerDescription))
 
     this.game.startGame(mission)
 
@@ -193,7 +187,7 @@ export class CampaignScene extends Container implements IScene {
         ],
         triggers: [
           {
-            type: 'timed',
+            type: ETriggerType.timed,
             time: 3000,
             action: () => {
               this.game.showMessage({
@@ -203,7 +197,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'timed',
+            type: ETriggerType.timed,
             time: 10000,
             action: () => {
               this.game.showMessage({
@@ -213,7 +207,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               return this.game.tileMap.isItemsDead([-1, -3, -4])
             },
@@ -222,7 +216,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               // Check if first enemy is dead
               return this.game.tileMap.isItemsDead(-2)
@@ -235,7 +229,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               const hero = this.game.tileMap.getItemByUid(-1)
               if (hero != null) {
@@ -252,7 +246,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               const hero = this.game.tileMap.getItemByUid(-1)
               if (hero != null) {
@@ -273,7 +267,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               const transport1 = this.game.tileMap.getItemByUid(-3)
               const transport2 = this.game.tileMap.getItemByUid(-4)
@@ -325,7 +319,7 @@ export class CampaignScene extends Container implements IScene {
         ],
         triggers: [
           {
-            type: 'timed',
+            type: ETriggerType.timed,
             time: 8000,
             action: () => {
               const { tileMap } = this.game
@@ -346,7 +340,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'timed',
+            type: ETriggerType.timed,
             time: 25000,
             action: () => {
               // Supply extra cash
@@ -354,39 +348,41 @@ export class CampaignScene extends Container implements IScene {
                 character: EMessageCharacter.op,
                 message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
               })
-              this.game.cash[Team.blue] = 1500
+              this.game.cash[Team.blue] += 1500
             }
           },
           {
-            type: 'interval',
+            type: ETriggerType.interval,
             interval: 1000,
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
-              if (this.game.cash[Team.green] > 1000) {
+              if (this.game.cash[Team.green] > 1000 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
                 // game.sendCommand([-12, -13], { type: 'construct-unit', details: { type: 'vehicles', name: 'scout-tank', orders: { type: 'hunt' } } })
               }
             }
           },
           {
-            type: 'interval',
+            type: ETriggerType.interval,
             interval: 180000,
             action: () => {
               // Send in some reinforcements every three minutes
-              this.game.showMessage({
-                character: EMessageCharacter.op,
-                message: 'Commander!! More Reinforcments have arrived.'
-              })
-              const { tileMap } = this.game
-              tileMap.addItem(new ScoutTank({
-                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 55, gridY: 21 } }
-              }))
-              tileMap.addItem(new HeavyTank({
-                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 23, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 56, gridY: 23 } }
-              }))
+              if (this.game.tileMap.getTeamMoveableItems(Team.blue).length < 15) {
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'Commander!! More Reinforcments have arrived.'
+                })
+                const { tileMap } = this.game
+                tileMap.addItem(new ScoutTank({
+                  game: this.game, initX: tileMap.gridSize * 62, initY: tileMap.gridSize * 22, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 55, gridY: 21 } }
+                }))
+                tileMap.addItem(new HeavyTank({
+                  game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 23, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 56, gridY: 23 } }
+                }))
+              }
             }
           },
           {
-            type: 'timed',
+            type: ETriggerType.timed,
             time: 300000,
             action: () => {
               // Send in air support after 5 minutes
@@ -401,7 +397,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               //  Lose if our base gets destroyed
               return this.game.tileMap.isItemsDead(-1)
@@ -411,7 +407,7 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: 'conditional',
+            type: ETriggerType.conditional,
             condition: () => {
               // Win if enemy base gets destroyed
               return this.game.tileMap.isItemsDead(-11)

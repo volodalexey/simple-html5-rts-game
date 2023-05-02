@@ -301,6 +301,10 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   handleUpdate (deltaMS: number): void {
     this.processOrders()
     this.updateAnimation()
+    this.calcZIndex()
+  }
+
+  calcZIndex (): void {
     this.zIndex = this.y + this.height
   }
 }

@@ -110,4 +110,8 @@ export class Starport extends Building implements IBuildable {
     this.spritesContainer.addChild(closingAnimation)
     this.closingAnimation = closingAnimation
   }
+
+  calcZIndex (): void {
+    this.zIndex = this.y + this.height * this.passableGrid.filter(row => row.some(i => i === 1)).length / this.passableGrid.length
+  }
 }

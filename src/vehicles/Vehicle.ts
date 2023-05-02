@@ -473,6 +473,9 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   _moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
     const { tileMap, turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
+    if (this.uid === -66) {
+      // debugger
+    }
 
     // First find path to destination
     const destX = Math.round(destination.gridX)

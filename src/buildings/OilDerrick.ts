@@ -71,6 +71,9 @@ export class OilDerrick extends Building implements IBuildable {
   public life = this.hitPoints
   public deployAnimationSpeed = 0.1
   public deployAnimation!: AnimatedSprite
+  public elapsedTime = 0
+  public harvestInterval = 1000
+  public harvestAmount = 2
 
   static buildableGrid = [
     [1, 1]
@@ -148,5 +151,18 @@ export class OilDerrick extends Building implements IBuildable {
     this.hideAllAnimations()
     this.currentAnimation.gotoAndPlay(0)
     this.currentAnimation.visible = true
+  }
+
+  handleUpdate (deltaMS: number): void {
+    if (this.isHealthy()) {
+      if (this.elapsedTime >= this.harvestInterval) {
+        this.game.cash[this.team] += this.harvestAmount
+        this.elapsedTime = 0
+      }
+      this.elapsedTime += deltaMS
+    }
+    this.processOrders()
+    this.updateAnimation()
+    this.calcZIndex()
   }
 }

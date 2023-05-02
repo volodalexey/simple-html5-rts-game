@@ -4,7 +4,7 @@ import { Hitbox } from './Hitbox'
 import { manifest } from './LoaderScene'
 import { type Building } from './buildings/Building'
 import { type Vehicle } from './vehicles/Vehicle'
-import { type BaseActiveItem, type BaseItem } from './common'
+import { type Team, type BaseActiveItem, type BaseItem } from './common'
 import { type Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
@@ -219,6 +219,10 @@ export class TileMap extends Container {
 
   get allItems (): BaseItem[] {
     return [...this.activeItems.children, ...this.projectiles.children]
+  }
+
+  getTeamMoveableItems (team: Team): Vehicle[] {
+    return this.moveableItems.filter(item => item.team === team)
   }
 
   itemUnderPointer (point: IPointData): BaseActiveItem | undefined {
