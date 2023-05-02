@@ -1,5 +1,4 @@
 import { Team } from '../common'
-import { Bullet } from '../projectiles/Bullet'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type IHarvesterOptions = Pick<
@@ -44,7 +43,6 @@ export class Harvester extends Vehicle {
   public cost = 1600
   public hitPoints = 50
   public turnSpeed = 2
-  public Projectile = Bullet
 
   constructor (options: IHarvesterOptions) {
     super({

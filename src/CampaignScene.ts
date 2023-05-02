@@ -267,7 +267,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.driver,
                   message: 'Thank you. We thought we would never get out of here alive.'
                 })
-                this.game.processCommand([-3, -4], { type: 'guard', to: hero })
+                this.game.processCommand([-3, -4], { type: 'follow', to: hero })
               }
             }
           },

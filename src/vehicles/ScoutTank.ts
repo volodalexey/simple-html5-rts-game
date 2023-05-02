@@ -1,13 +1,14 @@
 import { Team } from '../common'
 import { Bullet } from '../projectiles/Bullet'
-import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
+import { AttackableVehicle } from './AttackableVehicle'
+import { type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type IScoutTankOptions = Pick<
 IVehicleOptions,
 Exclude<keyof IVehicleOptions, 'textures'>
 >
 
-export class ScoutTank extends Vehicle {
+export class ScoutTank extends AttackableVehicle {
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
 

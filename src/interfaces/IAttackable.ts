@@ -3,7 +3,6 @@ import { type BaseActiveItem } from '../common'
 import { type Projectile } from '../projectiles/Projectile'
 
 export interface IAttackable {
-  radius: number
   reloadTimeLeft: number
   drawReloadBarOptions: {
     alpha: number

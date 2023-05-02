@@ -1,9 +1,8 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../Vector'
-import { findAngle, type Team, angleDiff, wrapDirection, type BaseActiveItem, findAngleGrid, generateUid } from '../common'
+import { findAngle, type Team, angleDiff, wrapDirection, findAngleGrid, generateUid } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
-import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
 import { AStar } from '../AStar'
@@ -11,13 +10,8 @@ import { type IMoveable } from '../interfaces/IMoveable'
 import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { type IBuildable } from '../interfaces/IBuildable'
 import { LifeBar } from '../LifeBar'
-import { type Bullet } from '../projectiles/Bullet'
-import { type CannonBall } from '../projectiles/CannonBall'
-import { type Laser } from '../projectiles/Laser'
-import { type Rocket } from '../projectiles/HeatSeeker'
 import { logVehicleBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
-import { ReloadBar } from '../ReloadBar'
 
 export interface IVehicleTextures {
   upTextures: Texture[]
@@ -55,7 +49,7 @@ interface IPathPoint {
   y: number
 }
 
-export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IAttackable, IMoveable, ITurnable, IBuildable {
+export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable, IBuildable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Container()
@@ -86,17 +80,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
-  public drawReloadBarOptions = {
-    alpha: 0,
-    width: 0,
-    height: 0,
-    fillColor: 0,
-    offset: {
-      x: 0,
-      y: 0
-    }
-  }
-
   public game: Game
   public uid: number
   public type = EItemType.vehicles
@@ -104,7 +87,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public hitPoints = 0
   public life = 0
   public lifeBar!: LifeBar
-  public reloadBar!: ReloadBar
   public team: Team
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
@@ -126,12 +108,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public orders: IOrder
   public sight = 0
   public radius = 0
-  public canAttack = false
-  public canAttackLand = false
-  public canAttackAir = false
   public cost = 0
-  public reloadTimeLeft = 0
-  public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
 
   constructor (options: IVehicleOptions) {
     super()
@@ -200,9 +177,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
 
     this.lifeBar = new LifeBar(this.drawLifeBarOptions)
     this.addChild(this.lifeBar)
-
-    this.reloadBar = new ReloadBar(this.drawReloadBarOptions)
-    this.addChild(this.reloadBar)
   }
 
   setSelected (selected: boolean): void {
@@ -365,41 +339,8 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
-  isValidTarget (item: BaseActiveItem): boolean {
-    return item.team !== this.team &&
-      (
-        (this.canAttackLand && (item.type === EItemType.buildings || item.type === EItemType.vehicles)) ||
-        (this.canAttackAir && (item.type === EItemType.aircraft))
-      )
-  }
-
-  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
-    const thisGrid = this.getGridXY({ center: true })
-    const targetsByDistance: Record<string, BaseActiveItem[]> = {}
-    const items = this.game.tileMap.activeItems.children
-    for (let i = items.length - 1; i >= 0; i--) {
-      const item = items[i]
-      if (this.isValidTarget(item)) {
-        const itemGrid = item.getGridXY({ center: true })
-        const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sight + addSight, 2)) {
-          if (!Array.isArray(targetsByDistance[distance])) {
-            targetsByDistance[distance] = []
-          }
-          targetsByDistance[distance].push(item)
-        }
-      }
-    }
-
-    // Sort targets based on distance from attacker
-    const targetKeys = Object.keys(targetsByDistance).map(Number).sort((a, b) => a - b)
-    const targets = targetKeys.map(key => targetsByDistance[key]).flat()
-
-    return targets[0]
-  }
-
-  processOrders (): void {
-    const { tileMap, turnSpeedAdjustmentFactor } = this.game
+  processOrders (): boolean {
+    const { tileMap } = this.game
     const thisGrid = this.getGridXY({ center: true })
     switch (this.orders.type) {
       case 'move': {
@@ -409,11 +350,11 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
         if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
           // Stop when within one radius of the destination
           this.orders = { type: 'stand' }
-          return
+          return true
         } else if (this.colliding && distanceFromDestinationSquared < Math.pow(this.radius * 3 / tileMap.gridSize, 2)) {
           // Stop when within 3 radius of the destination if colliding with something
           this.orders = { type: 'stand' }
-          return
+          return true
         } else {
           if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
             // Count collsions within 5 radius distance of goal
@@ -425,7 +366,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
             // Stop if more than 30 collisions occur
             if (this.collisionCount > 30) {
               this.orders = { type: 'stand' }
-              return
+              return true
             }
           }
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
@@ -433,150 +374,37 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
           // Pathfinding couldn't find a path so stop
           if (!moving) {
             this.orders = { type: 'stand' }
-            return
+            return true
           }
         }
-        break
+        return true
       }
-      case 'stand': {
-        const target = this.findTargetInSight()
-        if (target != null) {
-          this.orders = { type: 'attack', to: target }
-        }
-        break
-      }
-      case 'sentry': {
-        const target = this.findTargetInSight(2)
-        if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
-        }
-        break
-      }
-      case 'hunt': {
-        const target = this.findTargetInSight(100)
-        if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
-        }
-        break
-      }
-      case 'attack': {
-        if (this.orders.to == null) {
-          return
-        }
-        if (this.orders.to.isDead() || !this.isValidTarget(this.orders.to)) {
-          if (this.orders.nextOrder != null) {
-            this.orders = this.orders.nextOrder
-          } else {
-            this.orders = { type: 'stand' }
-          }
-          return
-        }
-        const toGrid = this.orders.to.getGridXY({ center: true })
-        const distanceFromDestination = Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)
-        if (distanceFromDestination < Math.pow(this.sight, 2)) {
-          // Turn towards target and then start attacking when within range of the target
-          const newDirection = findAngleGrid({
-            from: toGrid, to: thisGrid, directions: this.vector.directions
-          })
-          const difference = angleDiff({ angle1: this.vector.direction, angle2: newDirection, directions: this.vector.directions })
-          const turnAmount = this.turnSpeed * turnSpeedAdjustmentFactor
-          if (Math.abs(difference) > turnAmount) {
-            this.vector.setDirection({
-              direction: wrapDirection({
-                direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,
-                directions: this.vector.directions
-              })
-            })
-            this.moveTurning = true
-          } else {
-            this.vector.setDirection({ direction: newDirection })
-            this.moveTurning = false
-            if (this.reloadTimeLeft <= 0) {
-              this.reloadTimeLeft = this.Projectile.reloadTime
-              const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
-              const bulletX = thisGrid.gridX - (this.radius * Math.sin(angleRadians) / tileMap.gridSize)
-              const bulletY = thisGrid.gridY - (this.radius * Math.cos(angleRadians) / tileMap.gridSize)
-              const projectile = new this.Projectile({
-                game: this.game,
-                initX: bulletX * tileMap.gridSize,
-                initY: bulletY * tileMap.gridSize,
-                direction: newDirection,
-                target: this.orders.to
-              })
-              tileMap.addItem(projectile)
-            }
-          }
-        } else {
-          const distanceFromDestinationSquared = Math.pow(distanceFromDestination, 0.5)
-          const moving = this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
-          if (!moving) {
-            // Pathfinding couldn't find a path so stop
-            // e.g. enemy is in hard collide state
-            this.orders = { type: 'stand' }
-            return
-          }
-        }
-        break
-      }
-      case 'patrol': {
-        const target = this.findTargetInSight(1)
-        if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
-          return
-        }
-        const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
-        if (distanceFromDestinationSquared < Math.pow(this.sight / tileMap.gridSize, 2)) {
-          const to = this.orders.toPoint
-          this.orders.toPoint = this.orders.fromPoint
-          this.orders.fromPoint = to
-        } else {
-          this._moveTo(this.orders.toPoint, distanceFromDestinationSquared)
-        }
-        break
-      }
-      case 'guard': {
+      case 'follow': {
         if (this.orders.to.isDead()) {
           if (this.orders.nextOrder != null) {
             this.orders = this.orders.nextOrder
           } else {
             this.orders = { type: 'stand' }
           }
-          return
+          return true
         }
         const toGrid = this.orders.to.getGridXY({ center: true })
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
         if (distanceFromDestinationSquared < Math.pow(this.sight - 1, 2)) {
-          const target = this.findTargetInSight(1)
-          if (target != null) {
-            this.orders = { type: 'attack', to: target, nextOrder: this.orders }
-            return
-          }
-          const targetToAttackTo = this.orders.to.findTargetInSight(1)
-          if (targetToAttackTo != null) {
-            this.orders = { type: 'attack', to: targetToAttackTo, nextOrder: this.orders }
-            return
-          }
+          // do nothing
         } else {
-          const target = this.findTargetInSight(1)
-          if (target != null) {
-            this.orders = { type: 'attack', to: target, nextOrder: this.orders }
-          } else {
-            const toGrid = this.orders.to.getGridXY({ center: true })
-            this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
-          }
+          const toGrid = this.orders.to.getGridXY({ center: true })
+          this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
         }
       }
     }
-    this.updateAnimation()
+    return false
   }
 
   handleUpdate (deltaMS: number): void {
-    if (this.reloadTimeLeft > 0) {
-      this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
-    }
     this.processOrders()
-    this.updateReload()
+    this.updateAnimation()
     this.zIndex = this.y + this.height
   }
 
@@ -772,16 +600,5 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   removeAndDestroy (): void {
     this.game.deselectItem(this)
     this.removeFromParent()
-  }
-
-  drawReloadBar (): void {
-    this.reloadBar.draw(this.drawReloadBarOptions)
-    const { offset } = this.drawReloadBarOptions
-    this.reloadBar.position.set(offset.x, offset.y)
-  }
-
-  updateReload (): void {
-    const { reloadTime } = this.Projectile
-    this.reloadBar.updateReload((reloadTime - this.reloadTimeLeft) / reloadTime)
   }
 }
