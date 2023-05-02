@@ -24,8 +24,9 @@ export class TileMap extends Container {
   public mapGridWidth !: number
   public mapGridHeight !: number
   public currentMapTerrainGrid: GridArray = []
-  public rebuildRequired = false
+  public rebuildPassableRequired = false
   private _currentMapPassableGrid: GridArray = []
+  private _currentMapBuildableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()
   public activeItems = new Container<Building | Vehicle>()
@@ -117,8 +118,9 @@ export class TileMap extends Container {
       this.currentMapTerrainGrid[obstruction.initGridY][obstruction.initGridX] = 1
     }
     this._currentMapPassableGrid = []
+    this._currentMapBuildableGrid = []
 
-    this.rebuildRequired = true
+    this.rebuildPassableRequired = true
     this.calcScaleLimits()
     this.calcPivotLimits()
   }
@@ -202,7 +204,7 @@ export class TileMap extends Container {
   addItem (item: BaseItem): void {
     if (item.type === EItemType.buildings || item.type === EItemType.vehicles) {
       this.activeItems.addChild(item as BaseActiveItem)
-    } else if (item.type === EItemType.bullets) {
+    } else if (item.type === EItemType.projectiles) {
       this.projectiles.addChild(item as Projectile)
     }
   }
@@ -238,11 +240,15 @@ export class TileMap extends Container {
   }
 
   get currentMapPassableGrid (): GridArray {
-    if (this.rebuildRequired) {
+    if (this.rebuildPassableRequired) {
       this.rebuildPassableGrid()
-      this.rebuildRequired = false
+      this.rebuildPassableRequired = false
     }
     return this._currentMapPassableGrid
+  }
+
+  get currentMapBuildableGrid (): GridArray {
+    return this._currentMapBuildableGrid
   }
 
   get currentCopyMapPassableGrid (): GridArray {
@@ -267,11 +273,43 @@ export class TileMap extends Container {
     for (let i = staticItems.length - 1; i >= 0; i--) {
       const item = staticItems[i]
       const { passableGrid } = item
-      const itemGrid = item.getGridXY()
+      const itemGrid = item.getGridXY({ floor: true })
       for (let y = passableGrid.length - 1; y >= 0; y--) {
         for (let x = passableGrid[y].length - 1; x >= 0; x--) {
           if (passableGrid[y][x] !== 0) {
             this._currentMapPassableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
+          }
+        }
+      }
+    }
+  }
+
+  rebuildBuildableGrid (exceptItem?: Vehicle): void {
+    this._currentMapBuildableGrid = this.currentMapTerrainGrid.map(g => g.slice())
+    const { activeItems } = this
+    const { tileMap } = this.game
+    for (let i = activeItems.children.length - 1; i >= 0; i--) {
+      const item = activeItems.children[i]
+      if (item.type === EItemType.buildings || item.type === EItemType.terrain) {
+        const itemGrid = item.getGridXY()
+        const { buildableGrid } = item as Building
+        for (let y = buildableGrid.length - 1; y >= 0; y--) {
+          for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
+            if (buildableGrid[y][x] === 1) {
+              this._currentMapBuildableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
+            }
+          }
+        }
+      } else if (item.type === EItemType.vehicles && item !== exceptItem) {
+        // Mark all squares under or near the vehicle as unbuildable
+        const itemBounds = item.getSelectionBounds()
+        const x1 = Math.floor(itemBounds.left / tileMap.gridSize)
+        const x2 = Math.floor(itemBounds.right / tileMap.gridSize)
+        const y1 = Math.floor(itemBounds.top / tileMap.gridSize)
+        const y2 = Math.floor(itemBounds.bottom / tileMap.gridSize)
+        for (let x = x1; x <= x2; x++) {
+          for (let y = y1; y <= y2; y++) {
+            this._currentMapBuildableGrid[y][x] = 1
           }
         }
       }

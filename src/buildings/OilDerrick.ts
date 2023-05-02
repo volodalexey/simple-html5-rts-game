@@ -6,10 +6,18 @@ import { type IBuildable } from '../interfaces/IBuildable'
 export type IOilDerrickOptions = Pick<
 IBuildingOptions,
 Exclude<keyof IBuildingOptions, 'textures'>
->
+> & {
+  initialAnimation?: OilDerrickAnimation
+}
 
 export interface IOilDerrickTextures extends IBuildingTextures {
   deployTextures: Texture[]
+}
+
+export enum OilDerrickAnimation {
+  deploy = 'deploy',
+  healthy = 'healthy',
+  damaged = 'damaged',
 }
 
 export class OilDerrick extends Building implements IBuildable {
@@ -64,11 +72,11 @@ export class OilDerrick extends Building implements IBuildable {
   public deployAnimationSpeed = 0.1
   public deployAnimation!: AnimatedSprite
 
-  public buildableGrid = [
+  static buildableGrid = [
     [1, 1]
   ]
 
-  public passableGrid = [
+  static passableGrid = [
     [1, 1]
   ]
 
@@ -77,23 +85,68 @@ export class OilDerrick extends Building implements IBuildable {
       ...options,
       textures: OilDerrick.textures(options.team)
     })
-    this.setupChild()
+    this.buildableGrid = OilDerrick.buildableGrid
+    this.passableGrid = OilDerrick.passableGrid
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
     this.drawSelection()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
-    this.updateAnimation()
+    this.deployAnimation.animationSpeed = this.deployAnimationSpeed
+    if (options.initialAnimation) {
+      this.switchAnimation(options.initialAnimation)
+    } else {
+      this.updateAnimation()
+    }
 
     this.checkDrawBuildingBounds()
   }
 
-  setupChild (): void {
+  setup (options: IOilDerrickOptions): void {
+    super.setup({
+      ...options,
+      textures: OilDerrick.textures(options.team)
+    })
     const { deployTextures } = OilDerrick.textures(this.team)
     const deployAnimation = new AnimatedSprite(deployTextures)
-    deployAnimation.animationSpeed = this.deployAnimationSpeed
     this.spritesContainer.addChild(deployAnimation)
     this.deployAnimation = deployAnimation
+  }
+
+  isDeploying (): boolean {
+    return this.currentAnimation === this.deployAnimation
+  }
+
+  updateAnimation (): void {
+    if (this.isHealthy()) {
+      if (this.isDeploying() && this.deployAnimation.currentFrame === this.deployAnimation.totalFrames - 1) {
+        this.switchAnimation(OilDerrickAnimation.healthy)
+      }
+    } else if (this.isAlive()) {
+      this.switchAnimation(OilDerrickAnimation.damaged)
+    }
+  }
+
+  switchAnimation <T>(animation: T): void {
+    let newAnimation
+    switch (animation) {
+      case OilDerrickAnimation.deploy:
+        newAnimation = this.deployAnimation
+        break
+      case OilDerrickAnimation.healthy:
+        newAnimation = this.healthyAnimation
+        break
+      case OilDerrickAnimation.damaged:
+        newAnimation = this.damagedAnimation
+        break
+    }
+    if (newAnimation === this.currentAnimation || newAnimation == null) {
+      return
+    }
+    this.currentAnimation = newAnimation
+    this.hideAllAnimations()
+    this.currentAnimation.gotoAndPlay(0)
+    this.currentAnimation.visible = true
   }
 }

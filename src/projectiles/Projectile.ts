@@ -35,7 +35,7 @@ export class Projectile extends Container implements IItem, IMoveable {
   public game: Game
   public uid: number
   public sight = 0
-  public type = EItemType.bullets
+  public type = EItemType.projectiles
   public ordersable = true
   public range = 0
   public damage = 0

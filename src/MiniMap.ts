@@ -216,7 +216,7 @@ export class MiniMap extends Container {
       }
       if (activeItem.type === EItemType.buildings) {
         graphics.drawRect(0, 0, itemBounds.right - itemBounds.left, itemBounds.bottom - itemBounds.top)
-      } else if (activeItem.type === EItemType.vehicles || activeItem.type === EItemType.aircraft) {
+      } else if (activeItem.type === EItemType.vehicles || activeItem.type === EItemType.airVehicles) {
         graphics.drawCircle(0, 0, (itemBounds.right - itemBounds.left) / 2)
       }
       graphics.endFill()

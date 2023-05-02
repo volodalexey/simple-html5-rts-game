@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
-import { generateUid, type BaseActiveItem, type Team } from '../common'
+import { generateUid, type Team } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { EItemType, type IItem } from '../interfaces/IItem'
@@ -7,12 +7,6 @@ import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logBuildingBounds } from '../logger'
-import { type IAttackable } from '../interfaces/IAttackable'
-import { type Bullet } from '../projectiles/Bullet'
-import { type CannonBall } from '../projectiles/CannonBall'
-import { type Laser } from '../projectiles/Laser'
-import { type Rocket } from '../projectiles/HeatSeeker'
-import { ReloadBar } from '../ReloadBar'
 
 export interface IBuildingTextures {
   healthyTextures: Texture[]
@@ -32,7 +26,7 @@ export interface IBuildingOptions {
   orders?: IOrder
 }
 
-export class Building extends Container implements IItem, ISelectable, ILifeable, IAttackable {
+export class Building extends Container implements IItem, ISelectable, ILifeable {
   public selected = false
   public selectable = true
   public selectedGraphics = new Container()
@@ -63,19 +57,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     }
   }
 
-  public drawReloadBarOptions = {
-    alpha: 0,
-    width: 0,
-    height: 0,
-    fillColor: 0,
-    offset: {
-      x: 0,
-      y: 0
-    }
-  }
-
   public lifeBar!: LifeBar
-  public reloadBar!: ReloadBar
 
   public spritesContainer = new Container<AnimatedSprite>()
 
@@ -88,13 +70,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
 
   public sight = 0
   public radius = 0
-  public canAttack = false
-  public canAttackLand = false
-  public canAttackAir = false
   public cost = 0
-  public reloadTimeLeft = 0
-  public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
-
   public game: Game
   public uid: number
   public type = EItemType.buildings
@@ -147,9 +123,6 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
 
     this.lifeBar = new LifeBar(this.drawLifeBarOptions)
     this.addChild(this.lifeBar)
-
-    this.reloadBar = new ReloadBar(this.drawReloadBarOptions)
-    this.addChild(this.reloadBar)
   }
 
   drawSelection (): void {
@@ -192,7 +165,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     })
   }
 
-  switchAnimation (animation: BuildingAnimation): void {
+  switchAnimation <T extends BuildingAnimation>(animation: T): void {
     let newAnimation
     switch (animation) {
       case BuildingAnimation.healthy:
@@ -202,7 +175,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
         newAnimation = this.damagedAnimation
         break
     }
-    if (newAnimation === this.currentAnimation) {
+    if (newAnimation === this.currentAnimation || newAnimation == null) {
       return
     }
     this.currentAnimation = newAnimation
@@ -308,7 +281,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   removeAndDestroy (): void {
     this.game.deselectItem(this)
     this.removeFromParent()
-    this.game.tileMap.rebuildRequired = true
+    this.game.tileMap.rebuildPassableRequired = true
   }
 
   drawLifeBar (): void {
@@ -321,57 +294,14 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     this.lifeBar.updateLife(this.life / this.hitPoints)
   }
 
-  processOrders (): void {
-
+  processOrders (): boolean {
+    return false
   }
 
   handleUpdate (deltaMS: number): void {
     this.processOrders()
+    this.updateAnimation()
     this.zIndex = this.y + this.height
-  }
-
-  isValidTarget (item: BaseActiveItem): boolean {
-    return item.team !== this.team &&
-      (
-        (this.canAttackLand && (item.type === EItemType.buildings || item.type === EItemType.vehicles)) ||
-        (this.canAttackAir && (item.type === EItemType.aircraft))
-      )
-  }
-
-  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
-    const thisGrid = this.getGridXY({ center: true })
-    const targetsByDistance: Record<string, BaseActiveItem[]> = {}
-    const items = this.game.tileMap.activeItems.children
-    for (let i = items.length - 1; i >= 0; i--) {
-      const item = items[i]
-      if (this.isValidTarget(item)) {
-        const itemGrid = item.getGridXY({ center: true })
-        const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sight + addSight, 2)) {
-          if (!Array.isArray(targetsByDistance[distance])) {
-            targetsByDistance[distance] = []
-          }
-          targetsByDistance[distance].push(item)
-        }
-      }
-    }
-
-    // Sort targets based on distance from attacker
-    const targetKeys = Object.keys(targetsByDistance).map(Number).sort((a, b) => a - b)
-    const targets = targetKeys.map(key => targetsByDistance[key]).flat()
-
-    return targets[0]
-  }
-
-  drawReloadBar (): void {
-    this.reloadBar.draw(this.drawReloadBarOptions)
-    const { offset } = this.drawReloadBarOptions
-    this.reloadBar.position.set(offset.x, offset.y)
-  }
-
-  updateReload (): void {
-    const { reloadTime } = this.Projectile
-    this.reloadBar.updateReload((reloadTime - this.reloadTimeLeft) / reloadTime)
   }
 }
 

@@ -61,6 +61,5 @@ interface IFollowOrder {
 
 interface IDeployOrder {
   type: 'deploy'
-  toUid?: number
-  toPoint?: IPointGridData
+  toPoint: IPointGridData
 }

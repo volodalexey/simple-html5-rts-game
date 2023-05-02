@@ -67,13 +67,13 @@ export class Starport extends Building implements IBuildable {
   public closingAnimationSpeed = 0.1
   public closingAnimation!: AnimatedSprite
 
-  public buildableGrid = [
+  static buildableGrid = [
     [1, 1],
     [1, 1],
     [1, 1]
   ]
 
-  public passableGrid = [
+  static passableGrid = [
     [1, 1],
     [0, 0],
     [0, 0]
@@ -84,6 +84,8 @@ export class Starport extends Building implements IBuildable {
       ...options,
       textures: Starport.textures(options.team)
     })
+    this.buildableGrid = Starport.buildableGrid
+    this.passableGrid = Starport.passableGrid
     this.setupChild()
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00

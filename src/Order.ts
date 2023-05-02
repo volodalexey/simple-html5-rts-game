@@ -26,6 +26,8 @@ export class Order extends Graphics {
         return 0xffff00
       case 'guard':
         return 0x0000ff
+      case 'deploy':
+        return 0xff00ff
       default:
         return 0xffffff
     }
@@ -41,6 +43,8 @@ export class Order extends Graphics {
         return 0x00ffff
       case 'guard':
         return 0x0000ff
+      case 'deploy':
+        return 0xff00ff
       default:
         return 0xffffff
     }
@@ -85,6 +89,11 @@ export class Order extends Graphics {
       }
       case 'patrol': {
         from = { x: selectedItem.orders.fromPoint.gridX * tileMap.gridSize, y: selectedItem.orders.fromPoint.gridY * tileMap.gridSize }
+        to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
+        break
+      }
+      case 'deploy': {
+        from = selectedItemPosition
         to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
         break
       }

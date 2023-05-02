@@ -137,7 +137,7 @@ export class Game extends Container {
     const underPointerItem = this.tileMap.itemUnderPointer(point)
     const { previousPointerTapEvent } = this
     if (previousPointerTapEvent != null && underPointerItem != null &&
-      (underPointerItem.type === EItemType.vehicles || underPointerItem.type === EItemType.aircraft)) {
+      (underPointerItem.type === EItemType.vehicles || underPointerItem.type === EItemType.airVehicles)) {
       const isPreviousMouse = previousPointerTapEvent.pointerType === 'mouse' && e.pointerType === 'mouse' && previousPointerTapEvent.pointerId === e.pointerId
       const isPreviousTouch = previousPointerTapEvent.pointerType === 'touch' && e.pointerType === 'touch' && previousPointerTapEvent.pointerId + 1 === e.pointerId
       if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < Game.options.doubleTapMaxTime) {
@@ -186,7 +186,7 @@ export class Game extends Container {
       // identify selected items from players team that can move
       for (let i = this.selectedItems.length - 1; i >= 0; i--) {
         const item = this.selectedItems[i]
-        if (item.team === this.team && item.ordersable && (item.type === EItemType.vehicles || item.type === EItemType.aircraft)) {
+        if (item.team === this.team && item.ordersable && (item.type === EItemType.vehicles || item.type === EItemType.airVehicles)) {
           if (item.uid != null) {
             uids.push(item.uid)
           }
@@ -446,7 +446,7 @@ export class Game extends Container {
 
   drawOrders (): void {
     this.selectedItems.forEach(selectedItem => {
-      if (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.aircraft) {
+      if (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles) {
         let order = this.tileMap.orders.children.find(o => o.item === selectedItem)
         if (order == null) {
           order = new Order({ item: selectedItem })

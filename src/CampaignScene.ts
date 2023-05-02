@@ -11,7 +11,8 @@ import { EMessageCharacter } from './StatusBar'
 import { type IOrder } from './interfaces/IOrder'
 import { GroundTurret } from './buildings/GroundTurret'
 import { type OilDerrick } from './buildings/OilDerrick'
-import { type Starport } from './buildings/Starport'
+import { Starport } from './buildings/Starport'
+import { Harvester } from './vehicles/Harvester'
 
 interface IMissionItem {
   Constructor: typeof Base | typeof GroundTurret | typeof OilDerrick | typeof Starport |
@@ -314,6 +315,10 @@ export class CampaignScene extends Container implements IScene {
           { Constructor: ScoutTank, initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 35, gridY: 5 }, toPoint: { gridX: 35, gridY: 30 } } },
           /* The Enemy Rebel Base */
           { Constructor: Base, initGridX: 5, initGridY: 36, team: Team.green, uid: -11 },
+          { Constructor: Starport, initGridX: 1, initGridY: 30, team: Team.green, uid: -12 },
+          { Constructor: Starport, initGridX: 4, initGridY: 32, team: Team.green, uid: -13 },
+          { Constructor: Harvester, initGridX: 1, initGridY: 38, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 16, gridY: 7 } } },
+          { Constructor: Harvester, initGridX: 10, initGridY: 38, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 20, gridY: 7 } } },
           { Constructor: GroundTurret, initGridX: 5, initGridY: 28, team: Team.green },
           { Constructor: GroundTurret, initGridX: 7, initGridY: 33, team: Team.green },
           { Constructor: GroundTurret, initGridX: 8, initGridY: 37, team: Team.green }

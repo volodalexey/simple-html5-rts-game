@@ -1,5 +1,6 @@
 import { ReloadBar } from '../ReloadBar'
 import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../common'
+import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType } from '../interfaces/IItem'
 import { type Bullet } from '../projectiles/Bullet'
 import { type CannonBall } from '../projectiles/CannonBall'
@@ -9,7 +10,7 @@ import { type IVehicleOptions, Vehicle } from './Vehicle'
 
 export interface IAttackableVehicleOptions extends IVehicleOptions {}
 
-export class AttackableVehicle extends Vehicle {
+export class AttackableVehicle extends Vehicle implements IAttackable {
   public reloadTimeLeft = 0
   public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
   public reloadBar!: ReloadBar
@@ -43,7 +44,7 @@ export class AttackableVehicle extends Vehicle {
     return item.team !== this.team &&
       (
         (this.canAttackLand && (item.type === EItemType.buildings || item.type === EItemType.vehicles)) ||
-        (this.canAttackAir && (item.type === EItemType.aircraft))
+        (this.canAttackAir && (item.type === EItemType.airVehicles))
       )
   }
 

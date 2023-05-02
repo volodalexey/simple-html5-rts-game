@@ -3,9 +3,9 @@ import { type IOrder } from './IOrder'
 export enum EItemType {
   buildings = 'buildings',
   vehicles = 'vehicles',
-  aircraft = 'aircraft',
+  airVehicles = 'airVehicles',
   terrain = 'terrain',
-  bullets = 'bullets'
+  projectiles = 'projectiles'
 }
 
 export interface IItem {
