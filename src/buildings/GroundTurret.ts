@@ -117,14 +117,13 @@ export class GroundTurret extends AttackableBuilding {
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
     this.drawSelection()
+    this.drawCollision()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
     this.drawReloadBar()
     this.updateReload()
     this.updateAnimation()
-
-    this.drawCollision()
   }
 
   setup (options: IGroundTurretOptions): void {
