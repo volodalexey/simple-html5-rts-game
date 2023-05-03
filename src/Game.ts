@@ -72,6 +72,7 @@ export class Game extends Container {
   public pointerSecondDownId = -1
   public pointerSecondDownX = -1
   public pointerSecondDownY = -1
+  public pointerZoomed = false
   public previousPointerTapEvent?: {
     type: FederatedPointerEvent['pointerType']
     pointerId: FederatedPointerEvent['pointerId']
@@ -214,6 +215,7 @@ export class Game extends Container {
     if (this.gameEnded) {
       return
     }
+    this.pointerZoomed = false
     const localPosition = this.toLocal(e)
     if (this.pointerMainDownId > -1) {
       this.pointerSecondDownId = e.pointerId
@@ -234,9 +236,7 @@ export class Game extends Container {
     this.pointerSecondDownId = this.pointerSecondDownX = this.pointerSecondDownY = -1
     this.pointerMainDownId = this.pointerMainDownX = this.pointerSecondDownY = -1
     logPointerEvent('Game pointer up')
-    if (this.dragSelect.width === 0) {
-      this.handlePointerTap(e)
-    } else {
+    if (this.dragSelect.width > 0) {
       if (!e.shiftKey) {
         this.clearSelection()
       }
@@ -253,16 +253,18 @@ export class Game extends Container {
           return
         }
 
-        const itemBounds = moveableItem.getCollisionBounds()
+        const itemPosition = moveableItem.getCollisionPosition({ center: true })
 
-        if (itemBounds.left >= left &&
-          itemBounds.right <= right &&
-          itemBounds.top >= top &&
-          itemBounds.bottom <= bottom
+        if (itemPosition.x >= left &&
+          itemPosition.x <= right &&
+          itemPosition.y >= top &&
+          itemPosition.y <= bottom
         ) {
           this.selectItem(moveableItem, true)
         }
       })
+    } else if (!this.pointerZoomed) {
+      this.handlePointerTap(e)
     }
     this.dragSelect.clear()
   }
@@ -286,11 +288,9 @@ export class Game extends Container {
       return
     }
     const localPosition = this.toLocal(e)
-    const isMain = e.pointerId === this.pointerMainDownId
-    logPointerEvent(`Game pointer ${isMain ? 'main' : 'unknown'} move`)
-    if (isMain) {
-      if (this.pointerSecondDownId === -1 &&
-        this.pointerMainDownX > -1 && this.pointerMainDownY > -1 &&
+    logPointerEvent('Game pointer move')
+    if (this.pointerMainDownId > -1 && this.pointerSecondDownId === -1) {
+      if (this.pointerMainDownX > -1 && this.pointerMainDownY > -1 &&
         Math.abs(localPosition.x - this.pointerMainDownX) > this.dragSelectThreshold &&
         Math.abs(localPosition.y - this.pointerMainDownY) > this.dragSelectThreshold) {
         this.drawDragSelect(localPosition)
@@ -299,6 +299,7 @@ export class Game extends Container {
       if (this.dragSelect.width > 0) {
         this.dragSelect.clear()
       }
+      const isMain = e.pointerId === this.pointerMainDownId
       const fromX = isMain ? this.pointerSecondDownX : this.pointerMainDownX
       const fromY = isMain ? this.pointerSecondDownY : this.pointerMainDownY
       const toOldX = isMain ? this.pointerMainDownX : this.pointerSecondDownX
@@ -321,6 +322,7 @@ export class Game extends Container {
         this.pointerSecondDownX = localPosition.x
         this.pointerSecondDownY = localPosition.y
       }
+      this.pointerZoomed = true
     }
   }
 
