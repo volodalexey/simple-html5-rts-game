@@ -107,6 +107,7 @@ export class OilDerrick extends Building {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+
     this.deployAnimation.animationSpeed = this.deployAnimationSpeed
     if (options.initialAnimation) {
       this.switchAnimation(options.initialAnimation)
@@ -123,6 +124,7 @@ export class OilDerrick extends Building {
     })
     const { deployTextures } = textures
     const deployAnimation = new AnimatedSprite(deployTextures)
+    deployAnimation.loop = false
     this.spritesContainer.addChild(deployAnimation)
     this.deployAnimation = deployAnimation
   }
@@ -133,7 +135,11 @@ export class OilDerrick extends Building {
 
   override updateAnimation (): void {
     if (this.isHealthy()) {
-      if (this.isDeploying() && this.deployAnimation.currentFrame === this.deployAnimation.totalFrames - 1) {
+      if (this.isDeploying()) {
+        if (this.deployAnimation.currentFrame === this.deployAnimation.totalFrames - 1) {
+          this.switchAnimation(OilDerrickAnimation.healthy)
+        }
+      } else {
         this.switchAnimation(OilDerrickAnimation.healthy)
       }
     } else if (this.isAlive()) {

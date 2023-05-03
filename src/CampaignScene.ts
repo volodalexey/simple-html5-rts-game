@@ -349,7 +349,8 @@ export class CampaignScene extends Container implements IScene {
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
               if (this.game.cash[Team.green] > 1000 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
-                // game.sendCommand([-12, -13], { type: 'construct-unit', details: { type: 'vehicles', name: 'scout-tank', orders: { type: 'hunt' } } })
+                this.game.processCommand([-12], { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } })
+                this.game.processCommand([-13], { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } })
               }
             }
           },

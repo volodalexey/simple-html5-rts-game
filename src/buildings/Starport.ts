@@ -3,6 +3,7 @@ import { Team } from '../common'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
 import { EItemName, type UnitName } from '../interfaces/IItem'
 import { EMessageCharacter } from '../StatusBar'
+import { type IOrder } from '../interfaces/IOrder'
 
 export type IStarportOptions = Pick<
 IBuildingOptions,
@@ -89,7 +90,14 @@ export class Starport extends Building {
   public closingAnimationSpeed = 0.1
   public closingAnimation!: AnimatedSprite
   public openingAnimation!: AnimatedSprite
-  public constructUnit?: { initX: number, initY: number, name: UnitName, team: Team }
+  public constructUnit?: {
+    initX: number
+    initY: number
+    name: UnitName
+    team: Team
+    initCenter?: boolean
+    orders?: IOrder
+  }
 
   static buildableGrid = [
     [1, 1],
@@ -117,6 +125,10 @@ export class Starport extends Building {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+
+    this.teleportingAnimation.animationSpeed = this.teleportingAnimationSpeed
+    this.closingAnimation.animationSpeed = this.closingAnimationSpeed
+    this.openingAnimation.animationSpeed = this.closingAnimationSpeed
     this.updateAnimation()
   }
 
@@ -130,19 +142,19 @@ export class Starport extends Building {
       ...options,
       textures
     })
-    const { teleportTextures, closingTextures } = textures
+    const { teleportTextures, closingTextures, openingTextures } = textures
     const teleportingAnimation = new AnimatedSprite(teleportTextures)
-    teleportingAnimation.animationSpeed = this.teleportingAnimationSpeed
+    teleportingAnimation.loop = false
     this.spritesContainer.addChild(teleportingAnimation)
     this.teleportingAnimation = teleportingAnimation
 
     const closingAnimation = new AnimatedSprite(closingTextures)
-    closingAnimation.animationSpeed = this.closingAnimationSpeed
+    closingAnimation.loop = false
     this.spritesContainer.addChild(closingAnimation)
     this.closingAnimation = closingAnimation
 
-    const openingAnimation = new AnimatedSprite(closingTextures)
-    openingAnimation.animationSpeed = this.closingAnimationSpeed
+    const openingAnimation = new AnimatedSprite(openingTextures)
+    openingAnimation.loop = false
     this.spritesContainer.addChild(openingAnimation)
     this.openingAnimation = openingAnimation
   }
@@ -157,12 +169,19 @@ export class Starport extends Building {
 
   override updateAnimation (): void {
     if (this.isHealthy()) {
-      if (this.isOpening() && this.openingAnimation.currentFrame === this.openingAnimation.totalFrames - 1) {
-        this.switchAnimation(StarportAnimation.close)
-        if (this.constructUnit != null) {
-          this.game.createItem(this.constructUnit)
+      if (this.isOpening()) {
+        if (this.openingAnimation.currentFrame === this.openingAnimation.totalFrames - 1) {
+          this.switchAnimation(StarportAnimation.close)
+          if (this.constructUnit != null) {
+            const item = this.game.createItem(this.constructUnit)
+            if (item != null) {
+              this.game.tileMap.addItem(item)
+            }
+          }
         }
       } else if (this.isClosing() && this.closingAnimation.currentFrame === this.closingAnimation.totalFrames - 1) {
+        this.switchAnimation(StarportAnimation.healthy)
+      } else {
         this.switchAnimation(StarportAnimation.healthy)
       }
     } else if (this.isAlive()) {
@@ -240,9 +259,12 @@ export class Starport extends Building {
             this.constructUnit = {
               initX: thisPosition.x,
               initY: thisPosition.y,
+              initCenter: true,
               team: this.team,
-              name: this.orders.name
+              name: this.orders.name,
+              orders: this.orders.orders
             }
+            this.switchAnimation(StarportAnimation.open)
           }
         } else {
           console.warn(`Unable to calc item (name=${this.orders.name}) cost`)

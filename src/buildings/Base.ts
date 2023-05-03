@@ -96,13 +96,14 @@ export class Base extends Building {
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
+
+    this.constructingAnimation.animationSpeed = this.constructingAnimationSpeed
     this.updateAnimation()
   }
 
   setupChild (): void {
     const { constructingTextures } = Base.textures(this.team)
     const constructingAnimation = new AnimatedSprite(constructingTextures)
-    constructingAnimation.animationSpeed = this.constructingAnimationSpeed
     this.spritesContainer.addChild(constructingAnimation)
     this.constructingAnimation = constructingAnimation
   }

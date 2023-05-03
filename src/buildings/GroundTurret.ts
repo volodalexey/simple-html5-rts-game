@@ -123,6 +123,8 @@ export class GroundTurret extends AttackableBuilding {
     this.updateLife()
     this.drawReloadBar()
     this.updateReload()
+
+    this.teleportingAnimation.animationSpeed = this.teleportingAnimationSpeed
     this.updateAnimation()
   }
 
@@ -134,7 +136,6 @@ export class GroundTurret extends AttackableBuilding {
     })
 
     const teleportingAnimation = new AnimatedSprite(textures.teleportTextures)
-    teleportingAnimation.animationSpeed = this.teleportingAnimationSpeed
     this.spritesContainer.addChild(teleportingAnimation)
     this.teleportingAnimation = teleportingAnimation
   }

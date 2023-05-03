@@ -6,7 +6,9 @@ import { type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 export type IScoutTankOptions = Pick<
 IVehicleOptions,
 Exclude<keyof IVehicleOptions, 'textures'>
->
+> & {
+  initCenter?: boolean
+}
 
 export class ScoutTank extends AttackableVehicle {
   public itemName = EItemName.ScoutTank
@@ -94,7 +96,7 @@ export class ScoutTank extends AttackableVehicle {
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
     this.drawCollision()
-    this.setPositionByXY({ x: options.initX, y: options.initY })
+    this.setPositionByXY({ x: options.initX, y: options.initY, center: options.initCenter })
     this.drawLifeBar()
     this.updateLife()
     this.drawReloadBar()

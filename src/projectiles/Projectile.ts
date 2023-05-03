@@ -243,7 +243,7 @@ export class Projectile extends Container implements IItem, IMoveable {
     if (this.orders.type === 'fire') {
       const thisBounds = this.getCollisionBounds()
       const toBounds = this.orders.to.getCollisionBounds()
-      return checkCollision(thisBounds, toBounds) > 0.35
+      return checkCollision(thisBounds, toBounds) > 0.5
     }
     return false
   }

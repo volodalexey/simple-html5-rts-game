@@ -256,7 +256,7 @@ export class TileMap extends Container {
     // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
     //   return;
     // }
-    return this.activeItems.children.find(activeItem => {
+    const detect = (activeItem: BaseActiveItem): boolean => {
       const itemBounds = activeItem.getCollisionBounds()
       if (activeItem.isAlive() &&
         point.x >= itemBounds.left &&
@@ -267,7 +267,12 @@ export class TileMap extends Container {
         return true
       }
       return false
-    })
+    }
+    const activeItem = this.moveableItems.find(detect)
+    if (activeItem != null) {
+      return activeItem
+    }
+    return this.staticItems.find(detect)
   }
 
   get currentMapPassableGrid (): GridArray {
