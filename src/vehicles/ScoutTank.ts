@@ -1,5 +1,5 @@
 import { Team } from '../common'
-import { Bullet } from '../projectiles/Bullet'
+import { EItemName, type ProjectileName } from '../interfaces/IItem'
 import { AttackableVehicle } from './AttackableVehicle'
 import { type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
@@ -9,8 +9,32 @@ Exclude<keyof IVehicleOptions, 'textures'>
 >
 
 export class ScoutTank extends AttackableVehicle {
+  public itemName = EItemName.ScoutTank
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
+  static textures (team: Team): IVehicleTextures {
+    return team === Team.blue ? ScoutTank.blueTextures : ScoutTank.greenTextures
+  }
+
+  static prepareTextures ({
+    blueTextures,
+    greenTextures
+  }: {
+    blueTextures: IVehicleTextures
+    greenTextures: IVehicleTextures
+  }): void {
+    ScoutTank.blueTextures = blueTextures
+    ScoutTank.greenTextures = greenTextures
+  }
+
+  public collisionOptions = {
+    width: 22,
+    height: 22,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
 
   public drawSelectionOptions = {
     width: 0,
@@ -53,10 +77,10 @@ export class ScoutTank extends AttackableVehicle {
   public radius = 11
   public speed = 20
   public sight = 4
-  public cost = 500
+  static cost = 500
   public hitPoints = 50
   public turnSpeed = 4
-  public Projectile = Bullet
+  public projectile: ProjectileName = EItemName.Bullet
   public canAttack = true
   public canAttackLand = true
   public canAttackAir = false
@@ -64,29 +88,17 @@ export class ScoutTank extends AttackableVehicle {
   constructor (options: IScoutTankOptions) {
     super({
       ...options,
-      textures: options.team === Team.blue ? ScoutTank.blueTextures : ScoutTank.greenTextures
+      textures: ScoutTank.textures(options.team)
     })
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
+    this.drawCollision()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
     this.drawReloadBar()
     this.updateReload()
     this.updateAnimation()
-
-    this.checkDrawVehicleBounds()
-  }
-
-  static prepareTextures ({
-    blueTextures,
-    greenTextures
-  }: {
-    blueTextures: IVehicleTextures
-    greenTextures: IVehicleTextures
-  }): void {
-    ScoutTank.blueTextures = blueTextures
-    ScoutTank.greenTextures = greenTextures
   }
 }

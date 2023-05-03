@@ -1,9 +1,8 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../common'
-import { type IBuildable } from '../interfaces/IBuildable'
-import { CannonBall } from '../projectiles/CannonBall'
 import { type IOrder } from '../interfaces/IOrder'
 import { type IAttackableBuildingTextures, type IAttackableBuildingOptions, AttackableBuilding } from './AttackableBuilding'
+import { EItemName, type ProjectileName } from '../interfaces/IItem'
 
 export type IGroundTurretOptions = Pick<
 IAttackableBuildingOptions,
@@ -20,7 +19,8 @@ export enum GroundTurretAnimation {
   teleport = 'teleport',
 }
 
-export class GroundTurret extends AttackableBuilding implements IBuildable {
+export class GroundTurret extends AttackableBuilding {
+  public itemName = EItemName.GroundTurret
   static blueTextures: IGroundTurretTextures
   static greenTextures: IGroundTurretTextures
   static textures (team: Team): IGroundTurretTextures {
@@ -36,6 +36,15 @@ export class GroundTurret extends AttackableBuilding implements IBuildable {
   }): void {
     GroundTurret.blueTextures = blueTextures
     GroundTurret.greenTextures = greenTextures
+  }
+
+  public collisionOptions = {
+    width: 22,
+    height: 19,
+    offset: {
+      x: 8,
+      y: 11
+    }
   }
 
   public drawSelectionOptions = {
@@ -77,7 +86,7 @@ export class GroundTurret extends AttackableBuilding implements IBuildable {
   }
 
   public sight = 10
-  public cost = 1500
+  static cost = 1500
   public hitPoints = 200
   public life = this.hitPoints
   public teleportingAnimationSpeed = 0.1
@@ -87,7 +96,7 @@ export class GroundTurret extends AttackableBuilding implements IBuildable {
   public canAttackLand = true
   public canAttackAir = false
   public turnSpeed = 4
-  public Projectile = CannonBall
+  public projectile: ProjectileName = EItemName.CannonBall
   public orders: IOrder = { type: 'sentry' }
 
   static buildableGrid = [
@@ -115,7 +124,7 @@ export class GroundTurret extends AttackableBuilding implements IBuildable {
     this.updateReload()
     this.updateAnimation()
 
-    this.checkDrawBuildingBounds()
+    this.drawCollision()
   }
 
   setup (options: IGroundTurretOptions): void {

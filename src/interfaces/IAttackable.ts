@@ -1,6 +1,6 @@
 import { type ReloadBar } from '../ReloadBar'
 import { type BaseActiveItem } from '../common'
-import { type Projectile } from '../projectiles/Projectile'
+import { type ProjectileName } from './IItem'
 
 export interface IAttackable {
   reloadTimeLeft: number
@@ -15,7 +15,7 @@ export interface IAttackable {
     }
   }
   reloadBar: ReloadBar
-  Projectile: typeof Projectile
+  projectile: ProjectileName
   canAttack: boolean
   canAttackLand: boolean
   canAttackAir: boolean

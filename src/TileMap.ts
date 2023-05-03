@@ -1,4 +1,4 @@
-import { Assets, Container, type IPointData, Sprite, type Texture } from 'pixi.js'
+import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics } from 'pixi.js'
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { manifest } from './LoaderScene'
@@ -9,6 +9,7 @@ import { type Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
 import { EItemType } from './interfaces/IItem'
+import { logGrid } from './logger'
 
 export interface ITileMapOptions {
   game: Game
@@ -84,6 +85,7 @@ export class TileMap extends Container {
 
     this.background.texture = background
     this.background.scale.set(1, 1)
+    this.background.pivot.set(0, 0)
 
     const hitboxesPoints = MapSettings.mapTilesToPositions({
       mapSettings: settings,
@@ -104,6 +106,31 @@ export class TileMap extends Container {
     this.gridSize = settings.tilewidth
     this.mapGridWidth = settings.width
     this.mapGridHeight = settings.height
+    if (logGrid.enabled) {
+      for (let x = 0; x < this.mapGridWidth; x++) {
+        for (let y = 0; y < this.mapGridHeight; y++) {
+          const gr = new Graphics()
+          gr.beginFill(0xffffff)
+          gr.position.set(x * this.gridSize, y * this.gridSize)
+          gr.drawRect(0, 0, this.gridSize, this.gridSize)
+          gr.endFill()
+          gr.beginHole()
+          gr.drawRect(1, 1, this.gridSize - 1 * 2, this.gridSize - 1 * 2)
+          gr.endHole()
+          const text = new Text(`x=${x}\ny=${y}`, {
+            fontSize: 20,
+            fill: 0xffff00,
+            align: 'center'
+          })
+          text.anchor.set(0.5, 0.5)
+          text.position.set(this.gridSize / 2, this.gridSize / 2)
+          text.scale.set(0.4)
+          gr.addChild(text)
+          gr.alpha = 0.3
+          this.background.addChild(gr)
+        }
+      }
+    }
 
     // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
     this.currentMapTerrainGrid = []
@@ -230,7 +257,7 @@ export class TileMap extends Container {
     //   return;
     // }
     return this.activeItems.children.find(activeItem => {
-      const itemBounds = activeItem.getSelectionBounds()
+      const itemBounds = activeItem.getCollisionBounds()
       if (activeItem.isAlive() &&
         point.x >= itemBounds.left &&
         point.x <= itemBounds.right &&
@@ -306,7 +333,7 @@ export class TileMap extends Container {
         }
       } else if (item.type === EItemType.vehicles && item !== exceptItem) {
         // Mark all squares under or near the vehicle as unbuildable
-        const itemBounds = item.getSelectionBounds()
+        const itemBounds = item.getCollisionBounds()
         const x1 = Math.floor(itemBounds.left / tileMap.gridSize)
         const x2 = Math.floor(itemBounds.right / tileMap.gridSize)
         const y1 = Math.floor(itemBounds.top / tileMap.gridSize)

@@ -1,4 +1,5 @@
 import { Team } from '../common'
+import { EItemName } from '../interfaces/IItem'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type ITransportOptions = Pick<
@@ -7,8 +8,32 @@ Exclude<keyof IVehicleOptions, 'textures'>
 >
 
 export class Transport extends Vehicle {
+  public itemName = EItemName.Transport
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
+  static textures (team: Team): IVehicleTextures {
+    return team === Team.blue ? Transport.blueTextures : Transport.greenTextures
+  }
+
+  static prepareTextures ({
+    blueTextures,
+    greenTextures
+  }: {
+    blueTextures: IVehicleTextures
+    greenTextures: IVehicleTextures
+  }): void {
+    Transport.blueTextures = blueTextures
+    Transport.greenTextures = greenTextures
+  }
+
+  public collisionOptions = {
+    width: 30,
+    height: 30,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
 
   public drawSelectionOptions = {
     width: 0,
@@ -40,34 +65,22 @@ export class Transport extends Vehicle {
   public radius = 15
   public speed = 15
   public sight = 3
-  public cost = 400
+  static cost = 400
   public hitPoints = 100
   public turnSpeed = 2
 
   constructor (options: ITransportOptions) {
     super({
       ...options,
-      textures: options.team === Team.blue ? Transport.blueTextures : Transport.greenTextures
+      textures: Transport.textures(options.team)
     })
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
+    this.drawCollision()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
     this.updateAnimation()
-
-    this.checkDrawVehicleBounds()
-  }
-
-  static prepareTextures ({
-    blueTextures,
-    greenTextures
-  }: {
-    blueTextures: IVehicleTextures
-    greenTextures: IVehicleTextures
-  }): void {
-    Transport.blueTextures = blueTextures
-    Transport.greenTextures = greenTextures
   }
 }

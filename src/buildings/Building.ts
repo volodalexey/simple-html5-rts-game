@@ -2,11 +2,11 @@ import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { generateUid, type Team } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
-import { EItemType, type IItem } from '../interfaces/IItem'
+import { EItemName, EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
-import { logBuildingBounds } from '../logger'
+import { logItemBounds } from '../logger'
 
 export interface IBuildingTextures {
   healthyTextures: Texture[]
@@ -27,9 +27,19 @@ export interface IBuildingOptions {
 }
 
 export class Building extends Container implements IItem, ISelectable, ILifeable {
+  public collisionGraphics = new Graphics()
+  public collisionOptions = {
+    width: 0,
+    height: 0,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
+  public selectedGraphics = new Graphics()
   public selected = false
   public selectable = true
-  public selectedGraphics = new Container()
   public drawSelectionOptions = {
     width: 0,
     height: 0,
@@ -43,6 +53,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     }
   }
 
+  public lifeBar!: LifeBar
   public drawLifeBarOptions = {
     borderColor: 0,
     borderThickness: 0,
@@ -56,8 +67,6 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
       y: 0
     }
   }
-
-  public lifeBar!: LifeBar
 
   public spritesContainer = new Container<AnimatedSprite>()
 
@@ -74,6 +83,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   public game: Game
   public uid: number
   public type = EItemType.buildings
+  public itemName = EItemName.None
   public ordersable = true
   public team: Team
   public healthyAnimation!: AnimatedSprite
@@ -108,6 +118,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   }: IBuildingOptions): void {
     this.addChild(this.selectedGraphics)
     this.addChild(this.spritesContainer)
+    this.addChild(this.collisionGraphics)
 
     const { healthyAnimationSpeed, damagedAnimationSpeed } = this
 
@@ -125,38 +136,47 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     this.addChild(this.lifeBar)
   }
 
+  drawCollision (): void {
+    const { offset, width, height } = this.collisionOptions
+    const { collisionGraphics } = this
+    collisionGraphics.position.set(offset.x, offset.y)
+    collisionGraphics.beginFill(0xffffff)
+    collisionGraphics.drawRect(0, 0, width, height)
+    collisionGraphics.endFill()
+    collisionGraphics.alpha = logItemBounds.enabled ? 0.5 : 0
+  }
+
   drawSelection (): void {
     const { offset, strokeWidth, strokeColor, strokeSecondColor, width, height } = this.drawSelectionOptions
-    this.selectedGraphics.position.set(offset.x, offset.y)
-    const selection = new Graphics()
-    this.selectedGraphics.addChild(selection)
+    const { selectedGraphics } = this
+    selectedGraphics.position.set(offset.x, offset.y)
     const halfWidth = width / 2
     const halfHeight = height / 2
-    selection.beginFill(strokeColor)
-    selection.drawRect(0, 0, halfWidth, strokeWidth)
-    selection.endFill()
-    selection.beginFill(strokeSecondColor)
-    selection.drawRect(halfWidth, 0, halfWidth, strokeWidth)
-    selection.endFill()
-    selection.beginFill(strokeColor)
-    selection.drawRect(width - strokeWidth, 0, strokeWidth, halfHeight)
-    selection.endFill()
-    selection.beginFill(strokeSecondColor)
-    selection.drawRect(width - strokeWidth, halfHeight, strokeWidth, halfHeight)
-    selection.endFill()
-    selection.beginFill(strokeColor)
-    selection.drawRect(halfWidth, height - strokeWidth, halfWidth, strokeWidth)
-    selection.endFill()
-    selection.beginFill(strokeSecondColor)
-    selection.drawRect(0, height - strokeWidth, halfWidth, strokeWidth)
-    selection.endFill()
-    selection.beginFill(strokeColor)
-    selection.drawRect(0, halfHeight, strokeWidth, halfHeight)
-    selection.endFill()
-    selection.beginFill(strokeSecondColor)
-    selection.drawRect(0, 0, strokeWidth, halfHeight)
-    selection.endFill()
-    this.selectedGraphics.alpha = 0
+    selectedGraphics.beginFill(strokeColor)
+    selectedGraphics.drawRect(0, 0, halfWidth, strokeWidth)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeSecondColor)
+    selectedGraphics.drawRect(halfWidth, 0, halfWidth, strokeWidth)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeColor)
+    selectedGraphics.drawRect(width - strokeWidth, 0, strokeWidth, halfHeight)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeSecondColor)
+    selectedGraphics.drawRect(width - strokeWidth, halfHeight, strokeWidth, halfHeight)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeColor)
+    selectedGraphics.drawRect(halfWidth, height - strokeWidth, halfWidth, strokeWidth)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeSecondColor)
+    selectedGraphics.drawRect(0, height - strokeWidth, halfWidth, strokeWidth)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeColor)
+    selectedGraphics.drawRect(0, halfHeight, strokeWidth, halfHeight)
+    selectedGraphics.endFill()
+    selectedGraphics.beginFill(strokeSecondColor)
+    selectedGraphics.drawRect(0, 0, strokeWidth, halfHeight)
+    selectedGraphics.endFill()
+    selectedGraphics.alpha = 0
   }
 
   hideAllAnimations (): void {
@@ -197,34 +217,33 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     this.selected = selected
   }
 
-  getSelectionPosition ({ center = false } = {}): { x: number, y: number } {
-    const sub = this.drawSelectionOptions.strokeWidth
+  getCollisionPosition ({ center = false } = {}): { x: number, y: number } {
+    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
     const ret = {
-      x: this.x + this.selectedGraphics.x + sub,
-      y: this.y + this.selectedGraphics.y + sub
+      x: this.x + colX,
+      y: this.y + colY
     }
     if (center) {
-      ret.x += (this.selectedGraphics.width - sub * 2) / 2
-      ret.y += (this.selectedGraphics.height - sub * 2) / 2
+      ret.x += (colWidth) / 2
+      ret.y += (colHeight) / 2
     }
     return ret
   }
 
-  getSelectionBounds (): { top: number, right: number, bottom: number, left: number } {
-    const selectionPosition = this.getSelectionPosition()
-    const sub = this.drawSelectionOptions.strokeWidth
+  getCollisionBounds (): { top: number, right: number, bottom: number, left: number } {
+    const collisionPosition = this.getCollisionPosition()
     return {
-      top: selectionPosition.y,
-      right: selectionPosition.x + this.selectedGraphics.width - sub * 2,
-      bottom: selectionPosition.y + this.selectedGraphics.height - sub * 2,
-      left: selectionPosition.x
+      top: collisionPosition.y,
+      right: collisionPosition.x + this.collisionGraphics.width,
+      bottom: collisionPosition.y + this.collisionGraphics.height,
+      left: collisionPosition.x
     }
   }
 
   getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
-    const selectionPosition = this.getSelectionPosition({ center })
-    const ret = { gridX: selectionPosition.x / gridSize, gridY: selectionPosition.y / gridSize }
+    const collisionPosition = this.getCollisionPosition({ center })
+    const ret = { gridX: collisionPosition.x / gridSize, gridY: collisionPosition.y / gridSize }
     if (floor) {
       ret.gridX = Math.floor(ret.gridX)
       ret.gridY = Math.floor(ret.gridY)
@@ -233,27 +252,15 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   }
 
   setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
-    const sub = this.drawSelectionOptions.strokeWidth
-    const diffX = 0 - (this.selectedGraphics.x + (center ? this.selectedGraphics.width / 2 : sub))
-    const diffY = 0 - (this.selectedGraphics.y + (center ? this.selectedGraphics.height / 2 : sub))
+    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
+    const diffX = 0 - (colX + (center ? colWidth / 2 : 0))
+    const diffY = 0 - (colY + (center ? colHeight / 2 : 0))
     this.position.set(x + diffX, y + diffY)
   }
 
   setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
     const { gridSize } = this.game.tileMap
     this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
-  }
-
-  checkDrawBuildingBounds (): void {
-    if (logBuildingBounds.enabled) {
-      const selectionBounds = this.getSelectionBounds()
-      const gr = new Graphics()
-      gr.beginFill(0xffffff)
-      gr.alpha = 0.5
-      gr.drawRect(selectionBounds.left - this.x, selectionBounds.top - this.y, selectionBounds.right - selectionBounds.left, selectionBounds.bottom - selectionBounds.top)
-      gr.endFill()
-      this.addChild(gr)
-    }
   }
 
   isAlive (): boolean {

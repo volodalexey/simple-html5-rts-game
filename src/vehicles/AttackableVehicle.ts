@@ -1,18 +1,14 @@
 import { ReloadBar } from '../ReloadBar'
 import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../common'
 import { type IAttackable } from '../interfaces/IAttackable'
-import { EItemType } from '../interfaces/IItem'
-import { type Bullet } from '../projectiles/Bullet'
-import { type CannonBall } from '../projectiles/CannonBall'
-import { type Rocket } from '../projectiles/HeatSeeker'
-import { type Laser } from '../projectiles/Laser'
+import { EItemType, type ProjectileName } from '../interfaces/IItem'
 import { type IVehicleOptions, Vehicle } from './Vehicle'
 
 export interface IAttackableVehicleOptions extends IVehicleOptions {}
 
 export class AttackableVehicle extends Vehicle implements IAttackable {
   public reloadTimeLeft = 0
-  public Projectile!: typeof Bullet | typeof CannonBall | typeof Laser | typeof Rocket
+  public projectile!: ProjectileName
   public reloadBar!: ReloadBar
   public drawReloadBarOptions = {
     alpha: 0,
@@ -133,18 +129,23 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
             this.vector.setDirection({ direction: newDirection })
             this.moveTurning = false
             if (this.reloadTimeLeft <= 0) {
-              this.reloadTimeLeft = this.Projectile.reloadTime
-              const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
-              const bulletX = thisGrid.gridX - (this.radius * Math.sin(angleRadians) / tileMap.gridSize)
-              const bulletY = thisGrid.gridY - (this.radius * Math.cos(angleRadians) / tileMap.gridSize)
-              const projectile = new this.Projectile({
-                game: this.game,
-                initX: bulletX * tileMap.gridSize,
-                initY: bulletY * tileMap.gridSize,
-                direction: newDirection,
-                target: this.orders.to
-              })
-              tileMap.addItem(projectile)
+              const reloadTime = this.game.getReloadTime(this.projectile)
+              if (typeof reloadTime === 'number') {
+                this.reloadTimeLeft = reloadTime
+                const angleRadians = -(this.vector.direction / this.vector.directions) * 2 * Math.PI
+                const bulletX = thisGrid.gridX - (this.radius * Math.sin(angleRadians) / tileMap.gridSize)
+                const bulletY = thisGrid.gridY - (this.radius * Math.cos(angleRadians) / tileMap.gridSize)
+                const projectile = this.game.createProjectile({
+                  name: this.projectile,
+                  initX: bulletX * tileMap.gridSize,
+                  initY: bulletY * tileMap.gridSize,
+                  direction: newDirection,
+                  target: this.orders.to
+                })
+                if (projectile != null) {
+                  tileMap.addItem(projectile)
+                }
+              }
             }
           }
         } else {
@@ -232,7 +233,9 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
   }
 
   updateReload (): void {
-    const { reloadTime } = this.Projectile
-    this.reloadBar.updateReload((reloadTime - this.reloadTimeLeft) / reloadTime)
+    const reloadTime = this.game.getReloadTime(this.projectile)
+    if (typeof reloadTime === 'number') {
+      this.reloadBar.updateReload((reloadTime - this.reloadTimeLeft) / reloadTime)
+    }
   }
 }

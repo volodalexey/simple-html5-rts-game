@@ -77,6 +77,9 @@ export class MiniMap extends Container {
   }
 
   handlePointerDown = (e: FederatedPointerEvent): void => {
+    if (this.game.gameEnded) {
+      return
+    }
     const localPosition = this.background.toLocal(e)
     this.pointerDownX = localPosition.x
     this.pointerDownY = localPosition.y
@@ -95,11 +98,17 @@ export class MiniMap extends Container {
   }
 
   handlePointerUp = (e: FederatedPointerEvent): void => {
+    if (this.game.gameEnded) {
+      return
+    }
     this.pointerDownX = this.pointerDownY = -1
     logPointerEvent(`MiniMap pdX=${this.pointerDownX} pdX=${this.pointerDownY} up`)
   }
 
   handlePointerMove = (e: FederatedPointerEvent): void => {
+    if (this.game.gameEnded) {
+      return
+    }
     if (this.pointerDownX > -1 && this.pointerDownY > -1) {
       const localPosition = this.background.toLocal(e)
       logPointerEvent(`MiniMap pdX=${this.pointerDownX} pdX=${this.pointerDownY} mX=${localPosition.x} mY=${localPosition.y}`)
@@ -110,6 +119,9 @@ export class MiniMap extends Container {
   }
 
   handlePointerLeave = (e: FederatedPointerEvent): void => {
+    if (this.game.gameEnded) {
+      return
+    }
     this.pointerDownX = this.pointerDownY = -1
     logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} up`)
   }
@@ -205,7 +217,7 @@ export class MiniMap extends Container {
       const activeItem = activeItems.children[i]
       const graphics = new Graphics()
       graphics.beginFill(activeItem.team === Team.blue ? itemBlueTeamClor : itemGreeTeamClor)
-      const itemBounds = activeItem.getSelectionBounds()
+      const itemBounds = activeItem.getCollisionBounds()
       if ((itemBounds.left < bgBounds.left && itemBounds.right < bgBounds.left) ||
         (itemBounds.left > bgBounds.right && itemBounds.right > bgBounds.right) ||
         (itemBounds.top < bgBounds.top && itemBounds.bottom < bgBounds.top) ||

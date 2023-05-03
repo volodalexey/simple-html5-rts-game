@@ -3,14 +3,13 @@ import { Vector, EVectorDirection } from '../Vector'
 import { findAngle, type Team, angleDiff, wrapDirection, findAngleGrid, generateUid } from '../common'
 import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
-import { EItemType, type IItem } from '../interfaces/IItem'
+import { EItemName, EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
 import { AStar } from '../AStar'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
-import { type IBuildable } from '../interfaces/IBuildable'
 import { LifeBar } from '../LifeBar'
-import { logVehicleBounds } from '../logger'
+import { logItemBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
 
 export interface IVehicleTextures {
@@ -49,10 +48,20 @@ interface IPathPoint {
   y: number
 }
 
-export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable, IBuildable {
+export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
+  public collisionGraphics = new Graphics()
+  public collisionOptions = {
+    width: 0,
+    height: 0,
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
+  public selectedGraphics = new Graphics()
   public selected = false
   public selectable = true
-  public selectedGraphics = new Container()
   public drawSelectionOptions = {
     width: 0,
     height: 0,
@@ -66,6 +75,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
+  public lifeBar!: LifeBar
   public drawLifeBarOptions = {
     borderColor: 0,
     borderThickness: 0,
@@ -83,10 +93,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public game: Game
   public uid: number
   public type = EItemType.vehicles
+  public itemName = EItemName.None
   public ordersable = true
   public hitPoints = 0
   public life = 0
-  public lifeBar!: LifeBar
   public team: Team
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
@@ -108,7 +118,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public orders: IOrder
   public sight = 0
   public radius = 0
-  public cost = 0
 
   constructor (options: IVehicleOptions) {
     super()
@@ -142,6 +151,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   }: IVehicleOptions): void {
     this.addChild(this.selectedGraphics)
     this.addChild(this.spritesContainer)
+    this.addChild(this.collisionGraphics)
 
     const upAnimation = new AnimatedSprite(upTextures)
     this.spritesContainer.addChild(upAnimation)
@@ -184,34 +194,33 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.selected = selected
   }
 
-  getSelectionPosition ({ center = false } = {}): { x: number, y: number } {
-    const sub = this.drawSelectionOptions.strokeWidth
+  getCollisionPosition ({ center = false } = {}): { x: number, y: number } {
+    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
     const ret = {
-      x: this.x + this.selectedGraphics.x + sub,
-      y: this.y + this.selectedGraphics.y + sub
+      x: this.x + colX,
+      y: this.y + colY
     }
     if (center) {
-      ret.x += (this.selectedGraphics.width - sub * 2) / 2
-      ret.y += (this.selectedGraphics.height - sub * 2) / 2
+      ret.x += (colWidth) / 2
+      ret.y += (colHeight) / 2
     }
     return ret
   }
 
-  getSelectionBounds (): { top: number, right: number, bottom: number, left: number } {
-    const selectionPosition = this.getSelectionPosition()
-    const sub = this.drawSelectionOptions.strokeWidth
+  getCollisionBounds (): { top: number, right: number, bottom: number, left: number } {
+    const collisionPosition = this.getCollisionPosition()
     return {
-      top: selectionPosition.y,
-      right: selectionPosition.x + this.selectedGraphics.width - sub * 2,
-      bottom: selectionPosition.y + this.selectedGraphics.height - sub * 2,
-      left: selectionPosition.x
+      top: collisionPosition.y,
+      right: collisionPosition.x + this.collisionGraphics.width,
+      bottom: collisionPosition.y + this.collisionGraphics.height,
+      left: collisionPosition.x
     }
   }
 
   getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
-    const selectionPosition = this.getSelectionPosition({ center })
-    const ret = { gridX: selectionPosition.x / gridSize, gridY: selectionPosition.y / gridSize }
+    const collisionPosition = this.getCollisionPosition({ center })
+    const ret = { gridX: collisionPosition.x / gridSize, gridY: collisionPosition.y / gridSize }
     if (floor) {
       ret.gridX = Math.floor(ret.gridX)
       ret.gridY = Math.floor(ret.gridY)
@@ -220,27 +229,15 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   }
 
   setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
-    const sub = this.drawSelectionOptions.strokeWidth
-    const diffX = 0 - (this.selectedGraphics.x + (center ? this.selectedGraphics.width / 2 : sub))
-    const diffY = 0 - (this.selectedGraphics.y + (center ? this.selectedGraphics.height / 2 : sub))
+    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
+    const diffX = 0 - (colX + (center ? colWidth / 2 : 0))
+    const diffY = 0 - (colY + (center ? colHeight / 2 : 0))
     this.position.set(x + diffX, y + diffY)
   }
 
   setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
     const { gridSize } = this.game.tileMap
     this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
-  }
-
-  checkDrawVehicleBounds (): void {
-    if (logVehicleBounds.enabled) {
-      const selectionBounds = this.getSelectionBounds()
-      const gr = new Graphics()
-      gr.beginFill(0xffffff)
-      gr.alpha = 0.5
-      gr.drawRect(selectionBounds.left - this.x, selectionBounds.top - this.y, selectionBounds.right - selectionBounds.left, selectionBounds.bottom - selectionBounds.top)
-      gr.endFill()
-      this.addChild(gr)
-    }
   }
 
   hideAllAnimations (): void {
@@ -284,28 +281,37 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.currentAnimation.visible = true
   }
 
+  drawCollision (): void {
+    const { offset, width, height } = this.collisionOptions
+    const { collisionGraphics } = this
+    collisionGraphics.position.set(offset.x, offset.y)
+    collisionGraphics.beginFill(0xffffff)
+    collisionGraphics.drawRect(0, 0, width, height)
+    collisionGraphics.endFill()
+    collisionGraphics.alpha = logItemBounds.enabled ? 0.5 : 0
+  }
+
   drawSelection (): void {
     const { offset, strokeWidth, strokeColor, strokeSecondColor, radius } = this.drawSelectionOptions
-    this.selectedGraphics.position.set(offset.x, offset.y)
-    const selection = new Graphics()
-    this.selectedGraphics.addChild(selection)
+    const { selectedGraphics } = this
+    selectedGraphics.position.set(offset.x, offset.y)
     const segmentsCount = 8
     const segment = Math.PI * 2 / segmentsCount
     const cx = radius + strokeWidth
     const cy = radius + strokeWidth
     for (let i = 0; i < segmentsCount; i++) {
-      selection.beginFill(i % 2 === 0 ? strokeColor : strokeSecondColor)
+      selectedGraphics.beginFill(i % 2 === 0 ? strokeColor : strokeSecondColor)
       const angleStart = segment * i
       const angleEnd = segment * (i + 1)
       const radiusStroke = radius + strokeWidth
-      selection.moveTo(cx + radius * Math.cos(angleStart), cy + radius * Math.sin(angleStart))
-      selection.lineTo(cx + radiusStroke * Math.cos(angleStart), cy + radiusStroke * Math.sin(angleStart))
-      selection.arc(cx, cy, radiusStroke, angleStart, angleEnd)
-      selection.lineTo(cx + radius * Math.cos(angleEnd), cy + radius * Math.sin(angleEnd))
-      selection.arc(cx, cy, radius, angleEnd, angleStart, true)
-      selection.endFill()
+      selectedGraphics.moveTo(cx + radius * Math.cos(angleStart), cy + radius * Math.sin(angleStart))
+      selectedGraphics.lineTo(cx + radiusStroke * Math.cos(angleStart), cy + radiusStroke * Math.sin(angleStart))
+      selectedGraphics.arc(cx, cy, radiusStroke, angleStart, angleEnd)
+      selectedGraphics.lineTo(cx + radius * Math.cos(angleEnd), cy + radius * Math.sin(angleEnd))
+      selectedGraphics.arc(cx, cy, radius, angleEnd, angleStart, true)
+      selectedGraphics.endFill()
     }
-    this.selectedGraphics.alpha = 0
+    selectedGraphics.alpha = 0
   }
 
   drawLifeBar (): void {

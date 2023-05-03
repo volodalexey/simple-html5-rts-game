@@ -9914,6 +9914,26 @@
       "starport-blue-closing-16.png",
       "starport-blue-closing-17.png"
     ],
+    "starport-blue-opening": [
+      "starport-blue-closing-17.png",
+      "starport-blue-closing-16.png",
+      "starport-blue-closing-15.png",
+      "starport-blue-closing-14.png",
+      "starport-blue-closing-13.png",
+      "starport-blue-closing-12.png",
+      "starport-blue-closing-11.png",
+      "starport-blue-closing-10.png",
+      "starport-blue-closing-09.png",
+      "starport-blue-closing-08.png",
+      "starport-blue-closing-07.png",
+      "starport-blue-closing-06.png",
+      "starport-blue-closing-05.png",
+      "starport-blue-closing-04.png",
+      "starport-blue-closing-03.png",
+      "starport-blue-closing-02.png",
+      "starport-blue-closing-01.png",
+      "starport-blue-closing-00.png"
+    ],
     "starport-green-closing": [
       "starport-green-closing-00.png",
       "starport-green-closing-01.png",
@@ -9933,6 +9953,26 @@
       "starport-green-closing-15.png",
       "starport-green-closing-16.png",
       "starport-green-closing-17.png"
+    ],
+    "starport-green-opening": [
+      "starport-green-closing-17.png",
+      "starport-green-closing-16.png",
+      "starport-green-closing-15.png",
+      "starport-green-closing-14.png",
+      "starport-green-closing-13.png",
+      "starport-green-closing-12.png",
+      "starport-green-closing-11.png",
+      "starport-green-closing-10.png",
+      "starport-green-closing-09.png",
+      "starport-green-closing-08.png",
+      "starport-green-closing-07.png",
+      "starport-green-closing-06.png",
+      "starport-green-closing-05.png",
+      "starport-green-closing-04.png",
+      "starport-green-closing-03.png",
+      "starport-green-closing-02.png",
+      "starport-green-closing-01.png",
+      "starport-green-closing-00.png"
     ],
     "starport-blue-healthy": [
       "starport-blue-healthy-0.png",

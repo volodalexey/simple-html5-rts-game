@@ -1,4 +1,5 @@
 import { AUDIO } from '../audio'
+import { EItemName } from '../interfaces/IItem'
 import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
 export type IBulletOptions = Pick<
@@ -7,6 +8,7 @@ Exclude<keyof IProjectileOptions, 'textures'>
 >
 
 export class Bullet extends Projectile {
+  public itemName = EItemName.Bullet
   static textures: IProjectileTextures
   static reloadTime = 2
   static shootAudio = ''
@@ -15,12 +17,23 @@ export class Bullet extends Projectile {
   public range = 5
   public damage = 1
 
+  public collisionOptions = {
+    width: 4,
+    height: 4,
+    offset: {
+      x: 3,
+      y: 4
+    }
+  }
+
   constructor (options: IBulletOptions) {
     super({
       ...options,
       textures: Bullet.textures
     })
 
+    this.drawCollision()
+    this.setPositionByXY({ x: options.initX, y: options.initY, center: true })
     AUDIO.play('bullet')
   }
 

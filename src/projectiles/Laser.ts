@@ -1,4 +1,5 @@
 import { AUDIO } from '../audio'
+import { EItemName } from '../interfaces/IItem'
 import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
 export type IFireBallOptions = Pick<
@@ -7,6 +8,7 @@ Exclude<keyof IProjectileOptions, 'textures'>
 >
 
 export class Laser extends Projectile {
+  public itemName = EItemName.Laser
   static textures: IProjectileTextures
   static reloadTime = 30
 
@@ -20,6 +22,8 @@ export class Laser extends Projectile {
       textures: Laser.textures
     })
 
+    this.drawCollision()
+    this.setPositionByXY({ x: options.initX, y: options.initY, center: true })
     AUDIO.play('laser')
   }
 

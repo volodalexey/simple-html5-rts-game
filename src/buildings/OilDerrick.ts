@@ -1,7 +1,7 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../common'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
-import { type IBuildable } from '../interfaces/IBuildable'
+import { EItemName } from '../interfaces/IItem'
 
 export type IOilDerrickOptions = Pick<
 IBuildingOptions,
@@ -20,7 +20,8 @@ export enum OilDerrickAnimation {
   damaged = 'damaged',
 }
 
-export class OilDerrick extends Building implements IBuildable {
+export class OilDerrick extends Building {
+  public itemName = EItemName.OilDerrick
   static blueTextures: IOilDerrickTextures
   static greenTextures: IOilDerrickTextures
   static textures (team: Team): IOilDerrickTextures {
@@ -38,9 +39,18 @@ export class OilDerrick extends Building implements IBuildable {
     OilDerrick.greenTextures = greenTextures
   }
 
+  public collisionOptions = {
+    width: 35,
+    height: 19,
+    offset: {
+      x: 2,
+      y: 41
+    }
+  }
+
   public drawSelectionOptions = {
-    width: 40,
-    height: 22,
+    width: 39,
+    height: 23,
     radius: 0,
     strokeWidth: 2,
     strokeColor: 0,
@@ -66,7 +76,7 @@ export class OilDerrick extends Building implements IBuildable {
   }
 
   public sight = 3
-  public cost = 5000
+  static cost = 5000
   public hitPoints = 300
   public life = this.hitPoints
   public deployAnimationSpeed = 0.1
@@ -103,15 +113,16 @@ export class OilDerrick extends Building implements IBuildable {
       this.updateAnimation()
     }
 
-    this.checkDrawBuildingBounds()
+    this.drawCollision()
   }
 
   setup (options: IOilDerrickOptions): void {
+    const textures = OilDerrick.textures(options.team)
     super.setup({
       ...options,
-      textures: OilDerrick.textures(options.team)
+      textures
     })
-    const { deployTextures } = OilDerrick.textures(this.team)
+    const { deployTextures } = textures
     const deployAnimation = new AnimatedSprite(deployTextures)
     this.spritesContainer.addChild(deployAnimation)
     this.deployAnimation = deployAnimation
@@ -121,7 +132,7 @@ export class OilDerrick extends Building implements IBuildable {
     return this.currentAnimation === this.deployAnimation
   }
 
-  updateAnimation (): void {
+  override updateAnimation (): void {
     if (this.isHealthy()) {
       if (this.isDeploying() && this.deployAnimation.currentFrame === this.deployAnimation.totalFrames - 1) {
         this.switchAnimation(OilDerrickAnimation.healthy)
@@ -131,7 +142,7 @@ export class OilDerrick extends Building implements IBuildable {
     }
   }
 
-  switchAnimation <T>(animation: T): void {
+  override switchAnimation <T>(animation: T): void {
     let newAnimation
     switch (animation) {
       case OilDerrickAnimation.deploy:

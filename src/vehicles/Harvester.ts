@@ -1,6 +1,6 @@
 import { OilDerrick, OilDerrickAnimation } from '../buildings/OilDerrick'
 import { wrapDirection, Team, angleDiff } from '../common'
-import { EItemType } from '../interfaces/IItem'
+import { EItemName, EItemType } from '../interfaces/IItem'
 import { EVectorDirection } from '../Vector'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
@@ -10,6 +10,7 @@ Exclude<keyof IVehicleOptions, 'textures'>
 >
 
 export class Harvester extends Vehicle {
+  public itemName = EItemName.Harvester
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
   static textures (team: Team): IVehicleTextures {
@@ -25,6 +26,15 @@ export class Harvester extends Vehicle {
   }): void {
     Harvester.blueTextures = blueTextures
     Harvester.greenTextures = greenTextures
+  }
+
+  public collisionOptions = {
+    width: 20,
+    height: 20,
+    offset: {
+      x: 1,
+      y: 0
+    }
   }
 
   public drawSelectionOptions = {
@@ -57,7 +67,7 @@ export class Harvester extends Vehicle {
   public radius = 10
   public speed = 10
   public sight = 3
-  public cost = 1600
+  static cost = 1600
   public hitPoints = 50
   public turnSpeed = 2
 
@@ -69,12 +79,11 @@ export class Harvester extends Vehicle {
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
+    this.drawCollision()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
     this.updateAnimation()
-
-    this.checkDrawVehicleBounds()
   }
 
   processOrders (): boolean {

@@ -1,6 +1,7 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../common'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
+import { EItemName } from '../interfaces/IItem'
 
 export type IBaseOptions = Pick<
 IBuildingOptions,
@@ -12,6 +13,7 @@ export interface IBaseTextures extends IBuildingTextures {
 }
 
 export class Base extends Building {
+  public itemName = EItemName.Base
   static blueTextures: IBaseTextures
   static greenTextures: IBaseTextures
   static textures (team: Team): IBaseTextures {
@@ -27,6 +29,15 @@ export class Base extends Building {
   }): void {
     Base.blueTextures = blueTextures
     Base.greenTextures = greenTextures
+  }
+
+  public collisionOptions = {
+    width: 40,
+    height: 40,
+    offset: {
+      x: 0,
+      y: 20
+    }
   }
 
   public drawSelectionOptions = {
@@ -52,7 +63,7 @@ export class Base extends Building {
     emptyColor: 0xff0000,
     offset: {
       x: 0,
-      y: -4
+      y: -2
     }
   }
 
@@ -86,7 +97,7 @@ export class Base extends Building {
     this.updateLife()
     this.updateAnimation()
 
-    this.checkDrawBuildingBounds()
+    this.drawCollision()
   }
 
   setupChild (): void {

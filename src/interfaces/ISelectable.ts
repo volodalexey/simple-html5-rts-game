@@ -1,4 +1,4 @@
-import { type Container } from 'pixi.js'
+import { type Graphics } from 'pixi.js'
 import { type Team } from '../common'
 
 export interface ISelectable {
@@ -17,8 +17,7 @@ export interface ISelectable {
     }
   }
 
-  selectedGraphics: Container
+  selectedGraphics: Graphics
   setSelected: (selected: boolean) => void
-  getSelectionPosition: (options: { center?: boolean }) => { x: number, y: number }
-  getSelectionBounds: () => { top: number, right: number, bottom: number, left: number }
+  drawSelection: () => void
 }

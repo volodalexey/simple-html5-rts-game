@@ -1,5 +1,5 @@
 import { Team } from '../common'
-import { CannonBall } from '../projectiles/CannonBall'
+import { EItemName, type ProjectileName } from '../interfaces/IItem'
 import { AttackableVehicle } from './AttackableVehicle'
 import { type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
@@ -9,8 +9,32 @@ Exclude<keyof IVehicleOptions, 'textures'>
 >
 
 export class HeavyTank extends AttackableVehicle {
+  public itemName = EItemName.HeavyTank
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
+  static textures (team: Team): IVehicleTextures {
+    return team === Team.blue ? HeavyTank.blueTextures : HeavyTank.greenTextures
+  }
+
+  static prepareTextures ({
+    blueTextures,
+    greenTextures
+  }: {
+    blueTextures: IVehicleTextures
+    greenTextures: IVehicleTextures
+  }): void {
+    HeavyTank.blueTextures = blueTextures
+    HeavyTank.greenTextures = greenTextures
+  }
+
+  public collisionOptions = {
+    width: 26,
+    height: 26,
+    offset: {
+      x: 3,
+      y: 3
+    }
+  }
 
   public drawSelectionOptions = {
     width: 0,
@@ -53,10 +77,10 @@ export class HeavyTank extends AttackableVehicle {
   public radius = 13
   public speed = 15
   public sight = 10
-  public cost = 1200
+  static cost = 1200
   public hitPoints = 50
   public turnSpeed = 4
-  public Projectile = CannonBall
+  public projectile: ProjectileName = EItemName.CannonBall
   public canAttack = true
   public canAttackLand = true
   public canAttackAir = false
@@ -64,29 +88,17 @@ export class HeavyTank extends AttackableVehicle {
   constructor (options: IHeavyTankOptions) {
     super({
       ...options,
-      textures: options.team === Team.blue ? HeavyTank.blueTextures : HeavyTank.greenTextures
+      textures: HeavyTank.textures(options.team)
     })
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()
+    this.drawCollision()
     this.setPositionByXY({ x: options.initX, y: options.initY })
     this.drawLifeBar()
     this.updateLife()
     this.drawReloadBar()
     this.updateReload()
     this.updateAnimation()
-
-    this.checkDrawVehicleBounds()
-  }
-
-  static prepareTextures ({
-    blueTextures,
-    greenTextures
-  }: {
-    blueTextures: IVehicleTextures
-    greenTextures: IVehicleTextures
-  }): void {
-    HeavyTank.blueTextures = blueTextures
-    HeavyTank.greenTextures = greenTextures
   }
 }

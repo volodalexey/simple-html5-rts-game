@@ -1,8 +1,8 @@
 import { type BaseActiveItem } from '../common'
-import { type EItemType } from './IItem'
+import { type UnitName, type EItemType } from './IItem'
 
 export type IOrder = IMoveOrder | IFireOrder | IAttackOrder | IPatrolOrder | IStandOrder
-| ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder | IDeployOrder
+| ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder | IDeployOrder | IConstructUnitOrder
 
 interface IMoveOrder {
   type: 'move'
@@ -62,4 +62,9 @@ interface IFollowOrder {
 interface IDeployOrder {
   type: 'deploy'
   toPoint: IPointGridData
+}
+
+interface IConstructUnitOrder {
+  type: 'construct-unit'
+  name: UnitName
 }

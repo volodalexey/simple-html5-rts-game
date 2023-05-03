@@ -69,7 +69,7 @@ export class Order extends Graphics {
   }
 
   drawOrderLine ({ selectedItem, tileMap }: { selectedItem: SelectableItem, tileMap: TileMap }): void {
-    const selectedItemPosition = selectedItem.getSelectionPosition({ center: true })
+    const selectedItemPosition = selectedItem.getCollisionPosition({ center: true })
     let from: { x: number, y: number } | undefined
     let to: { x: number, y: number } | undefined
     switch (selectedItem.orders.type) {
@@ -81,7 +81,7 @@ export class Order extends Graphics {
       case 'attack': case 'guard': {
         const toTarget = selectedItem.orders.toUid != null ? tileMap.getItemByUid(selectedItem.orders.toUid) : selectedItem.orders.to
         if (toTarget != null) {
-          const toGrid = toTarget.getSelectionPosition({ center: true })
+          const toGrid = toTarget.getCollisionPosition({ center: true })
           from = selectedItemPosition
           to = toGrid
         }

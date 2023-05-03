@@ -3,20 +3,20 @@ import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
 import { logLayout, logPointerEvent } from './logger'
-import { Team, type SelectableItem } from './common'
+import { Team, type SelectableItem, type BaseActiveItem } from './common'
 import { Base } from './buildings/Base'
 import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
-import { EItemType } from './interfaces/IItem'
+import { EItemName, EItemType } from './interfaces/IItem'
 import { type IAttackable } from './interfaces/IAttackable'
 import { type IOrder } from './interfaces/IOrder'
 import { AUDIO } from './audio'
 import { Bullet } from './projectiles/Bullet'
 import { CannonBall } from './projectiles/CannonBall'
 import { Laser } from './projectiles/Laser'
-import { Rocket } from './projectiles/HeatSeeker'
+import { Rocket } from './projectiles/Rocket'
 import { Order } from './Order'
 import { StartModal } from './StartModal'
 import { Firework } from './Particle'
@@ -25,6 +25,7 @@ import { TopBar } from './TopBar'
 import { GroundTurret } from './buildings/GroundTurret'
 import { OilDerrick } from './buildings/OilDerrick'
 import { Starport } from './buildings/Starport'
+import { type EVectorDirection } from './Vector'
 
 export interface IGameOptions {
   viewWidth: number
@@ -252,7 +253,7 @@ export class Game extends Container {
           return
         }
 
-        const itemBounds = moveableItem.getSelectionBounds()
+        const itemBounds = moveableItem.getCollisionBounds()
 
         if (itemBounds.left >= left &&
           itemBounds.right <= right &&
@@ -267,6 +268,9 @@ export class Game extends Container {
   }
 
   handlePointerLeave = (e: FederatedPointerEvent): void => {
+    if (this.gameEnded) {
+      return
+    }
     if (e.pointerId === this.pointerSecondDownId) {
       this.pointerSecondDownId = this.pointerSecondDownX = this.pointerSecondDownY = -1
       logPointerEvent('Game pointer second leave')
@@ -338,6 +342,9 @@ export class Game extends Container {
   }
 
   handleWheel = (e: FederatedWheelEvent): void => {
+    if (this.gameEnded) {
+      return
+    }
     const localPosition = this.tileMap.toLocal(e)
     const scaleModifier = -1 * Math.sign(e.deltaY) * Game.options.wheelScaleFactor
     this.tileMap.zoom({ scaleFactor: scaleModifier, sX: localPosition.x, sY: localPosition.y })
@@ -539,13 +546,15 @@ export class Game extends Container {
         healthyTextures: animations['starport-blue-healthy'],
         damagedTextures: [textures['starport-blue-damaged.png']],
         teleportTextures: animations['starport-blue-teleport'],
-        closingTextures: animations['starport-blue-closing']
+        closingTextures: animations['starport-blue-closing'],
+        openingTextures: animations['starport-blue-opening']
       },
       greenTextures: {
         healthyTextures: animations['starport-green-healthy'],
         damagedTextures: [textures['starport-green-damaged.png']],
         teleportTextures: animations['starport-green-teleport'],
-        closingTextures: animations['starport-green-closing']
+        closingTextures: animations['starport-green-closing'],
+        openingTextures: animations['starport-green-opening']
       }
     })
 
@@ -769,5 +778,165 @@ export class Game extends Container {
       AUDIO.play('message-received')
     }
     this.topBar.statusBar.appendMessage({ character, message, time: this.time })
+  }
+
+  getItemCost (name: EItemName): number | undefined {
+    switch (name) {
+      case EItemName.OilDerrick:
+        return OilDerrick.cost
+      case EItemName.Starport:
+        return Starport.cost
+      case EItemName.GroundTurret:
+        return GroundTurret.cost
+      case EItemName.Transport:
+        return Transport.cost
+      case EItemName.Harvester:
+        return Harvester.cost
+      case EItemName.HeavyTank:
+        return HeavyTank.cost
+      case EItemName.ScoutTank:
+        return ScoutTank.cost
+    }
+  }
+
+  getReloadTime (name: EItemName): number | undefined {
+    switch (name) {
+      case EItemName.Bullet:
+        return Bullet.reloadTime
+      case EItemName.CannonBall:
+        return CannonBall.reloadTime
+      case EItemName.Rocket:
+        return Rocket.reloadTime
+      case EItemName.Laser:
+        return Laser.reloadTime
+    }
+  }
+
+  createItem (options: {
+    name: EItemName
+    initGridX?: number
+    initGridY?: number
+    initX?: number
+    initY?: number
+    team: Team
+    direction?: EVectorDirection
+    uid?: number
+    life?: number
+    selectable?: boolean
+    ordersable?: boolean
+    orders?: IOrder
+  }): Base | OilDerrick | Starport | GroundTurret
+    | Transport | Harvester | ScoutTank | HeavyTank
+    | undefined {
+    let { initX = 0, initY = 0 } = options
+    const { name, initGridX, initGridY } = options
+    const { gridSize } = this.tileMap
+    initX = initGridX != null ? gridSize * initGridX : initX
+    initY = initGridY != null ? gridSize * initGridY : initY
+    switch (name) {
+      case EItemName.Base:
+        return new Base({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.OilDerrick:
+        return new OilDerrick({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Starport:
+        return new Starport({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.GroundTurret:
+        return new GroundTurret({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Transport:
+        return new Transport({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Harvester:
+        return new Harvester({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.HeavyTank:
+        return new HeavyTank({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.ScoutTank:
+        return new ScoutTank({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+    }
+  }
+
+  createProjectile (options: {
+    name: EItemName
+    initGridX?: number
+    initGridY?: number
+    initX?: number
+    initY?: number
+    direction: EVectorDirection
+    target: BaseActiveItem
+  }): Bullet | CannonBall | Rocket | Laser
+    | undefined {
+    let { initX = 0, initY = 0 } = options
+    const { name, initGridX, initGridY } = options
+    const { gridSize } = this.tileMap
+    initX = initGridX != null ? gridSize * initGridX : initX
+    initY = initGridY != null ? gridSize * initGridY : initY
+    switch (name) {
+      case EItemName.Bullet:
+        return new Bullet({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.CannonBall:
+        return new CannonBall({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Rocket:
+        return new Rocket({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Laser:
+        return new Laser({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+    }
   }
 }

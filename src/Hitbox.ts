@@ -1,4 +1,4 @@
-import { Graphics, Text } from 'pixi.js'
+import { Graphics } from 'pixi.js'
 import { logHitboxes } from './logger'
 
 interface IHitboxOptions {
@@ -22,13 +22,6 @@ export class Hitbox extends Graphics {
     this.endFill()
     this.alpha = logHitboxes.enabled ? 0.5 : 0
     this.position.set(initX, initY)
-    if (initGridX != null && initGridY != null) {
-      this.addChild(new Text(`x=${initGridX}\ny=${initGridY}`, {
-        fontSize: 8,
-        fill: 0xffff00,
-        align: 'center'
-      }))
-    }
   }
 
   getRectBounds (): {

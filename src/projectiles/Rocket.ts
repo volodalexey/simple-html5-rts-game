@@ -1,4 +1,5 @@
 import { AUDIO } from '../audio'
+import { EItemName } from '../interfaces/IItem'
 import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
 export type IHeatSeekerOptions = Pick<
@@ -7,6 +8,7 @@ Exclude<keyof IProjectileOptions, 'textures'>
 >
 
 export class Rocket extends Projectile {
+  public itemName = EItemName.Rocket
   static textures: IProjectileTextures
   static reloadTime = 40
 
@@ -21,6 +23,8 @@ export class Rocket extends Projectile {
       textures: Rocket.textures
     })
 
+    this.drawCollision()
+    this.setPositionByXY({ x: options.initX, y: options.initY, center: true })
     AUDIO.play('rocket')
   }
 
