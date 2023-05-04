@@ -4,12 +4,13 @@ import { Hitbox } from './Hitbox'
 import { manifest } from './LoaderScene'
 import { type Building } from './buildings/Building'
 import { type Vehicle } from './vehicles/Vehicle'
-import { type Team, type BaseActiveItem, type BaseItem } from './common'
+import { type Team, type BaseActiveItem, type BaseItem, type BaseMoveableItem } from './common'
 import { type Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
 import { EItemType } from './interfaces/IItem'
 import { logGrid } from './logger'
+import { type AirVehicle } from './air-vehicles/AirVehicle'
 
 export interface ITileMapOptions {
   game: Game
@@ -30,7 +31,7 @@ export class TileMap extends Container {
   private _currentMapBuildableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()
-  public activeItems = new Container<Building | Vehicle>()
+  public activeItems = new Container<BaseActiveItem>()
   public orders = new Container<Order>()
   public projectiles = new Container<Projectile>()
   public background = new Sprite()
@@ -229,15 +230,21 @@ export class TileMap extends Container {
   }
 
   addItem (item: BaseItem): void {
-    if (item.type === EItemType.buildings || item.type === EItemType.vehicles) {
+    if (item.type === EItemType.buildings || item.type === EItemType.vehicles || item.type === EItemType.airVehicles) {
       this.activeItems.addChild(item as BaseActiveItem)
     } else if (item.type === EItemType.projectiles) {
       this.projectiles.addChild(item as Projectile)
     }
   }
 
-  get moveableItems (): Vehicle[] {
-    return [...this.activeItems.children.filter((item): item is Vehicle => item.type === EItemType.vehicles)]
+  get moveableItems (): BaseMoveableItem[] {
+    return [...this.activeItems.children.filter(
+      (item): item is BaseMoveableItem => item.type === EItemType.vehicles || item.type === EItemType.airVehicles)]
+  }
+
+  get airItems (): AirVehicle[] {
+    return [...this.activeItems.children.filter(
+      (item): item is AirVehicle => item.type === EItemType.airVehicles)]
   }
 
   get staticItems (): Building[] {
@@ -248,7 +255,7 @@ export class TileMap extends Container {
     return [...this.activeItems.children, ...this.projectiles.children]
   }
 
-  getTeamMoveableItems (team: Team): Vehicle[] {
+  getTeamMoveableItems (team: Team): BaseMoveableItem[] {
     return this.moveableItems.filter(item => item.team === team)
   }
 

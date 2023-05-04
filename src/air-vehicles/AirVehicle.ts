@@ -5,14 +5,13 @@ import { type ISelectable } from '../interfaces/ISelectable'
 import { type ILifeable } from '../interfaces/ILifeable'
 import { EItemName, EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
-import { AStar } from '../AStar'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logItemBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
 
-export interface IVehicleTextures {
+export interface IAirVehicleTextures {
   upTextures: Texture[]
   upRightTextures: Texture[]
   rightTextures: Texture[]
@@ -23,13 +22,16 @@ export interface IVehicleTextures {
   upLeftTextures: Texture[]
 }
 
-export interface IVehicleOptions {
+export interface IAirVehicleOptions {
   game: Game
   uid?: number
   initX: number
   initY: number
   team: Team
-  textures: IVehicleTextures
+  textures: {
+    body: IAirVehicleTextures
+    shadow: IAirVehicleTextures
+  }
   direction?: EVectorDirection
   life?: number
   selectable?: boolean
@@ -44,12 +46,7 @@ enum ECollisionType {
   attraction = 'attraction',
 }
 
-interface IPathPoint {
-  x: number
-  y: number
-}
-
-export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
+export class AirVehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
   public collisionGraphics = new Graphics()
   public collisionOptions = {
     width: 0,
@@ -93,22 +90,46 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
 
   public game: Game
   public uid: number
-  public type = EItemType.vehicles
+  public type = EItemType.airVehicles
   public itemName = EItemName.None
   public ordersable = true
   public hitPoints = 0
   public life = 0
   public team: Team
-  public upAnimation!: AnimatedSprite
-  public upRightAnimation!: AnimatedSprite
-  public rightAnimation!: AnimatedSprite
-  public downRightAnimation!: AnimatedSprite
-  public downAnimation!: AnimatedSprite
-  public downLeftAnimation!: AnimatedSprite
-  public leftAnimation!: AnimatedSprite
-  public upLeftAnimation!: AnimatedSprite
-  public currentAnimation!: AnimatedSprite
-  public spritesContainer = new Container<AnimatedSprite>()
+  public bodyAnimation!: {
+    upAnimation: AnimatedSprite
+    upRightAnimation: AnimatedSprite
+    rightAnimation: AnimatedSprite
+    downRightAnimation: AnimatedSprite
+    downAnimation: AnimatedSprite
+    downLeftAnimation: AnimatedSprite
+    leftAnimation: AnimatedSprite
+    upLeftAnimation: AnimatedSprite
+  }
+
+  public currentBodyAnimation!: AnimatedSprite
+
+  public shadowAnimation!: {
+    upAnimation: AnimatedSprite
+    upRightAnimation: AnimatedSprite
+    rightAnimation: AnimatedSprite
+    downRightAnimation: AnimatedSprite
+    downAnimation: AnimatedSprite
+    downLeftAnimation: AnimatedSprite
+    leftAnimation: AnimatedSprite
+    upLeftAnimation: AnimatedSprite
+  }
+
+  public currentShadowAnimation!: AnimatedSprite
+  public drawShadowOptions = {
+    offset: {
+      x: 0,
+      y: 0
+    }
+  }
+
+  public bodySpritesContainer = new Container<AnimatedSprite>()
+  public shadowSpritesContainer = new Container<AnimatedSprite>()
   public vector = new Vector({ direction: EVectorDirection.down })
   public speed = 0
   public moveTurning = false
@@ -121,7 +142,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public radius = 0
   public teleportGraphics?: Graphics
 
-  constructor (options: IVehicleOptions) {
+  constructor (options: IAirVehicleOptions) {
     super()
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
@@ -141,56 +162,89 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
 
   setup ({
     textures: {
-      upTextures,
-      upRightTextures,
-      rightTextures,
-      downRightTextures,
-      downTextures,
-      downLeftTextures,
-      leftTextures,
-      upLeftTextures
+      body,
+      shadow
     },
     teleport
-  }: IVehicleOptions): void {
+  }: IAirVehicleOptions): void {
     this.addChild(this.selectedGraphics)
-    this.addChild(this.spritesContainer)
+    this.addChild(this.bodySpritesContainer)
+    this.addChild(this.shadowSpritesContainer)
     this.addChild(this.collisionGraphics)
     if (teleport === true) {
       this.teleportGraphics = new Graphics()
       this.addChild(this.teleportGraphics)
     }
 
-    const upAnimation = new AnimatedSprite(upTextures)
-    this.spritesContainer.addChild(upAnimation)
-    this.upAnimation = upAnimation
+    const bodyUpAnimation = new AnimatedSprite(body.upTextures)
+    this.bodySpritesContainer.addChild(bodyUpAnimation)
 
-    const upRightAnimation = new AnimatedSprite(upRightTextures)
-    this.spritesContainer.addChild(upRightAnimation)
-    this.upRightAnimation = upRightAnimation
+    const bodyUpRightAnimation = new AnimatedSprite(body.upRightTextures)
+    this.bodySpritesContainer.addChild(bodyUpRightAnimation)
 
-    const rightAnimation = new AnimatedSprite(rightTextures)
-    this.spritesContainer.addChild(rightAnimation)
-    this.rightAnimation = rightAnimation
+    const bodyRightAnimation = new AnimatedSprite(body.rightTextures)
+    this.bodySpritesContainer.addChild(bodyRightAnimation)
 
-    const downRightAnimation = new AnimatedSprite(downRightTextures)
-    this.spritesContainer.addChild(downRightAnimation)
-    this.downRightAnimation = downRightAnimation
+    const bodyDownRightAnimation = new AnimatedSprite(body.downRightTextures)
+    this.bodySpritesContainer.addChild(bodyDownRightAnimation)
 
-    const downAnimation = new AnimatedSprite(downTextures)
-    this.spritesContainer.addChild(downAnimation)
-    this.downAnimation = downAnimation
+    const bodyDownAnimation = new AnimatedSprite(body.downTextures)
+    this.bodySpritesContainer.addChild(bodyDownAnimation)
 
-    const downLeftAnimation = new AnimatedSprite(downLeftTextures)
-    this.spritesContainer.addChild(downLeftAnimation)
-    this.downLeftAnimation = downLeftAnimation
+    const bodyDownLeftAnimation = new AnimatedSprite(body.downLeftTextures)
+    this.bodySpritesContainer.addChild(bodyDownLeftAnimation)
 
-    const leftAnimation = new AnimatedSprite(leftTextures)
-    this.spritesContainer.addChild(leftAnimation)
-    this.leftAnimation = leftAnimation
+    const bodyLeftAnimation = new AnimatedSprite(body.leftTextures)
+    this.bodySpritesContainer.addChild(bodyLeftAnimation)
 
-    const upLeftAnimation = new AnimatedSprite(upLeftTextures)
-    this.spritesContainer.addChild(upLeftAnimation)
-    this.upLeftAnimation = upLeftAnimation
+    const bodyUpLeftAnimation = new AnimatedSprite(body.upLeftTextures)
+    this.bodySpritesContainer.addChild(bodyUpLeftAnimation)
+
+    this.bodyAnimation = {
+      upAnimation: bodyUpAnimation,
+      upRightAnimation: bodyUpRightAnimation,
+      rightAnimation: bodyRightAnimation,
+      downRightAnimation: bodyDownRightAnimation,
+      downAnimation: bodyDownAnimation,
+      downLeftAnimation: bodyDownLeftAnimation,
+      leftAnimation: bodyLeftAnimation,
+      upLeftAnimation: bodyUpLeftAnimation
+    }
+
+    const shadowUpAnimation = new AnimatedSprite(shadow.upTextures)
+    this.shadowSpritesContainer.addChild(shadowUpAnimation)
+
+    const shadowUpRightAnimation = new AnimatedSprite(shadow.upRightTextures)
+    this.shadowSpritesContainer.addChild(shadowUpRightAnimation)
+
+    const shadowRightAnimation = new AnimatedSprite(shadow.rightTextures)
+    this.shadowSpritesContainer.addChild(shadowRightAnimation)
+
+    const shadowDownRightAnimation = new AnimatedSprite(shadow.downRightTextures)
+    this.shadowSpritesContainer.addChild(shadowDownRightAnimation)
+
+    const shadowDownAnimation = new AnimatedSprite(shadow.downTextures)
+    this.shadowSpritesContainer.addChild(shadowDownAnimation)
+
+    const shadowDownLeftAnimation = new AnimatedSprite(shadow.downLeftTextures)
+    this.shadowSpritesContainer.addChild(shadowDownLeftAnimation)
+
+    const shadowLeftAnimation = new AnimatedSprite(shadow.leftTextures)
+    this.shadowSpritesContainer.addChild(shadowLeftAnimation)
+
+    const shadowUpLeftAnimation = new AnimatedSprite(shadow.upLeftTextures)
+    this.shadowSpritesContainer.addChild(shadowUpLeftAnimation)
+
+    this.shadowAnimation = {
+      upAnimation: shadowUpAnimation,
+      upRightAnimation: shadowUpRightAnimation,
+      rightAnimation: shadowRightAnimation,
+      downRightAnimation: shadowDownRightAnimation,
+      downAnimation: shadowDownAnimation,
+      downLeftAnimation: shadowDownLeftAnimation,
+      leftAnimation: shadowLeftAnimation,
+      upLeftAnimation: shadowUpLeftAnimation
+    }
 
     this.lifeBar = new LifeBar(this.drawLifeBarOptions)
     this.addChild(this.lifeBar)
@@ -201,7 +255,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.selected = selected
   }
 
-  getCollisionPosition ({ center = false } = {}): { x: number, y: number } {
+  getCollisionPosition ({ center = false, air = true } = {}): { x: number, y: number } {
     const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
     const ret = {
       x: this.x + colX,
@@ -211,11 +265,15 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       ret.x += (colWidth) / 2
       ret.y += (colHeight) / 2
     }
+    if (!air) {
+      const { offset } = this.drawShadowOptions
+      ret.y += offset.y
+    }
     return ret
   }
 
-  getCollisionBounds (): { top: number, right: number, bottom: number, left: number } {
-    const collisionPosition = this.getCollisionPosition()
+  getCollisionBounds ({ air }: { air?: boolean } = {}): { top: number, right: number, bottom: number, left: number } {
+    const collisionPosition = this.getCollisionPosition({ air })
     return {
       top: collisionPosition.y,
       right: collisionPosition.x + this.collisionGraphics.width,
@@ -224,9 +282,9 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
-  getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
+  getGridXY ({ floor = false, center = false, air = true } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
-    const collisionPosition = this.getCollisionPosition({ center })
+    const collisionPosition = this.getCollisionPosition({ center, air })
     const ret = { gridX: collisionPosition.x / gridSize, gridY: collisionPosition.y / gridSize }
     if (floor) {
       ret.gridX = Math.floor(ret.gridX)
@@ -247,8 +305,14 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
   }
 
-  hideAllAnimations (): void {
-    this.spritesContainer.children.forEach(spr => {
+  hideAllBodyAnimations (): void {
+    this.bodySpritesContainer.children.forEach(spr => {
+      spr.visible = false
+    })
+  }
+
+  hideAllShadowAnimations (): void {
+    this.shadowSpritesContainer.children.forEach(spr => {
       spr.visible = false
     })
   }
@@ -258,34 +322,47 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   }
 
   switchAnimation (direction: EVectorDirection): void {
-    let newAnimation
+    let newBodyAnimation
+    let newShadowAnimation
     const step = 0.5
     if ((direction >= EVectorDirection.upLeft + step && direction <= EVectorDirection.upLeft + 1) ||
         (direction >= EVectorDirection.up && direction <= EVectorDirection.upRight - step)) {
       // special case because of max direction
-      newAnimation = this.upAnimation
+      newBodyAnimation = this.bodyAnimation.upAnimation
+      newShadowAnimation = this.shadowAnimation.upAnimation
     } else if (direction >= EVectorDirection.upRight + step && direction <= EVectorDirection.downRight - step) {
-      newAnimation = this.rightAnimation
+      newBodyAnimation = this.bodyAnimation.rightAnimation
+      newShadowAnimation = this.shadowAnimation.rightAnimation
     } else if (direction >= EVectorDirection.downRight + step && direction <= EVectorDirection.downLeft - step) {
-      newAnimation = this.downAnimation
+      newBodyAnimation = this.bodyAnimation.downAnimation
+      newShadowAnimation = this.shadowAnimation.downAnimation
     } else if (direction >= EVectorDirection.downLeft + step && direction <= EVectorDirection.upLeft - step) {
-      newAnimation = this.leftAnimation
+      newBodyAnimation = this.bodyAnimation.leftAnimation
+      newShadowAnimation = this.shadowAnimation.leftAnimation
     } else if (direction > EVectorDirection.up && direction < EVectorDirection.right) {
-      newAnimation = this.upRightAnimation
+      newBodyAnimation = this.bodyAnimation.upRightAnimation
+      newShadowAnimation = this.shadowAnimation.upRightAnimation
     } else if (direction > EVectorDirection.right && direction < EVectorDirection.down) {
-      newAnimation = this.downRightAnimation
+      newBodyAnimation = this.bodyAnimation.downRightAnimation
+      newShadowAnimation = this.shadowAnimation.downRightAnimation
     } else if (direction >= EVectorDirection.down && direction < EVectorDirection.left) {
-      newAnimation = this.downLeftAnimation
+      newBodyAnimation = this.bodyAnimation.downLeftAnimation
+      newShadowAnimation = this.shadowAnimation.downLeftAnimation
     } else {
-      newAnimation = this.upLeftAnimation
+      newBodyAnimation = this.bodyAnimation.upLeftAnimation
+      newShadowAnimation = this.shadowAnimation.upLeftAnimation
     }
-    if (newAnimation === this.currentAnimation) {
+    if (newBodyAnimation === this.currentBodyAnimation) {
       return
     }
-    this.currentAnimation = newAnimation
-    this.hideAllAnimations()
-    this.currentAnimation.gotoAndPlay(0)
-    this.currentAnimation.visible = true
+    this.currentBodyAnimation = newBodyAnimation
+    this.currentShadowAnimation = newShadowAnimation
+    this.hideAllBodyAnimations()
+    this.hideAllShadowAnimations()
+    this.currentBodyAnimation.gotoAndPlay(0)
+    this.currentShadowAnimation.gotoAndPlay(0)
+    this.currentBodyAnimation.visible = true
+    this.currentShadowAnimation.visible = true
   }
 
   drawCollision (): void {
@@ -318,6 +395,11 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       selectedGraphics.arc(cx, cy, radius, angleEnd, angleStart, true)
       selectedGraphics.endFill()
     }
+    selectedGraphics.beginFill(strokeColor)
+    selectedGraphics.moveTo(cx, cy + radius + strokeWidth)
+    const { offset: colOffset } = this.collisionOptions
+    selectedGraphics.lineTo(cx, cy + radius + strokeWidth + colOffset.y)
+    selectedGraphics.endFill()
     selectedGraphics.alpha = 0
   }
 
@@ -358,15 +440,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     switch (this.orders.type) {
       case 'move': {
         this.collisionCount = 0
-        // Move towards destination until distance from destination is less than vehicle radius
+        // Move towards destination until distance from destination is less than aircraft radius
         const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
-          // Stop when within one radius of the destination
-          this.orders = { type: 'stand' }
-          return true
-        } else if (this.colliding && distanceFromDestinationSquared < Math.pow(this.radius * 3 / tileMap.gridSize, 2)) {
-          // Stop when within 3 radius of the destination if colliding with something
-          this.orders = { type: 'stand' }
+          this.orders = { type: 'float' }
           return true
         } else {
           if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
@@ -378,7 +455,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
             }
             // Stop if more than 30 collisions occur
             if (this.collisionCount > 30) {
-              this.orders = { type: 'stand' }
+              this.orders = { type: 'float' }
               return true
             }
           }
@@ -430,7 +507,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
-  checkCollisionObjects (grid: Array<Array<0 | 1>>, distanceFromDestination: number): Array<{
+  checkCollisionObjects (distanceFromDestination: number): Array<{
     collisionType: ECollisionType
     with: {
       type?: string
@@ -450,31 +527,9 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     // List of objects that will collide after next movement step
     const collisionObjects = []
 
-    const x1 = Math.max(0, Math.round(newX) - 3)
-    const x2 = Math.min(tileMap.mapGridWidth - 1, Math.round(newX) + 3)
-    const y1 = Math.max(0, Math.round(newY) - 3)
-    const y2 = Math.min(tileMap.mapGridHeight - 1, Math.round(newY) + 3)
-    // Test grid upto 3 squares away
-    for (let j = x1; j <= x2; j++) {
-      for (let i = y1; i <= y2; i++) {
-        if (grid[i][j] === 1) { // grid square is obstructed
-          const centerX = j + 0.5
-          const centerY = i + 0.5
-          const distanceSq = Math.pow(centerX - newX, 2) + Math.pow(centerY - newY, 2)
-          if (distanceSq < Math.pow(this.radius / tileMap.gridSize, 2)) {
-            // Distance of obstructed grid from vehicle is less than hard collision threshold
-            collisionObjects.push({ collisionType: ECollisionType.hard, with: { type: 'wall', x: centerX, y: centerY } })
-          } else if (distanceSq < Math.pow(this.radius * 1.1 / tileMap.gridSize, 2)) {
-            // Distance of obstructed grid from vehicle is less than soft collision threshold
-            collisionObjects.push({ collisionType: ECollisionType.soft, with: { type: 'wall', x: centerX, y: centerY } })
-          }
-        }
-      }
-    }
-
-    const { moveableItems } = tileMap
-    for (let i = moveableItems.length - 1; i >= 0; i--) {
-      const vehicle = moveableItems[i]
+    const { airItems } = tileMap
+    for (let i = airItems.length - 1; i >= 0; i--) {
+      const vehicle = airItems[i]
       const vehicleGrid = vehicle.getGridXY({ center: true })
       // Test vehicles that are less than 3 squares away for collisions
       if (vehicle !== this && Math.abs(vehicleGrid.gridX - thisGrid.gridX) < 3 && Math.abs(vehicleGrid.gridY - thisGrid.gridY) < 3) {
@@ -493,51 +548,22 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   }
 
   _moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
-    const { tileMap, turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
+    const { turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
-
     // First find path to destination
     const destX = Math.round(destination.gridX)
     const destY = Math.round(destination.gridY)
-    const start = { gridX: Math.round(thisGrid.gridX), gridY: Math.round(thisGrid.gridY) }
     const end = { gridX: destX, gridY: destY }
 
-    const grid = tileMap.currentCopyMapPassableGrid
-    // Allow destination to be "movable" so that algorithm can find a path
-    if (destination.type === EItemType.buildings || destination.type === EItemType.terrain) {
-      grid[destY][destX] = 0
-    }
-
-    let newDirection
-
-    const vehicleOutsideMapBounds = start.gridY < 0 || start.gridY >= tileMap.mapGridHeight || start.gridX < 0 || start.gridX >= tileMap.mapGridWidth
-    const vehicleReachedDestinationTile = start.gridX === end.gridX && start.gridY === end.gridY
-    let path: IPathPoint[] = []
-    if (vehicleOutsideMapBounds || vehicleReachedDestinationTile) {
-      // Don't use A*. Just turn towards destination.
-      path = [{ x: thisGrid.gridX, y: thisGrid.gridY }, { x: destination.gridX, y: destination.gridY }]
-      newDirection = findAngleGrid({
-        from: destination, to: thisGrid, directions: this.vector.directions
-      })
-    } else {
-      // Use A* algorithm to try and find a path to the destination
-      path = AStar.calc({ grid, start, end, f: 'Euclidean' })
-      if (path.length > 1) {
-        const nextStep = { x: path[1].x, y: path[1].y }
-        newDirection = findAngle({
-          from: nextStep,
-          to: { x: thisGrid.gridX, y: thisGrid.gridY },
-          directions: this.vector.directions
-        })
-      } else {
-        // There is no path
-        return false
-      }
-    }
+    let newDirection = findAngleGrid({
+      from: destination,
+      to: thisGrid,
+      directions: this.vector.directions
+    })
 
     // check if moving along current direction might cause collision..
     // If so, change newDirection
-    const collisionObjects = this.checkCollisionObjects(grid, distanceFromDestination)
+    const collisionObjects = this.checkCollisionObjects(distanceFromDestination)
     this.colliding = false
     this.hardCollision = false
     if (collisionObjects.length > 0) {
@@ -548,7 +574,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       // By default, the next step has a mild attraction force
       collisionObjects.push({
         collisionType: ECollisionType.attraction,
-        with: { x: path[1].x + 0.5, y: path[1].y + 0.5 }
+        with: { x: end.gridX, y: end.gridY }
       })
       for (let i = collisionObjects.length - 1; i >= 0; i--) {
         const collObject = collisionObjects[i]
@@ -635,5 +661,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       teleportGraphics.drawCircle(cx, cy, radius + strokeWidth)
       teleportGraphics.endFill()
     }
+  }
+
+  setupShadow (): void {
+    const { offset } = this.drawShadowOptions
+    this.shadowSpritesContainer.position.set(offset.x, offset.y)
   }
 }

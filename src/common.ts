@@ -4,14 +4,16 @@ import { type IItem } from './interfaces/IItem'
 import { type ISelectable } from './interfaces/ISelectable'
 import { type Projectile } from './projectiles/Projectile'
 import { type Vehicle } from './vehicles/Vehicle'
+import { type AirVehicle } from './air-vehicles/AirVehicle'
 
 export enum Team {
   blue = 'blue',
   green = 'green'
 }
 
-export type BaseItem = Building | Vehicle | Projectile
-export type BaseActiveItem = Building | Vehicle
+export type BaseItem = Building | Vehicle | AirVehicle | Projectile
+export type BaseMoveableItem = Vehicle | AirVehicle
+export type BaseActiveItem = Building | Vehicle | AirVehicle
 export type SelectableItem = ISelectable & IItem
 
 /**

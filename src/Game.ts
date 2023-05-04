@@ -26,6 +26,8 @@ import { GroundTurret } from './buildings/GroundTurret'
 import { OilDerrick } from './buildings/OilDerrick'
 import { Starport } from './buildings/Starport'
 import { type EVectorDirection } from './Vector'
+import { Chopper } from './air-vehicles/Chopper'
+import { Wraith } from './air-vehicles/Wraith'
 
 export interface IGameOptions {
   viewWidth: number
@@ -730,6 +732,72 @@ export class Game extends Container {
         texture: SceneManager.app.renderer.generateTexture(Firework.prepareGraphics())
       }
     })
+
+    Chopper.prepareTextures({
+      blueTextures: {
+        upTextures: animations['chopper-blue-up'],
+        upRightTextures: animations['chopper-blue-up-right'],
+        rightTextures: animations['chopper-blue-right'],
+        downRightTextures: animations['chopper-blue-down-right'],
+        downTextures: animations['chopper-blue-down'],
+        downLeftTextures: animations['chopper-blue-down-left'],
+        leftTextures: animations['chopper-blue-left'],
+        upLeftTextures: animations['chopper-blue-up-left']
+      },
+      greenTextures: {
+        upTextures: animations['chopper-green-up'],
+        upRightTextures: animations['chopper-green-up-right'],
+        rightTextures: animations['chopper-green-right'],
+        downRightTextures: animations['chopper-green-down-right'],
+        downTextures: animations['chopper-green-down'],
+        downLeftTextures: animations['chopper-green-down-left'],
+        leftTextures: animations['chopper-green-left'],
+        upLeftTextures: animations['chopper-green-up-left']
+      },
+      shadowTextures: {
+        upTextures: animations['chopper-shadow-up'],
+        upRightTextures: animations['chopper-shadow-up-right'],
+        rightTextures: animations['chopper-shadow-right'],
+        downRightTextures: animations['chopper-shadow-down-right'],
+        downTextures: animations['chopper-shadow-down'],
+        downLeftTextures: animations['chopper-shadow-down-left'],
+        leftTextures: animations['chopper-shadow-left'],
+        upLeftTextures: animations['chopper-shadow-up-left']
+      }
+    })
+
+    Wraith.prepareTextures({
+      blueTextures: {
+        upTextures: [textures['wraith-blue-up.png']],
+        upRightTextures: [textures['wraith-blue-up-right.png']],
+        rightTextures: [textures['wraith-blue-right.png']],
+        downRightTextures: [textures['wraith-blue-down-right.png']],
+        downTextures: [textures['wraith-blue-down.png']],
+        downLeftTextures: [textures['wraith-blue-down-left.png']],
+        leftTextures: [textures['wraith-blue-left.png']],
+        upLeftTextures: [textures['wraith-blue-up-left.png']]
+      },
+      greenTextures: {
+        upTextures: [textures['wraith-green-up.png']],
+        upRightTextures: [textures['wraith-green-up-right.png']],
+        rightTextures: [textures['wraith-green-right.png']],
+        downRightTextures: [textures['wraith-green-down-right.png']],
+        downTextures: [textures['wraith-green-down.png']],
+        downLeftTextures: [textures['wraith-green-down-left.png']],
+        leftTextures: [textures['wraith-green-left.png']],
+        upLeftTextures: [textures['wraith-green-up-left.png']]
+      },
+      shadowTextures: {
+        upTextures: [textures['wraith-shadow-up.png']],
+        upRightTextures: [textures['wraith-shadow-up-right.png']],
+        rightTextures: [textures['wraith-shadow-right.png']],
+        downRightTextures: [textures['wraith-shadow-down-right.png']],
+        downTextures: [textures['wraith-shadow-down.png']],
+        downLeftTextures: [textures['wraith-shadow-down-left.png']],
+        leftTextures: [textures['wraith-shadow-left.png']],
+        upLeftTextures: [textures['wraith-shadow-up-left.png']]
+      }
+    })
   }
 
   // Receive command from singleplayer or multiplayer object and send it to units
@@ -830,6 +898,7 @@ export class Game extends Container {
     teleport?: boolean
   }): Base | OilDerrick | Starport | GroundTurret
     | Transport | Harvester | ScoutTank | HeavyTank
+    | Chopper | Wraith
     | undefined {
     let { initX = 0, initY = 0 } = options
     const { name, initGridX, initGridY } = options
@@ -888,6 +957,20 @@ export class Game extends Container {
         })
       case EItemName.ScoutTank:
         return new ScoutTank({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Chopper:
+        return new Chopper({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.Wraith:
+        return new Wraith({
           ...options,
           game: this,
           initX,

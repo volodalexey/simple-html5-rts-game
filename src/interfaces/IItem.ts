@@ -36,7 +36,7 @@ export interface IItem {
   type: EItemType
   itemName: EItemName
   ordersable: boolean
-  getGridXY: () => { gridX: number, gridY: number }
+  getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => { gridX: number, gridY: number }
   setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
   setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
   handleUpdate: (deltaMS: number) => void
@@ -51,6 +51,6 @@ export interface IItem {
     }
   }
   drawCollision: () => void
-  getCollisionPosition: (options: { center?: boolean }) => { x: number, y: number }
+  getCollisionPosition: (options: { center?: boolean, air?: boolean }) => { x: number, y: number }
   getCollisionBounds: () => { top: number, right: number, bottom: number, left: number }
 }

@@ -128,7 +128,7 @@ export class GroundTurret extends AttackableBuilding {
     this.updateAnimation()
   }
 
-  setup (options: IGroundTurretOptions): void {
+  override setup (options: IGroundTurretOptions): void {
     const textures = GroundTurret.textures(options.team)
     super.setup({
       ...options,

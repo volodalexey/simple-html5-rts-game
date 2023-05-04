@@ -1,7 +1,9 @@
 import { type BaseActiveItem } from '../common'
 import { type UnitName, type EItemType } from './IItem'
 
-export type IOrder = IMoveOrder | IFireOrder | IAttackOrder | IPatrolOrder | IStandOrder
+export type IOrder = IMoveOrder
+| IFireOrder | IAttackOrder | IPatrolOrder
+| IStandOrder | IFloatOrder
 | ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder | IDeployOrder | IConstructUnitOrder
 
 interface IMoveOrder {
@@ -35,6 +37,10 @@ interface IPatrolOrder {
 
 interface IStandOrder {
   type: 'stand'
+}
+
+interface IFloatOrder {
+  type: 'float'
 }
 
 interface ISentryOrder {
