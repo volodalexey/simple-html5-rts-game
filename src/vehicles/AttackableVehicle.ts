@@ -216,14 +216,12 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
     return false
   }
 
-  handleUpdate (deltaMS: number): void {
+  override handleUpdate (deltaMS: number): void {
     if (this.reloadTimeLeft > 0) {
       this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
     }
-    this.processOrders()
-    this.updateAnimation()
     this.updateReload()
-    this.zIndex = this.y + this.height
+    super.handleUpdate(deltaMS)
   }
 
   drawReloadBar (): void {

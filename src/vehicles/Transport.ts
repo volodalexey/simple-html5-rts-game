@@ -84,5 +84,8 @@ export class Transport extends Vehicle {
     this.drawLifeBar()
     this.updateLife()
     this.updateAnimation()
+    if (options.teleport === true) {
+      this.drawTeleport()
+    }
   }
 }

@@ -827,6 +827,7 @@ export class Game extends Container {
     selectable?: boolean
     ordersable?: boolean
     orders?: IOrder
+    teleport?: boolean
   }): Base | OilDerrick | Starport | GroundTurret
     | Transport | Harvester | ScoutTank | HeavyTank
     | undefined {

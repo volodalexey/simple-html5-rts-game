@@ -102,5 +102,8 @@ export class HeavyTank extends AttackableVehicle {
     this.drawReloadBar()
     this.updateReload()
     this.updateAnimation()
+    if (options.teleport === true) {
+      this.drawTeleport()
+    }
   }
 }

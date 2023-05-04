@@ -35,6 +35,7 @@ export interface IVehicleOptions {
   selectable?: boolean
   ordersable?: boolean
   orders?: IOrder
+  teleport?: boolean
 }
 
 enum ECollisionType {
@@ -118,6 +119,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public orders: IOrder
   public sight = 0
   public radius = 0
+  public teleportGraphics?: Graphics
 
   constructor (options: IVehicleOptions) {
     super()
@@ -147,11 +149,16 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       downLeftTextures,
       leftTextures,
       upLeftTextures
-    }
+    },
+    teleport
   }: IVehicleOptions): void {
     this.addChild(this.selectedGraphics)
     this.addChild(this.spritesContainer)
     this.addChild(this.collisionGraphics)
+    if (teleport === true) {
+      this.teleportGraphics = new Graphics()
+      this.addChild(this.teleportGraphics)
+    }
 
     const upAnimation = new AnimatedSprite(upTextures)
     this.spritesContainer.addChild(upAnimation)
@@ -412,6 +419,15 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.processOrders()
     this.updateAnimation()
     this.zIndex = this.y + this.height
+    if (this.teleportGraphics != null) {
+      if (this.teleportGraphics.alpha > 0) {
+        this.teleportGraphics.alpha -= 0.01
+      } else {
+        this.teleportGraphics.alpha = 0
+        this.teleportGraphics.removeFromParent()
+        this.teleportGraphics = undefined
+      }
+    }
   }
 
   checkCollisionObjects (grid: Array<Array<0 | 1>>, distanceFromDestination: number): Array<{
@@ -609,5 +625,18 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   removeAndDestroy (): void {
     this.game.deselectItem(this)
     this.removeFromParent()
+  }
+
+  drawTeleport (): void {
+    const { offset, strokeWidth, radius } = this.drawSelectionOptions
+    const { teleportGraphics } = this
+    if (teleportGraphics != null) {
+      teleportGraphics.position.set(offset.x, offset.y)
+      const cx = radius + strokeWidth
+      const cy = radius + strokeWidth
+      teleportGraphics.beginFill(0xffffff)
+      teleportGraphics.drawCircle(cx, cy, radius + strokeWidth)
+      teleportGraphics.endFill()
+    }
   }
 }

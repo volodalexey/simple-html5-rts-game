@@ -97,6 +97,7 @@ export class Starport extends Building {
     team: Team
     initCenter?: boolean
     orders?: IOrder
+    teleport?: boolean
   }
 
   static buildableGrid = [
@@ -262,7 +263,8 @@ export class Starport extends Building {
               initCenter: true,
               team: this.team,
               name: this.orders.name,
-              orders: this.orders.orders
+              orders: this.orders.orders,
+              teleport: true
             }
             this.switchAnimation(StarportAnimation.open)
           }
