@@ -820,18 +820,26 @@ export class Game extends Container {
       if (item != null) {
         item.orders = Object.assign({}, orders)
         if (orders.type === 'move') {
-          if (item instanceof ScoutTank) {
+          if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-yes')
-          } else if (item instanceof HeavyTank) {
+          } else if (item.itemName === EItemName.HeavyTank) {
             AUDIO.play('heavy-tank-yes')
+          } else if (item.itemName === EItemName.Chopper) {
+            AUDIO.play('chopper-yes')
+          } else if (item.itemName === EItemName.Wraith) {
+            AUDIO.play('wraith-yes')
           } else {
             AUDIO.play('acknowledge-moving')
           }
         } else if (orders.type === 'attack') {
-          if (item instanceof ScoutTank) {
+          if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-attack')
-          } else if (item instanceof HeavyTank) {
+          } else if (item.itemName === EItemName.HeavyTank) {
             AUDIO.play('heavy-tank-attack')
+          } else if (item.itemName === EItemName.Chopper) {
+            AUDIO.play('chopper-attack')
+          } else if (item.itemName === EItemName.Wraith) {
+            AUDIO.play('wraith-attack')
           } else {
             AUDIO.play('acknowledge-attacking')
           }

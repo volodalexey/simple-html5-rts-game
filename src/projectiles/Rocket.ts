@@ -14,7 +14,7 @@ export class Rocket extends Projectile {
 
   public speed = 25
   public range = 9
-  public damage = 1
+  public damage = 20
   public turnSpeed = 2
 
   public collisionOptions = {

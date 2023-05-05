@@ -35,6 +35,23 @@ import tankYes0Audio from './assets/audio/tank-yes-0.mp3'
 import tankYes1Audio from './assets/audio/tank-yes-1.mp3'
 import tankYes2Audio from './assets/audio/tank-yes-2.mp3'
 import tankYes3Audio from './assets/audio/tank-yes-3.mp3'
+import chopperAttack0Audio from './assets/audio/chopper-attack-0.mp3'
+import chopperAttack1Audio from './assets/audio/chopper-attack-1.mp3'
+import chopperAttack2Audio from './assets/audio/chopper-attack-2.mp3'
+import chopperYes0Audio from './assets/audio/chopper-yes-0.mp3'
+import chopperYes1Audio from './assets/audio/chopper-yes-1.mp3'
+import chopperYes2Audio from './assets/audio/chopper-yes-2.mp3'
+import chopperYes3Audio from './assets/audio/chopper-yes-3.mp3'
+import chopperYes4Audio from './assets/audio/chopper-yes-4.mp3'
+import chopperYes5Audio from './assets/audio/chopper-yes-5.mp3'
+import wraithAttack0Audio from './assets/audio/wraith-attack-0.mp3'
+import wraithAttack1Audio from './assets/audio/wraith-attack-1.mp3'
+import wraithAttack2Audio from './assets/audio/wraith-attack-2.mp3'
+import wraithAttack3Audio from './assets/audio/wraith-attack-3.mp3'
+import wraithYes0Audio from './assets/audio/wraith-yes-0.mp3'
+import wraithYes1Audio from './assets/audio/wraith-yes-1.mp3'
+import wraithYes2Audio from './assets/audio/wraith-yes-2.mp3'
+import wraithYes3Audio from './assets/audio/wraith-yes-3.mp3'
 
 export const AUDIO = {
   bullet1: new Howl({
@@ -145,13 +162,67 @@ export const AUDIO = {
   tankYes3: new Howl({
     src: tankYes3Audio
   }),
+  chopperYes0: new Howl({
+    src: chopperYes0Audio
+  }),
+  chopperYes1: new Howl({
+    src: chopperYes1Audio
+  }),
+  chopperYes2: new Howl({
+    src: chopperYes2Audio
+  }),
+  chopperYes3: new Howl({
+    src: chopperYes3Audio
+  }),
+  chopperYes4: new Howl({
+    src: chopperYes4Audio
+  }),
+  chopperYes5: new Howl({
+    src: chopperYes5Audio
+  }),
+  chopperAttack0: new Howl({
+    src: chopperAttack0Audio
+  }),
+  chopperAttack1: new Howl({
+    src: chopperAttack1Audio
+  }),
+  chopperAttack2: new Howl({
+    src: chopperAttack2Audio
+  }),
+  wraithYes0: new Howl({
+    src: wraithYes0Audio
+  }),
+  wraithYes1: new Howl({
+    src: wraithYes1Audio
+  }),
+  wraithYes2: new Howl({
+    src: wraithYes2Audio
+  }),
+  wraithYes3: new Howl({
+    src: wraithYes3Audio
+  }),
+  wraithAttack0: new Howl({
+    src: wraithAttack0Audio
+  }),
+  wraithAttack1: new Howl({
+    src: wraithAttack1Audio
+  }),
+  wraithAttack2: new Howl({
+    src: wraithAttack2Audio
+  }),
+  wraithAttack3: new Howl({
+    src: wraithAttack3Audio
+  }),
   play (name: '' | 'acknowledge-attacking' | 'acknowledge-moving'
   | 'bullet' | 'bullet-hit'
   | 'rocket' | 'rocket-hit'
   | 'laser' | 'laser-hit'
   | 'cannon-ball' | 'cannon-hit'
-  | 'message-received' | 'scout-tank-attack' | 'scout-tank-yes'
-  | 'heavy-tank-attack' | 'heavy-tank-yes'): void {
+  | 'message-received'
+  | 'scout-tank-attack' | 'scout-tank-yes'
+  | 'heavy-tank-attack' | 'heavy-tank-yes'
+  | 'chopper-attack' | 'chopper-yes'
+  | 'wraith-attack' | 'wraith-yes'): void {
     let stopPrevious = false
     let sounds: Howl[] = []
     if (name === 'acknowledge-attacking') {
@@ -190,6 +261,18 @@ export const AUDIO = {
     } else if (name === 'heavy-tank-yes') {
       stopPrevious = true
       sounds = [this.tankYes0, this.tankYes1, this.tankYes2, this.tankYes3]
+    } else if (name === 'chopper-attack') {
+      stopPrevious = true
+      sounds = [this.chopperAttack0, this.chopperAttack1, this.chopperAttack2]
+    } else if (name === 'chopper-yes') {
+      stopPrevious = true
+      sounds = [this.chopperYes0, this.chopperYes1, this.chopperYes2, this.chopperYes3, this.chopperYes4, this.chopperYes5]
+    } else if (name === 'wraith-attack') {
+      stopPrevious = true
+      sounds = [this.wraithAttack0, this.wraithAttack1, this.wraithAttack2, this.wraithAttack3]
+    } else if (name === 'wraith-yes') {
+      stopPrevious = true
+      sounds = [this.wraithYes0, this.wraithYes1, this.wraithYes2, this.wraithYes3]
     }
     if (sounds.length > 0) {
       if (stopPrevious) {
