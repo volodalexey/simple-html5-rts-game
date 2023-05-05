@@ -8,6 +8,8 @@ export interface IButtonOptions {
   onClick?: (attackBtn: Button) => void
   iconPaddingTop?: number
   iconPaddingLeft?: number
+  iconIdleAlpha?: number
+  iconHoverAlpha?: number
   textPaddingTop?: number
   textPaddingLeft?: number
   fontSize?: number
@@ -40,6 +42,8 @@ export class Button extends Container {
   public text!: Text
   public iconPaddingTop !: number
   public iconPaddingLeft !: number
+  public iconIdleAlpha !: number
+  public iconHoverAlpha !: number
   public textPaddingTop !: number
   public textPaddingLeft !: number
   public buttonIdleColor !: number
@@ -68,6 +72,8 @@ export class Button extends Container {
     this.onClick = options.onClick
     this.iconPaddingTop = options.iconPaddingTop ?? 20
     this.iconPaddingLeft = options.iconPaddingLeft ?? 20
+    this.iconIdleAlpha = options.iconIdleAlpha ?? 1
+    this.iconHoverAlpha = options.iconHoverAlpha ?? 1
     this.textPaddingTop = options.textPaddingTop ?? 20
     this.textPaddingLeft = options.textPaddingLeft ?? 20
     this.fontSize = options.fontSize ?? 16
@@ -138,7 +144,10 @@ export class Button extends Container {
         text.position.set(icon.x + icon.width + textPaddingLeft, textPaddingTop)
       } else if (flexDirection === 'col-center') {
         text.anchor.set(0.5, 0)
-        text.position.set(buttonBorderWidth + icon.width / 2, icon.y + icon.height + textPaddingTop)
+        text.position.set(
+          buttonWidth != null ? buttonWidth / 2 : (buttonBorderWidth + iconPaddingLeft + icon.width / 2),
+          icon.y + icon.height + textPaddingTop
+        )
       } else {
         text.position.set(buttonBorderWidth + textPaddingLeft, icon.y + icon.height + textPaddingTop)
       }
@@ -181,12 +190,19 @@ export class Button extends Container {
     })
   }
 
-  draw ({ buttonWidth, buttonHeight, buttonRadius = 0, buttonBorderWidth = 0 }: IButtonOptions): void {
+  draw ({
+    iconPaddingTop = 0,
+    buttonWidth,
+    buttonHeight,
+    buttonRadius = 0,
+    buttonBorderWidth = 0,
+    textPaddingTop = 0
+  }: IButtonOptions): void {
     if (typeof buttonWidth !== 'number') {
       buttonWidth = this.width + buttonBorderWidth * 2
     }
     if (typeof buttonHeight !== 'number') {
-      buttonHeight = this.height + buttonBorderWidth * 2
+      buttonHeight = iconPaddingTop + this.icon.height + textPaddingTop + this.text.height + buttonBorderWidth * 2
     }
     this.border.beginFill(0xffffff)
     this.border.drawRoundedRect(0, 0, buttonWidth, buttonHeight, buttonRadius)
@@ -200,61 +216,68 @@ export class Button extends Container {
   }
 
   color ({
-    alpha,
+    bgAlpha,
     brdColor,
     brdAlpha,
     bgColor,
     txtColor,
-    iconColor
+    iconColor,
+    iconAlpha
   }: {
-    alpha: number
+    bgAlpha: number
     brdColor: number
     brdAlpha: number
     bgColor: number
     txtColor: number
     iconColor: number
+    iconAlpha: number
   }): void {
     this.border.tint = brdColor
     this.border.alpha = brdAlpha
     this.background.tint = bgColor
-    this.background.alpha = alpha
+    this.background.alpha = bgAlpha
     this.text.tint = txtColor
     this.icon.tint = iconColor
+    this.icon.alpha = iconAlpha
   }
 
   idleColor ({
-    alpha = this.buttonIdleAlpha,
+    bgAlpha = this.buttonIdleAlpha,
     brdColor = this.buttonBorderColor,
     brdAlpha = this.buttonBorderAlpha,
     bgColor = this.buttonIdleColor,
     txtColor = this.textColor,
-    iconColor = this.iconColor
+    iconColor = this.iconColor,
+    iconAlpha = this.iconIdleAlpha
   }: {
     brdColor?: number
     brdAlpha?: number
-    alpha?: number
+    bgAlpha?: number
     bgColor?: number
     txtColor?: number
     iconColor?: number
+    iconAlpha?: number
   } = {}): void {
-    this.color({ alpha, brdAlpha, brdColor, bgColor, txtColor, iconColor })
+    this.color({ bgAlpha, brdAlpha, brdColor, bgColor, txtColor, iconColor, iconAlpha })
   }
 
   hoverColor ({
-    alpha = this.buttonHoverAlpha,
+    bgAlpha = this.buttonHoverAlpha,
     brdColor = this.buttonBorderHoverColor,
     brdAlpha = this.buttonBorderHoverAlpha,
     bgColor = this.buttonHoverColor,
     txtColor = this.textColorHover,
-    iconColor = this.iconColorHover
+    iconColor = this.iconColorHover,
+    iconAlpha = this.iconHoverAlpha
   }: {
     brdColor?: number
     brdAlpha?: number
-    alpha?: number
+    bgAlpha?: number
     bgColor?: number
     txtColor?: number
     iconColor?: number
+    iconAlpha?: number
   } = {}): void {
-    this.color({ alpha, brdAlpha, brdColor, bgColor, txtColor, iconColor })
+    this.color({ bgAlpha, brdAlpha, brdColor, bgColor, txtColor, iconColor, iconAlpha })
   }
 }

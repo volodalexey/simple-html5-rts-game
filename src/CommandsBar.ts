@@ -90,6 +90,22 @@ export class CommandsBar extends Container {
         hasPatrol = true
       }
     })
+    const commandNames = [ECommandName.deselect]
+    if (hasMoveable) {
+      if (hasMoveFollow) {
+        commandNames.push(ECommandName.moveFollow)
+      }
+      if (hasAttackGuard) {
+        commandNames.push(ECommandName.attackGuard)
+      }
+      if (hasPatrol) {
+        commandNames.push(ECommandName.patrol)
+      }
+    } else if (hasBuilding) {
+      if (hasAttackGuard) {
+        commandNames.push(ECommandName.attackGuard)
+      }
+    }
 
     return true
   }
@@ -124,15 +140,20 @@ export class CommandsBar extends Container {
     this.commandNames.forEach(commandName => {
       const commandDescription = CommandsBar.commandsDic[commandName]
       const button = new Button({
-        iconPaddingTop: 0,
-        iconPaddingLeft: 0,
+        buttonRadius: 3,
+        iconPaddingTop: 6,
+        iconPaddingLeft: 6,
+        iconIdleAlpha: 0.5,
+        iconHoverAlpha: 0.5,
         textPaddingLeft: 0,
-        textPaddingTop: 0,
+        textPaddingTop: 6,
+        buttonWidth: 56,
         fontSize: 10,
         textColor: 0xffffff,
         textColorHover: 0xffff00,
         iconColor: 0xffffff,
         iconColorHover: 0xffff00,
+        iconScale: 0.8,
         shadowTextColor: 0x800080,
         shadowThickness: 1,
         buttonHoverColor: 0x454545,
