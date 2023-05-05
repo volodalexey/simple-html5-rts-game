@@ -335,7 +335,7 @@ export class TileMap extends Container {
   rebuildBuildableGrid (exceptItem?: Vehicle): void {
     this._currentMapBuildableGrid = this.currentMapTerrainGrid.map(g => g.slice())
     const { activeItems } = this
-    const { tileMap } = this.game
+    const { tileMap: { mapGridWidth, mapGridHeight } } = this.game
     for (let i = activeItems.children.length - 1; i >= 0; i--) {
       const item = activeItems.children[i]
       if (item.type === EItemType.buildings || item.type === EItemType.terrain) {
@@ -350,14 +350,18 @@ export class TileMap extends Container {
         }
       } else if (item.type === EItemType.vehicles && item !== exceptItem) {
         // Mark all squares under or near the vehicle as unbuildable
-        const itemBounds = item.getCollisionBounds()
-        const x1 = Math.floor(itemBounds.left / tileMap.gridSize)
-        const x2 = Math.floor(itemBounds.right / tileMap.gridSize)
-        const y1 = Math.floor(itemBounds.top / tileMap.gridSize)
-        const y2 = Math.floor(itemBounds.bottom / tileMap.gridSize)
+        const itemBounds = item.getGridCollisionBounds()
+        const x1 = itemBounds.leftGridX
+        const x2 = itemBounds.rightGridX
+        const y1 = itemBounds.topGridY
+        const y2 = itemBounds.bottomGridY
         for (let x = x1; x <= x2; x++) {
           for (let y = y1; y <= y2; y++) {
-            this._currentMapBuildableGrid[y][x] = 1
+            if (x < 0 || x >= mapGridWidth || y < 0 || y >= mapGridHeight) {
+              continue
+            } else {
+              this._currentMapBuildableGrid[y][x] = 1
+            }
           }
         }
       }

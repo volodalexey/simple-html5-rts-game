@@ -224,6 +224,17 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     }
   }
 
+  getGridCollisionBounds (): { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number } {
+    const bounds = this.getCollisionBounds()
+    const { gridSize } = this.game.tileMap
+    return {
+      topGridY: Math.ceil(bounds.top / gridSize),
+      rightGridX: Math.floor(bounds.right / gridSize),
+      bottomGridY: Math.floor(bounds.bottom / gridSize),
+      leftGridX: Math.ceil(bounds.left / gridSize)
+    }
+  }
+
   getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
     const collisionPosition = this.getCollisionPosition({ center })

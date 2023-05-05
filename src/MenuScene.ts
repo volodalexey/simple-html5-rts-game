@@ -121,7 +121,7 @@ export class MenuScene extends Container implements IScene {
     })
     this.choices.addChild(homeButton);
 
-    [0, 1].forEach(missionIdx => {
+    [0, 1, 2].forEach(missionIdx => {
       const vsCPUButton = new Button({
         onClick: () => { this.goToCampaignScene(missionIdx) },
         ...style,

@@ -9,11 +9,13 @@ import { EMessageCharacter } from './StatusBar'
 import { type IOrder } from './interfaces/IOrder'
 import { type Trigger, type ITrigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger } from './Trigger'
 import { EItemName } from './interfaces/IItem'
+import { Chopper } from './air-vehicles/Chopper'
 
 interface IMissionItem {
   name: EItemName
   initGridX: number
   initGridY: number
+  initCenter?: boolean
   team: Team
   direction?: EVectorDirection
   uid?: number
@@ -168,9 +170,6 @@ export class CampaignScene extends Container implements IScene {
 
           /* Player heavy tank */
           { name: EItemName.HeavyTank, initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
-          { name: EItemName.Chopper, initGridX: 54, initGridY: 14, direction: EVectorDirection.downRight, team: Team.blue },
-          { name: EItemName.Wraith, initGridX: 56, initGridY: 14, direction: EVectorDirection.downRight, team: Team.blue },
-          { name: EItemName.Wraith, initGridX: 52, initGridY: 15, direction: EVectorDirection.downRight, team: Team.green },
 
           /* Two transport vehicles waiting just outside the visible map */
           { name: EItemName.Transport, initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, ordersable: false },
@@ -387,7 +386,7 @@ export class CampaignScene extends Container implements IScene {
                 message: 'Close Air Support en route. Will try to do what I can.'
               })
               const { tileMap } = this.game
-              tileMap.addItem(new HeavyTank({
+              tileMap.addItem(new Chopper({
                 game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, ordersable: false, team: Team.blue, orders: { type: 'hunt' }
               }))
             }
@@ -410,6 +409,69 @@ export class CampaignScene extends Container implements IScene {
             },
             action: () => {
               this.endMission({ success: true })
+            }
+          }
+        ]
+      },
+      {
+        name: 'Under Siege',
+        briefing: 'Thanks to the attack led by you, we now have control of the rebel base. We can expect the rebels to try to retaliate.\n The colony is sending in aircraft to help us evacuate back to the main camp. All we need to do is hang tight until the choppers get here. \n Luckily, we have some supplies and ammunition to defend ourselves with until they get here. \nProtect the transports at all costs.',
+        mapImageSrc: 'level1Background',
+        mapSettingsSrc: 'level1Settings',
+        startGridX: 0,
+        startGridY: 20,
+        cash: {
+          blue: 0,
+          green: 0
+        },
+        items: [
+          /* The Rebel Base now in our hands */
+          { name: EItemName.Base, initGridX: 5, initGridY: 36, team: Team.blue, uid: -11 },
+          { name: EItemName.Starport, initGridX: 1, initGridY: 28, team: Team.blue, uid: -12 },
+          { name: EItemName.Starport, initGridX: 4, initGridY: 32, team: Team.blue, uid: -13 },
+          { name: EItemName.Harvester, initGridX: 1.5, initGridY: 38.5, initCenter: true, team: Team.blue, orders: { type: 'deploy', toPoint: { gridX: 1.5, gridY: 38.5 } } },
+          { name: EItemName.GroundTurret, initGridX: 7, initGridY: 28, team: Team.blue },
+          { name: EItemName.GroundTurret, initGridX: 8, initGridY: 32, team: Team.blue },
+          { name: EItemName.GroundTurret, initGridX: 11, initGridY: 37, team: Team.blue },
+          /* The transports that need to be protected */
+          { name: EItemName.Transport, initGridX: 2, initGridY: 33, team: Team.blue, ordersable: false, uid: -1 },
+          { name: EItemName.Transport, initGridX: 1, initGridY: 34, team: Team.blue, ordersable: false, uid: -2 },
+          { name: EItemName.Transport, initGridX: 2, initGridY: 35, team: Team.blue, ordersable: false, uid: -3 },
+          { name: EItemName.Transport, initGridX: 1, initGridY: 36, team: Team.blue, ordersable: false, uid: -4 },
+          /* The chopper pilot from the last mission */
+          { name: EItemName.Chopper, initGridX: 15, initGridY: 40, team: Team.blue, ordersable: false, uid: -5, orders: { type: 'patrol', fromPoint: { gridX: 15, gridY: 40 }, toPoint: { gridX: 0, gridY: 25 } } },
+          /* The first wave of attacks */
+          { name: EItemName.ScoutTank, initGridX: 15, initGridY: 16, team: Team.green, orders: { type: 'hunt' } },
+          { name: EItemName.ScoutTank, initGridX: 17, initGridY: 16, team: Team.green, orders: { type: 'hunt' } },
+          /* Secret Rebel bases */
+          { name: EItemName.Starport, initGridX: 35, initGridY: 37, team: Team.green, uid: -23 },
+          { name: EItemName.Starport, initGridX: 33, initGridY: 37, team: Team.green, uid: -24 },
+          { name: EItemName.Harvester, initGridX: 28.5, initGridY: 39.5, initCenter: true, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 28, gridY: 39 } } },
+          { name: EItemName.Harvester, initGridX: 30.5, initGridY: 39.5, initCenter: true, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 30, gridY: 39 } } },
+          { name: EItemName.Starport, initGridX: 3, initGridY: 0, team: Team.green, uid: -21 },
+          { name: EItemName.Starport, initGridX: 6, initGridY: 0, team: Team.green, uid: -22 },
+          { name: EItemName.Harvester, initGridX: 0, initGridY: 2, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 0, gridY: 2 } } },
+          { name: EItemName.Harvester, initGridX: 0, initGridY: 4, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 0, gridY: 4 } } }
+        ],
+        triggers: [
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return this.game.tileMap.isItemsDead([-1, -2, -3, -4])
+            },
+            action: () => {
+              this.endMission({ success: false })
+            }
+          },
+          {
+            type: ETriggerType.timed,
+            time: 5000,
+            action: () => {
+              // Send in air support after 5 minutes
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander!! The rebels have started attacking. We need to protect the base at any cost.'
+              })
             }
           }
         ]

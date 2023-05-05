@@ -53,4 +53,5 @@ export interface IItem {
   drawCollision: () => void
   getCollisionPosition: (options: { center?: boolean, air?: boolean }) => { x: number, y: number }
   getCollisionBounds: () => { top: number, right: number, bottom: number, left: number }
+  getGridCollisionBounds: () => { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number }
 }

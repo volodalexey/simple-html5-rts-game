@@ -282,6 +282,17 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     }
   }
 
+  getGridCollisionBounds (): { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number } {
+    const bounds = this.getCollisionBounds()
+    const { gridSize } = this.game.tileMap
+    return {
+      topGridY: Math.ceil(bounds.top / gridSize),
+      rightGridX: Math.floor(bounds.right / gridSize),
+      bottomGridY: Math.floor(bounds.bottom / gridSize),
+      leftGridX: Math.ceil(bounds.left / gridSize)
+    }
+  }
+
   getGridXY ({ floor = false, center = false, air = true } = {}): { gridX: number, gridY: number } {
     const { gridSize } = this.game.tileMap
     const collisionPosition = this.getCollisionPosition({ center, air })

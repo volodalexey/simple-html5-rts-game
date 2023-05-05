@@ -896,6 +896,7 @@ export class Game extends Container {
     initGridY?: number
     initX?: number
     initY?: number
+    initCenter?: boolean
     team: Team
     direction?: EVectorDirection
     uid?: number

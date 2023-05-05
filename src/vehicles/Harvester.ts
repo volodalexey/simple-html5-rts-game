@@ -104,7 +104,7 @@ export class Harvester extends Vehicle {
         const { toPoint } = this.orders
         for (let y = buildableGrid.length - 1; y >= 0; y--) {
           for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
-            if (currentMapBuildableGrid[toPoint.gridY + y][toPoint.gridX + x] === 1) {
+            if (currentMapBuildableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
               // If oilfield has been used already, then cancel order
               this.orders = { type: 'stand' }
               return true
