@@ -120,3 +120,22 @@ let uid = 1000
 export function generateUid (): number {
   return ++uid
 }
+
+export function compareNumericArrays<T> (arr1: T[], arr2: T[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+  arr1 = [...arr1].sort()
+  // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+  arr2 = [...arr2].sort()
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return false
+    }
+  }
+
+  return true
+}

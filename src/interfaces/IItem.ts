@@ -1,5 +1,6 @@
 import { type Graphics } from 'pixi.js'
 import { type IOrder } from './IOrder'
+import { type ECommandName } from '../Command'
 
 export enum EItemType {
   buildings = 'buildings',
@@ -36,6 +37,7 @@ export interface IItem {
   type: EItemType
   itemName: EItemName
   ordersable: boolean
+  commands: ECommandName[]
   getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => { gridX: number, gridY: number }
   setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
   setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void

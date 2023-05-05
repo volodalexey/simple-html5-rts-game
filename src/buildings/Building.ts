@@ -7,6 +7,7 @@ import { type Game } from '../Game'
 import { type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logItemBounds } from '../logger'
+import { type ECommandName } from '../Command'
 
 export interface IBuildingTextures {
   healthyTextures: Texture[]
@@ -27,6 +28,7 @@ export interface IBuildingOptions {
 }
 
 export class Building extends Container implements IItem, ISelectable, ILifeable {
+  public commands: ECommandName[] = []
   public collisionGraphics = new Graphics()
   public collisionOptions = {
     width: 0,

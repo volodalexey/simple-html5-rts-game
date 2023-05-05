@@ -1,3 +1,4 @@
+import { ECommandName } from '../Command'
 import { Team } from '../common'
 import { EItemName, type ProjectileName } from '../interfaces/IItem'
 import { AttackableVehicle } from './AttackableVehicle'
@@ -12,6 +13,7 @@ Exclude<keyof IVehicleOptions, 'textures'>
 
 export class HeavyTank extends AttackableVehicle {
   public itemName = EItemName.HeavyTank
+  public commands = [ECommandName.moveFollow, ECommandName.attackGuard]
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
   static textures (team: Team): IVehicleTextures {

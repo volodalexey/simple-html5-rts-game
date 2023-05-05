@@ -2,14 +2,14 @@ import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js'
 
 export interface IButtonOptions {
   text: string
-  btnWidth?: number
-  btnHeight?: number
-  btnRadius?: number
+  buttonWidth?: number
+  buttonHeight?: number
+  buttonRadius?: number
   onClick?: (attackBtn: Button) => void
-  paddingTop?: number
-  paddingRight?: number
-  paddingBottom?: number
-  paddingLeft?: number
+  iconPaddingTop?: number
+  iconPaddingLeft?: number
+  textPaddingTop?: number
+  textPaddingLeft?: number
   fontSize?: number
   textColor?: number
   textColorHover?: number
@@ -18,27 +18,39 @@ export interface IButtonOptions {
   buttonIdleColor?: number
   buttonIdleAlpha?: number
   buttonHoverColor?: number
+  buttonBorderWidth?: number
   buttonHoverAlpha?: number
+  buttonBorderColor?: number
+  buttonBorderHoverColor?: number
+  buttonBorderAlpha?: number
+  buttonBorderHoverAlpha?: number
   initX?: number
   initY?: number
   iconTexture?: Texture
   iconScale?: number
   iconColor?: number
   iconColorHover?: number
+  flexDirection?: 'row' | 'col' | 'col-center'
 }
 
 export class Button extends Container {
+  public border!: Graphics
   public background!: Graphics
   public icon!: Sprite
   public text!: Text
-  public paddingTop !: number
-  public paddingRight !: number
-  public paddingBottom !: number
-  public paddingLeft !: number
+  public iconPaddingTop !: number
+  public iconPaddingLeft !: number
+  public textPaddingTop !: number
+  public textPaddingLeft !: number
   public buttonIdleColor !: number
   public buttonIdleAlpha !: number
   public buttonHoverColor !: number
   public buttonHoverAlpha !: number
+  public buttonBorderWidth !: number
+  public buttonBorderColor !: number
+  public buttonBorderHoverColor !: number
+  public buttonBorderAlpha !: number
+  public buttonBorderHoverAlpha !: number
   public textColor !: number
   public textColorHover !: number
   public shadowTextColor !: number
@@ -46,16 +58,18 @@ export class Button extends Container {
   public iconColor !: number
   public iconColorHover !: number
   public fontSize !: number
+  public flexDirection !: IButtonOptions['flexDirection']
   public onClick!: IButtonOptions['onClick']
+  public selected = false
   constructor (options: IButtonOptions) {
     super()
     this.eventMode = 'static'
     this.cursor = 'pointer'
     this.onClick = options.onClick
-    this.paddingTop = options.paddingTop ?? 20
-    this.paddingRight = options.paddingRight ?? 20
-    this.paddingBottom = options.paddingBottom ?? 20
-    this.paddingLeft = options.paddingLeft ?? 20
+    this.iconPaddingTop = options.iconPaddingTop ?? 20
+    this.iconPaddingLeft = options.iconPaddingLeft ?? 20
+    this.textPaddingTop = options.textPaddingTop ?? 20
+    this.textPaddingLeft = options.textPaddingLeft ?? 20
     this.fontSize = options.fontSize ?? 16
     this.textColor = options.textColor ?? 0x000000
     this.textColorHover = options.textColorHover ?? 0x000000
@@ -69,12 +83,14 @@ export class Button extends Container {
     this.buttonIdleAlpha = options.buttonIdleAlpha ?? 1
     this.buttonHoverColor = options.buttonHoverColor ?? options.buttonIdleColor ?? 0x000000
     this.buttonHoverAlpha = options.buttonHoverAlpha ?? 1
+    this.buttonBorderWidth = options.buttonBorderWidth ?? 0
+    this.buttonBorderColor = options.buttonBorderColor ?? options.buttonIdleColor ?? 0x000000
+    this.buttonBorderHoverColor = options.buttonBorderHoverColor ?? options.buttonIdleColor ?? 0x000000
+    this.buttonBorderAlpha = options.buttonBorderAlpha ?? 1
+    this.buttonBorderHoverAlpha = options.buttonBorderHoverAlpha ?? 1
+    this.flexDirection = options.flexDirection ?? 'row'
     this.setup(options)
-    if (options.btnWidth != null && options.btnHeight != null) {
-      this.draw({ btnWidth: options.btnWidth, btnHeight: options.btnHeight, btnRadius: options.btnRadius })
-    } else {
-      this.draw({ btnWidth: this.text.width, btnHeight: this.text.height, btnRadius: options.btnRadius })
-    }
+    this.draw(options)
     this.idleColor()
     if (typeof options.initX === 'number') {
       this.position.x = options.initX
@@ -84,14 +100,25 @@ export class Button extends Container {
     }
   }
 
-  setup ({ text: initText, btnWidth, btnHeight, iconTexture, iconScale = 1 }: IButtonOptions): void {
+  setup ({
+    text: initText,
+    buttonWidth,
+    buttonHeight,
+    iconTexture,
+    iconScale = 1,
+    buttonBorderWidth = 0
+  }: IButtonOptions): void {
+    const border = new Graphics()
+    this.addChild(border)
+    this.border = border
     const background = new Graphics()
     this.addChild(background)
     this.background = background
-    const { paddingLeft, paddingTop } = this
+    this.background.position.set(buttonBorderWidth, buttonBorderWidth)
+    const { iconPaddingTop, iconPaddingLeft, textPaddingTop, textPaddingLeft, flexDirection } = this
     const icon = new Sprite(iconTexture)
     icon.scale.set(iconScale)
-    icon.position.set(paddingLeft, paddingTop)
+    icon.position.set(iconPaddingLeft + buttonBorderWidth, iconPaddingTop + buttonBorderWidth)
     this.addChild(icon)
     this.icon = icon
 
@@ -106,13 +133,18 @@ export class Button extends Container {
       stroke: this.shadowTextColor,
       strokeThickness: this.shadowThickness
     })
-    if (btnWidth != null && btnHeight != null) {
-      if (iconTexture != null) {
-        text.position.set(icon.x + icon.width + paddingLeft, paddingTop)
+    if (iconTexture != null) {
+      if (flexDirection === 'row') {
+        text.position.set(icon.x + icon.width + textPaddingLeft, textPaddingTop)
+      } else if (flexDirection === 'col-center') {
+        text.anchor.set(0.5, 0)
+        text.position.set(buttonBorderWidth + icon.width / 2, icon.y + icon.height + textPaddingTop)
       } else {
-        text.anchor.set(0.5, 0.5)
-        text.position.set(btnWidth / 2, btnHeight / 2)
+        text.position.set(buttonBorderWidth + textPaddingLeft, icon.y + icon.height + textPaddingTop)
       }
+    } else if (buttonWidth != null && buttonHeight != null) {
+      text.anchor.set(0.5, 0.5)
+      text.position.set(buttonWidth / 2, buttonHeight / 2)
     }
     this.addChild(text)
     this.text = text
@@ -122,6 +154,7 @@ export class Button extends Container {
 
   initEventLesteners (): void {
     this.on('pointertap', (e) => {
+      this.selected = !this.selected
       if (typeof this.onClick === 'function') {
         this.onClick(this)
       }
@@ -148,23 +181,41 @@ export class Button extends Container {
     })
   }
 
-  draw ({ btnWidth, btnHeight, btnRadius = 0 }: { btnWidth: number, btnHeight: number, btnRadius?: number }): void {
+  draw ({ buttonWidth, buttonHeight, buttonRadius = 0, buttonBorderWidth = 0 }: IButtonOptions): void {
+    if (typeof buttonWidth !== 'number') {
+      buttonWidth = this.width + buttonBorderWidth * 2
+    }
+    if (typeof buttonHeight !== 'number') {
+      buttonHeight = this.height + buttonBorderWidth * 2
+    }
+    this.border.beginFill(0xffffff)
+    this.border.drawRoundedRect(0, 0, buttonWidth, buttonHeight, buttonRadius)
+    this.border.endFill()
+    this.border.beginHole()
+    this.border.drawRoundedRect(buttonBorderWidth, buttonBorderWidth, buttonWidth - buttonBorderWidth * 2, buttonHeight - buttonBorderWidth * 2, buttonRadius)
+    this.border.endHole()
     this.background.beginFill(0xffffff)
-    this.background.drawRoundedRect(0, 0, btnWidth, btnHeight, btnRadius)
+    this.background.drawRoundedRect(0, 0, buttonWidth - buttonBorderWidth * 2, buttonHeight - buttonBorderWidth * 2, buttonRadius)
     this.background.endFill()
   }
 
   color ({
     alpha,
+    brdColor,
+    brdAlpha,
     bgColor,
     txtColor,
     iconColor
   }: {
     alpha: number
+    brdColor: number
+    brdAlpha: number
     bgColor: number
     txtColor: number
     iconColor: number
   }): void {
+    this.border.tint = brdColor
+    this.border.alpha = brdAlpha
     this.background.tint = bgColor
     this.background.alpha = alpha
     this.text.tint = txtColor
@@ -173,29 +224,37 @@ export class Button extends Container {
 
   idleColor ({
     alpha = this.buttonIdleAlpha,
+    brdColor = this.buttonBorderColor,
+    brdAlpha = this.buttonBorderAlpha,
     bgColor = this.buttonIdleColor,
     txtColor = this.textColor,
     iconColor = this.iconColor
   }: {
+    brdColor?: number
+    brdAlpha?: number
     alpha?: number
     bgColor?: number
     txtColor?: number
     iconColor?: number
   } = {}): void {
-    this.color({ alpha, bgColor, txtColor, iconColor })
+    this.color({ alpha, brdAlpha, brdColor, bgColor, txtColor, iconColor })
   }
 
   hoverColor ({
     alpha = this.buttonHoverAlpha,
+    brdColor = this.buttonBorderHoverColor,
+    brdAlpha = this.buttonBorderHoverAlpha,
     bgColor = this.buttonHoverColor,
     txtColor = this.textColorHover,
     iconColor = this.iconColorHover
   }: {
+    brdColor?: number
+    brdAlpha?: number
     alpha?: number
     bgColor?: number
     txtColor?: number
     iconColor?: number
   } = {}): void {
-    this.color({ alpha, bgColor, txtColor, iconColor })
+    this.color({ alpha, brdAlpha, brdColor, bgColor, txtColor, iconColor })
   }
 }

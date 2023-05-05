@@ -159,10 +159,12 @@ export class StartModal extends Container {
       onClick: onLeftClick,
       iconTexture: iconHomeTexture,
       iconScale,
-      paddingLeft,
-      paddingTop,
-      btnHeight: height,
-      btnRadius: borderRadius
+      iconPaddingLeft: paddingLeft,
+      iconPaddingTop: paddingTop,
+      textPaddingLeft: paddingLeft,
+      textPaddingTop: paddingTop,
+      buttonHeight: height,
+      buttonRadius: borderRadius
     }
 
     const buttonRightStyle: IButtonOptions = {
@@ -174,12 +176,14 @@ export class StartModal extends Container {
       iconColorHover: textColorHover,
       onClick: onRightClick,
       iconScale,
-      paddingLeft,
-      paddingTop,
+      iconPaddingLeft: paddingLeft,
+      iconPaddingTop: paddingTop,
+      textPaddingLeft: paddingLeft,
+      textPaddingTop: paddingTop,
       buttonIdleColor: success ? fillSuccess : fillError,
-      btnWidth: widthRight,
-      btnHeight: height,
-      btnRadius: borderRadius,
+      buttonWidth: widthRight,
+      buttonHeight: height,
+      buttonRadius: borderRadius,
       initX: leftTwo + widthLeft + paddingLeft,
       initY: top
     }
@@ -187,13 +191,13 @@ export class StartModal extends Container {
     switch (view) {
       case 'home':
         buttonLeftStyle.buttonIdleColor = success ? fillSuccess : fillError
-        buttonLeftStyle.btnWidth = widthOne
+        buttonLeftStyle.buttonWidth = widthOne
         buttonLeftStyle.initX = leftOne
         buttonLeftStyle.initY = top
         break
       case 'home-next': {
         buttonLeftStyle.buttonIdleColor = fillRegular
-        buttonLeftStyle.btnWidth = widthLeft
+        buttonLeftStyle.buttonWidth = widthLeft
         buttonLeftStyle.initX = leftTwo
         buttonLeftStyle.initY = top
 
@@ -206,7 +210,7 @@ export class StartModal extends Container {
 
       case 'home-repeat': {
         buttonLeftStyle.buttonIdleColor = fillRegular
-        buttonLeftStyle.btnWidth = widthLeft
+        buttonLeftStyle.buttonWidth = widthLeft
         buttonLeftStyle.initX = leftTwo
         buttonLeftStyle.initY = top
 

@@ -28,6 +28,8 @@ import { Starport } from './buildings/Starport'
 import { type EVectorDirection } from './Vector'
 import { Chopper } from './air-vehicles/Chopper'
 import { Wraith } from './air-vehicles/Wraith'
+import { SideBar } from './SideBar'
+import { CommandsBar } from './CommandsBar'
 
 export interface IGameOptions {
   viewWidth: number
@@ -57,6 +59,7 @@ export class Game extends Container {
   public viewHeight: number
   public tileMap!: TileMap
   public topBar!: TopBar
+  public sideBar!: SideBar
   public startModal!: StartModal
   public camera!: Camera
   public selectedItems: SelectableItem[] = []
@@ -118,6 +121,11 @@ export class Game extends Container {
     })
     this.addChild(this.topBar)
 
+    this.sideBar = new SideBar({
+      game: this, initY: TopBar.options.initHeight
+    })
+    this.addChild(this.sideBar)
+
     this.startModal = new StartModal({ viewWidth, viewHeight })
     this.startModal.hideModal()
     this.addChild(this.startModal)
@@ -147,11 +155,11 @@ export class Game extends Container {
       if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < Game.options.doubleTapMaxTime) {
         if (Math.abs(e.globalX - previousPointerTapEvent.globalX) < 10 && Math.abs(e.globalY - previousPointerTapEvent.globalY) < 10) {
           logPointerEvent('Game pointerdoubletap')
-          this.clearSelection()
-          const { moveableItems } = this.tileMap
-          for (let i = 0; i < moveableItems.length; i++) {
-            const item = moveableItems[i]
-            if (underPointerItem.constructor === item.constructor && item.team === underPointerItem.team) {
+          this.clearSelection(true)
+          const { activeItems } = this.tileMap
+          for (let i = 0; i < activeItems.children.length; i++) {
+            const item = activeItems.children[i]
+            if (underPointerItem.itemName === item.itemName && item.team === underPointerItem.team) {
               // select all the same items include under pointer item
               this.selectItem(item, false)
             }
@@ -165,7 +173,7 @@ export class Game extends Container {
       const teamItemsCount = this.selectedItems.filter(si => si.team === this.team).length
       if (teamItemsCount === 0 || underPointerItem.team === this.team) {
         // Pressing shift adds to existing selection. If shift is not pressed, clear existing selection
-        if (!e.shiftKey) {
+        if (!e.shiftKey || underPointerItem.type === EItemType.buildings) {
           this.clearSelection()
         }
         this.selectItem(underPointerItem, e.shiftKey)
@@ -202,6 +210,8 @@ export class Game extends Container {
         this.processCommand(uids, { type: 'move', toPoint: { gridX: point.x / gridSize, gridY: point.y / gridSize } })
       }
     }
+
+    this.sideBar.handleSelectedItems(this.selectedItems)
 
     this.previousPointerTapEvent = {
       type: e.type,
@@ -265,6 +275,7 @@ export class Game extends Container {
           this.selectItem(moveableItem, true)
         }
       })
+      this.sideBar.handleSelectedItems(this.selectedItems)
     } else if (!this.pointerZoomed) {
       this.handlePointerTap(e)
     }
@@ -449,6 +460,7 @@ export class Game extends Container {
     this.time += deltaMS
     const { x: pX, y: pY } = this.tileMap.pivot
     this.topBar.handleUpdate({ deltaMS, camX: pX, camY: pY })
+    this.sideBar.handleUpdate(deltaMS)
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
 
@@ -479,7 +491,10 @@ export class Game extends Container {
     this.tileMap.initLevel({ mapImageSrc, mapSettingsSrc, viewWidth: this.camera.width, viewHeight: this.camera.height })
   }
 
-  clearSelection (): void {
+  clearSelection (toggleSideBar = false): void {
+    if (toggleSideBar) {
+      this.sideBar.handleSelectedItems([])
+    }
     for (let i = 0; i < this.selectedItems.length; i++) {
       const selectedItem = this.selectedItems[i]
       this.deselectItem(selectedItem)
@@ -796,6 +811,15 @@ export class Game extends Container {
         downLeftTextures: [textures['wraith-shadow-down-left.png']],
         leftTextures: [textures['wraith-shadow-left.png']],
         upLeftTextures: [textures['wraith-shadow-up-left.png']]
+      }
+    })
+
+    CommandsBar.prepareTextures({
+      textures: {
+        iconMoveFollowTexture: textures['icon-command-move-follow.png'],
+        iconAttackGuardTexture: textures['icon-command-attack-guard.png'],
+        iconPatrolTexture: textures['icon-command-patrol.png'],
+        iconDeselectTexture: textures['icon-deselect.png']
       }
     })
   }

@@ -30,6 +30,7 @@ export interface IProjectileOptions {
 }
 
 export class Projectile extends Container implements IItem, IMoveable {
+  public commands = []
   static reloadTime = 0
   public collisionGraphics = new Graphics()
   public collisionOptions = {

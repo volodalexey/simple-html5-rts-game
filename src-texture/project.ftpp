@@ -1205,6 +1205,26 @@
       "folder": ""
     },
     {
+      "name": "icon-command-attack-guard.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-command-attack-guard.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-command-move-follow.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-command-move-follow.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-command-patrol.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-command-patrol.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-deselect.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-deselect.png",
+      "folder": ""
+    },
+    {
       "name": "icon-home.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-home.png",
       "folder": ""

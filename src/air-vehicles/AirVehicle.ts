@@ -10,6 +10,7 @@ import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logItemBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
+import { type ECommandName } from '../Command'
 
 export interface IAirVehicleTextures {
   upTextures: Texture[]
@@ -47,6 +48,7 @@ enum ECollisionType {
 }
 
 export class AirVehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
+  public commands: ECommandName[] = []
   public collisionGraphics = new Graphics()
   public collisionOptions = {
     width: 0,
