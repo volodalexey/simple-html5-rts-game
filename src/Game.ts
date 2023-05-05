@@ -291,13 +291,13 @@ export class Game extends Container {
     }
     const localPosition = this.toLocal(e)
     logPointerEvent('Game pointer move')
-    if (this.pointerMainDownId > -1 && this.pointerSecondDownId === -1) {
+    if (this.pointerMainDownId !== -1 && this.pointerSecondDownId === -1) {
       if (this.pointerMainDownX > -1 && this.pointerMainDownY > -1 &&
         Math.abs(localPosition.x - this.pointerMainDownX) > this.dragSelectThreshold &&
         Math.abs(localPosition.y - this.pointerMainDownY) > this.dragSelectThreshold) {
         this.drawDragSelect(localPosition)
       }
-    } else if (this.pointerMainDownId > -1 && this.pointerSecondDownId > -1) {
+    } else if (this.pointerMainDownId !== -1 && this.pointerSecondDownId !== -1) {
       if (this.dragSelect.width > 0) {
         this.dragSelect.clear()
       }
