@@ -45,6 +45,6 @@ export class CannonBall extends Projectile {
   }
 
   playHitSound (): void {
-    AUDIO.cannonHit.play()
+    AUDIO.play('cannon-hit')
   }
 }

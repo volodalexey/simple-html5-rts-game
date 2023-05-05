@@ -62,7 +62,7 @@ export class Wraith extends AttackableAirVehicle {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 26,
+    width: 24,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
@@ -74,7 +74,7 @@ export class Wraith extends AttackableAirVehicle {
 
   public drawReloadBarOptions = {
     alpha: 1,
-    width: 26,
+    width: 24,
     height: 2,
     fillColor: 0xc1a517,
     offset: {

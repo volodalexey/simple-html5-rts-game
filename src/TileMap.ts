@@ -242,6 +242,11 @@ export class TileMap extends Container {
       (item): item is BaseMoveableItem => item.type === EItemType.vehicles || item.type === EItemType.airVehicles)]
   }
 
+  get groundItems (): Vehicle[] {
+    return [...this.activeItems.children.filter(
+      (item): item is Vehicle => item.type === EItemType.vehicles)]
+  }
+
   get airItems (): AirVehicle[] {
     return [...this.activeItems.children.filter(
       (item): item is AirVehicle => item.type === EItemType.airVehicles)]

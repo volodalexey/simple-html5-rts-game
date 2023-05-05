@@ -472,9 +472,9 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
       }
     }
 
-    const { moveableItems } = tileMap
-    for (let i = moveableItems.length - 1; i >= 0; i--) {
-      const vehicle = moveableItems[i]
+    const { groundItems } = tileMap
+    for (let i = groundItems.length - 1; i >= 0; i--) {
+      const vehicle = groundItems[i]
       const vehicleGrid = vehicle.getGridXY({ center: true })
       // Test vehicles that are less than 3 squares away for collisions
       if (vehicle !== this && Math.abs(vehicleGrid.gridX - thisGrid.gridX) < 3 && Math.abs(vehicleGrid.gridY - thisGrid.gridY) < 3) {

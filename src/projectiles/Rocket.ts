@@ -14,8 +14,17 @@ export class Rocket extends Projectile {
 
   public speed = 25
   public range = 9
-  public damage = 20
+  public damage = 1
   public turnSpeed = 2
+
+  public collisionOptions = {
+    width: 5,
+    height: 5,
+    offset: {
+      x: 3,
+      y: 3
+    }
+  }
 
   constructor (options: IHeatSeekerOptions) {
     super({
@@ -34,5 +43,9 @@ export class Rocket extends Projectile {
     textures: IProjectileTextures
   }): void {
     Rocket.textures = textures
+  }
+
+  playHitSound (): void {
+    AUDIO.play('rocket-hit')
   }
 }

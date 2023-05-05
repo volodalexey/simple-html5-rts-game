@@ -16,6 +16,15 @@ export class Laser extends Projectile {
   public range = 8
   public damage = 10
 
+  public collisionOptions = {
+    width: 4,
+    height: 4,
+    offset: {
+      x: 3,
+      y: 3
+    }
+  }
+
   constructor (options: IFireBallOptions) {
     super({
       ...options,
@@ -33,5 +42,9 @@ export class Laser extends Projectile {
     textures: IProjectileTextures
   }): void {
     Laser.textures = textures
+  }
+
+  playHitSound (): void {
+    AUDIO.play('laser-hit')
   }
 }

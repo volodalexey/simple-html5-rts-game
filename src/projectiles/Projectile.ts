@@ -79,7 +79,7 @@ export class Projectile extends Container implements IItem, IMoveable {
     this.orders = { type: 'fire', to: options.target }
     this.setup(options)
     this.vector.setDirection({ direction: options.direction })
-    this.switchAnimationByDirection(options.direction)
+    this.switchAnimation()
   }
 
   setup ({
@@ -142,9 +142,10 @@ export class Projectile extends Container implements IItem, IMoveable {
     })
   }
 
-  switchAnimationByDirection (direction: EVectorDirection): void {
+  switchAnimation (): void {
     let newAnimation
     const step = 0.5
+    const { direction } = this.vector
     if ((direction >= EVectorDirection.upLeft + step && direction <= EVectorDirection.up) ||
         (direction >= EVectorDirection.up && direction <= EVectorDirection.upRight - step)) {
       // special case because of max direction
@@ -304,6 +305,7 @@ export class Projectile extends Container implements IItem, IMoveable {
             directions: this.vector.directions
           })
         })
+        this.switchAnimation()
       }
     }
 

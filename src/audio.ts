@@ -15,8 +15,10 @@ import engagingAudio from './assets/audio/engaging.mp3'
 import gunAudio from './assets/audio/gun.mp3'
 import heatseeker1Audio from './assets/audio/heatseeker1.mp3'
 import heatseeker2Audio from './assets/audio/heatseeker2.mp3'
+import rocketHit0Audio from './assets/audio/rocket-hit-0.mp3'
 import laser1Audio from './assets/audio/laser1.mp3'
 import laser2Audio from './assets/audio/laser2.mp3'
+import laserHit0Audio from './assets/audio/laser-hit-0.mp3'
 import messageAudio from './assets/audio/message.mp3'
 import roger1Audio from './assets/audio/roger1.mp3'
 import roger2Audio from './assets/audio/roger2.mp3'
@@ -83,11 +85,17 @@ export const AUDIO = {
   heatseeker2: new Howl({
     src: heatseeker2Audio
   }),
+  rocketHit0: new Howl({
+    src: rocketHit0Audio
+  }),
   laser1: new Howl({
     src: laser1Audio
   }),
   laser2: new Howl({
     src: laser2Audio
+  }),
+  laserHit0: new Howl({
+    src: laserHit0Audio
   }),
   message: new Howl({
     src: messageAudio
@@ -138,7 +146,10 @@ export const AUDIO = {
     src: tankYes3Audio
   }),
   play (name: '' | 'acknowledge-attacking' | 'acknowledge-moving'
-  | 'bullet' | 'bullet-hit' | 'rocket' | 'laser' | 'cannon-ball' | 'cannon-hit'
+  | 'bullet' | 'bullet-hit'
+  | 'rocket' | 'rocket-hit'
+  | 'laser' | 'laser-hit'
+  | 'cannon-ball' | 'cannon-hit'
   | 'message-received' | 'scout-tank-attack' | 'scout-tank-yes'
   | 'heavy-tank-attack' | 'heavy-tank-yes'): void {
     let stopPrevious = false
@@ -155,8 +166,12 @@ export const AUDIO = {
       sounds = [this.bulletHit0, this.bulletHit1, this.bulletHit2, this.bulletHit3, this.bulletHit4, this.bulletHit5]
     } else if (name === 'rocket') {
       sounds = [this.heatseeker1, this.heatseeker2]
+    } else if (name === 'rocket-hit') {
+      sounds = [this.rocketHit0]
     } else if (name === 'laser') {
       sounds = [this.laser1, this.laser2]
+    } else if (name === 'laser-hit') {
+      sounds = [this.laserHit0]
     } else if (name === 'cannon-ball') {
       sounds = [this.cannon1, this.cannon2]
     } else if (name === 'cannon-hit') {

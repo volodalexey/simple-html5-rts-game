@@ -37,24 +37,24 @@ export class Chopper extends AttackableAirVehicle {
   }
 
   public collisionOptions = {
-    width: 26,
-    height: 26,
+    width: 28,
+    height: 28,
     offset: {
-      x: 3,
-      y: 3
+      x: 7,
+      y: 5
     }
   }
 
   public drawSelectionOptions = {
     width: 0,
     height: 0,
-    radius: 13,
+    radius: 15,
     strokeWidth: 2,
     strokeColor: 0,
     strokeSecondColor: 0xffffff,
     offset: {
-      x: 1,
-      y: 1
+      x: 4,
+      y: 2
     }
   }
 
@@ -62,24 +62,24 @@ export class Chopper extends AttackableAirVehicle {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 26,
+    width: 28,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 3,
-      y: -8
+      x: 7,
+      y: -5
     }
   }
 
   public drawReloadBarOptions = {
     alpha: 1,
-    width: 26,
+    width: 28,
     height: 2,
     fillColor: 0xc1a517,
     offset: {
-      x: 3,
-      y: -3
+      x: 7,
+      y: 0
     }
   }
 
@@ -100,6 +100,7 @@ export class Chopper extends AttackableAirVehicle {
   public canAttack = true
   public canAttackLand = true
   public canAttackAir = false
+  public animationSpeed = 0.2
 
   constructor (options: IChopperOptions) {
     super({
@@ -120,5 +121,8 @@ export class Chopper extends AttackableAirVehicle {
     if (options.teleport === true) {
       this.drawTeleport()
     }
+    Object.values(this.bodyAnimation).concat(Object.values(this.shadowAnimation)).forEach(animation => {
+      animation.animationSpeed = this.animationSpeed
+    })
   }
 }

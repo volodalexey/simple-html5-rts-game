@@ -684,15 +684,15 @@ export class Game extends Container {
 
     Laser.prepareTextures({
       textures: {
-        upTextures: [textures['fire-ball-up.png']],
-        upRightTextures: [textures['fire-ball-up-right.png']],
-        rightTextures: [textures['fire-ball-right.png']],
-        downRightTextures: [textures['fire-ball-down-right.png']],
-        downTextures: [textures['fire-ball-down.png']],
-        downLeftTextures: [textures['fire-ball-down-left.png']],
-        leftTextures: [textures['fire-ball-left.png']],
-        upLeftTextures: [textures['fire-ball-up-left.png']],
-        explodeTextures: animations['fire-ball-explode']
+        upTextures: [textures['fireball-up.png']],
+        upRightTextures: [textures['fireball-up-right.png']],
+        rightTextures: [textures['fireball-right.png']],
+        downRightTextures: [textures['fireball-down-right.png']],
+        downTextures: [textures['fireball-down.png']],
+        downLeftTextures: [textures['fireball-down-left.png']],
+        leftTextures: [textures['fireball-left.png']],
+        upLeftTextures: [textures['fireball-up-left.png']],
+        explodeTextures: animations['fireball-explode']
       }
     })
 

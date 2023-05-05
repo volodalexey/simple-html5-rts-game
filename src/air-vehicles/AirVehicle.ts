@@ -147,7 +147,7 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.team = options.team
-    this.orders = options.orders ?? { type: 'stand' }
+    this.orders = options.orders ?? { type: 'float' }
     this.setup(options)
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
@@ -395,11 +395,6 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
       selectedGraphics.arc(cx, cy, radius, angleEnd, angleStart, true)
       selectedGraphics.endFill()
     }
-    selectedGraphics.beginFill(strokeColor)
-    selectedGraphics.moveTo(cx, cy + radius + strokeWidth)
-    const { offset: colOffset } = this.collisionOptions
-    selectedGraphics.lineTo(cx, cy + radius + strokeWidth + colOffset.y)
-    selectedGraphics.endFill()
     selectedGraphics.alpha = 0
   }
 
@@ -463,7 +458,7 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
           const moving = this._moveTo(this.orders.toPoint, distanceFromDestination)
           // Pathfinding couldn't find a path so stop
           if (!moving) {
-            this.orders = { type: 'stand' }
+            this.orders = { type: 'float' }
             return true
           }
         }
@@ -474,7 +469,7 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
           if (this.orders.nextOrder != null) {
             this.orders = this.orders.nextOrder
           } else {
-            this.orders = { type: 'stand' }
+            this.orders = { type: 'float' }
           }
           return true
         }
