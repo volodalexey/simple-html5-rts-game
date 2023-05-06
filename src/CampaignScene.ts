@@ -11,6 +11,8 @@ import { type Trigger, type ITrigger, createTrigger, ETriggerType, type TimedTri
 import { EItemName, type EItemNames } from './interfaces/IItem'
 import { Chopper } from './air-vehicles/Chopper'
 import { type ECommandName } from './Command'
+import { Transport } from './vehicles/Transport'
+import { Wraith } from './air-vehicles/Wraith'
 
 interface IMissionItem {
   name: EItemNames
@@ -465,11 +467,159 @@ export class CampaignScene extends Container implements IScene {
             type: ETriggerType.timed,
             time: 5000,
             action: () => {
-              // Send in air support after 5 minutes
               this.game.showMessage({
-                character: EMessageCharacter.op,
+                character: EMessageCharacter.driver,
                 message: 'Commander!! The rebels have started attacking. We need to protect the base at any cost.'
               })
+            }
+          },
+          {
+            type: ETriggerType.timed,
+            time: 20000,
+            action: () => {
+              const { tileMap } = this.game
+              tileMap.addItem(new Transport({
+                game: this.game, initX: tileMap.gridSize * 57, initY: tileMap.gridSize * 3, commands: [], team: Team.blue, uid: -6
+              }))
+              this.game.processCommand({ uids: [-5], orderType: 'guard', toUid: -6 })
+              this.game.showMessage({
+                character: EMessageCharacter.driver,
+                message: 'Commander!! The colony has sent some extra supplies. We are coming in from the North East sector through rebel territory. We could use a little protection.'
+              })
+            }
+          },
+          {
+            type: ETriggerType.timed,
+            time: 28000,
+            action: () => {
+              // Have the pilot offer to assist and get some villains in to make it interesting
+              const { tileMap } = this.game
+              tileMap.addItem(new ScoutTank({
+                game: this.game, initX: tileMap.gridSize * 57, initY: tileMap.gridSize * 28, team: Team.green, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * 55, initY: tileMap.gridSize * 33, team: Team.green, order: { type: 'sentry' }
+              }))
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * 53, initY: tileMap.gridSize * 33, team: Team.green, order: { type: 'sentry' }
+              }))
+              tileMap.addItem(new ScoutTank({
+                game: this.game, initX: tileMap.gridSize * 35, initY: tileMap.gridSize * 25, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 35, gridY: 25 }, toPoint: { gridX: 35, gridY: 30 } }
+              }))
+              this.game.showMessage({
+                character: EMessageCharacter.pilot,
+                message: "I'm on my way."
+              })
+            }
+          },
+          {
+            type: ETriggerType.timed,
+            time: 48000,
+            action: () => {
+              // Start moving the transport
+              this.game.processCommand({ uids: [-6], order: { type: 'move', toPoint: { gridX: 0, gridY: 39 } } })
+              this.game.showMessage({
+                character: EMessageCharacter.driver,
+                message: 'Thanks! Appreciate the backup. All right. Off we go.'
+              })
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              // Pilot asks for help when attacked
+              const pilot = this.game.tileMap.getItemByUid(-5)
+              if (pilot != null) {
+                return pilot.life < pilot.hitPoints * 0.8
+              }
+              return false
+            },
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.pilot,
+                message: "We are under attack! Need assistance. This doesn't look good."
+              })
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              // Extra supplies from new transport
+              const transport = this.game.tileMap.getItemByUid(-6)
+              if (transport != null) {
+                const transportGrid = transport.getGridXY({ center: true })
+                return transportGrid.gridX < 5 && transportGrid.gridY > 37
+              }
+              return false
+            },
+            action: () => {
+              this.game.cash[Team.blue] += 1200
+              this.game.showMessage({
+                character: EMessageCharacter.driver,
+                message: 'The rebels came out of nowhere. There was nothing we could do. She saved our lives. Hope these supplies were worth it.'
+              })
+            }
+          },
+          {
+            type: ETriggerType.timed,
+            time: 480000,
+            action: () => {
+              // After 8 minutes, start waiting for the end
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander! The colony air fleet is just a few minutes away.'
+              })
+            }
+          },
+          {
+            type: ETriggerType.timed,
+            time: 600000,
+            action: () => {
+              // After 10 minutes send in reinforcements
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander! The colony air fleet is approaching'
+              })
+              const { tileMap } = this.game
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 20, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Chopper({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 22, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 24, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Chopper({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 26, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 28, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Chopper({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 30, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 32, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Chopper({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 34, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Wraith({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 36, team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Chopper({
+                game: this.game, initX: tileMap.gridSize * -1, initY: tileMap.gridSize * 38, team: Team.blue, order: { type: 'hunt' }
+              }))
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return this.game.tileMap.getTeamStaticItems(Team.green).length <= 0
+            },
+            action: () => {
+              this.endMission({ success: true })
             }
           }
         ]

@@ -264,6 +264,10 @@ export class TileMap extends Container {
     return this.moveableItems.filter(item => item.team === team)
   }
 
+  getTeamStaticItems (team: Team): Building[] {
+    return this.staticItems.filter(item => item.team === team)
+  }
+
   itemUnderPointer (point: IPointData): BaseActiveItem | undefined {
     // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
     //   return;
