@@ -71,7 +71,7 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
   }
 
   processOrders (): boolean {
-    if (super.processOrders()) {
+    if (this.order.type !== 'patrol' && super.processOrders()) {
       return true
     }
     const { tileMap, turnSpeedAdjustmentFactor } = this.game

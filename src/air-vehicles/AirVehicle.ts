@@ -296,6 +296,17 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
         }
         return true
       }
+      case 'patrol': {
+        const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
+        if (distanceFromDestinationSquared < Math.pow(this.sight / tileMap.gridSize, 2)) {
+          const to = this.order.toPoint
+          this.order.toPoint = this.order.fromPoint
+          this.order.fromPoint = to
+        } else {
+          this._moveTo(this.order.toPoint, distanceFromDestinationSquared)
+        }
+        return true
+      }
     }
     return false
   }

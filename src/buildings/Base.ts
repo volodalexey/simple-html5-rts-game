@@ -195,6 +195,7 @@ export class Base extends Building {
         const { buildableGrid } = this
         const availablePlaces: Array<{ gridX: number, gridY: number }> = []
         const thisGrid = this.getGridXY()
+        // check only diagonal spaces outside of main buildable grid
         for (const gridY of [thisGrid.gridY - 1, thisGrid.gridY + buildableGrid.length]) {
           for (const gridX of [thisGrid.gridX - 1, thisGrid.gridX + buildableGrid[0].length]) {
             if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
