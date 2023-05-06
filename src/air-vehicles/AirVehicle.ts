@@ -10,7 +10,7 @@ import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logItemBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
-import { type ECommandName } from '../Command'
+import { ECommandName } from '../Command'
 
 export interface IAirVehicleTextures {
   upTextures: Texture[]
@@ -48,7 +48,7 @@ enum ECollisionType {
 }
 
 export class AirVehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
-  public commands: ECommandName[] = []
+  public commands = [ECommandName.moveFollow, ECommandName.patrol]
   public collisionGraphics = new Graphics()
   public collisionOptions = {
     width: 0,
@@ -156,9 +156,6 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     }
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
-    }
-    if (Array.isArray(options.commands)) {
-      this.commands = options.commands
     }
   }
 

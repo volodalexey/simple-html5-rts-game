@@ -1,3 +1,4 @@
+import { ECommandName } from '../Command'
 import { ReloadBar } from '../ReloadBar'
 import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../common'
 import { type IAttackable } from '../interfaces/IAttackable'
@@ -7,6 +8,7 @@ import { type IAirVehicleOptions, AirVehicle } from './AirVehicle'
 export interface IAttackableAirVehicleOptions extends IAirVehicleOptions {}
 
 export class AttackableAirVehicle extends AirVehicle implements IAttackable {
+  public commands = [ECommandName.moveFollow, ECommandName.attackGuard, ECommandName.patrol]
   public reloadTimeLeft = 0
   public projectile!: ProjectileName
   public reloadBar!: ReloadBar

@@ -88,7 +88,7 @@ interface IDeployOrder {
 interface IConstructUnitOrder {
   type: 'construct-unit'
   name: UnitName
-  orders?: IOrder
+  unitOrder?: IOrder
 }
 
 interface IMoveAndAttack {

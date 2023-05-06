@@ -170,6 +170,7 @@ export class CampaignScene extends Container implements IScene {
           { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
           /* Player heavy tank */
           { name: 'heavy-tank', initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
+          { name: 'wraith', initGridX: 55, initGridY: 20, direction: EVectorDirection.downRight, team: Team.blue },
           /* Two transport vehicles waiting just outside the visible map */
           { name: 'transport', initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, commands: [] },
           { name: 'transport', initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, commands: [] },
@@ -349,8 +350,8 @@ export class CampaignScene extends Container implements IScene {
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
               if (this.game.cash[Team.green] > 1000 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
-                this.game.processCommand({ uids: [-12], order: { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } } })
-                this.game.processCommand({ uids: [-13], order: { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } } })
+                this.game.processCommand({ uids: [-12], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processCommand({ uids: [-13], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               }
             }
           },

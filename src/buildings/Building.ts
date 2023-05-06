@@ -24,7 +24,7 @@ export interface IBuildingOptions {
   life?: number
   selectable?: boolean
   commands?: ECommandName[]
-  orders?: IOrder
+  order?: IOrder
 }
 
 export class Building extends Container implements IItem, ISelectable, ILifeable {
@@ -98,7 +98,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.team = options.team
-    this.order = options.orders ?? { type: 'stand' }
+    this.order = options.order ?? { type: 'stand' }
     if (options.life != null) {
       this.life = options.life
     }

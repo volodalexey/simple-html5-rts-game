@@ -92,6 +92,9 @@ export class HeavyTank extends AttackableVehicle {
       ...options,
       textures: HeavyTank.textures(options.team)
     })
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
+    }
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.drawSelection()

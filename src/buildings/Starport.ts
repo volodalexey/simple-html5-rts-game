@@ -96,7 +96,7 @@ export class Starport extends Building {
     name: UnitName
     team: Team
     initCenter?: boolean
-    orders?: IOrder
+    order?: IOrder
     teleport?: boolean
   }
 
@@ -263,7 +263,7 @@ export class Starport extends Building {
               initCenter: true,
               team: this.team,
               name: this.order.name,
-              orders: this.order.orders,
+              order: this.order.unitOrder,
               teleport: true
             }
             this.switchAnimation(StarportAnimation.open)

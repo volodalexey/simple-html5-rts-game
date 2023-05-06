@@ -107,6 +107,9 @@ export class Chopper extends AttackableAirVehicle {
       ...options,
       textures: Chopper.textures(options.team)
     })
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
+    }
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x40bf40
     this.setupShadow()

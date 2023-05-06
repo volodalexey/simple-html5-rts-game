@@ -136,9 +136,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
     }
-    if (Array.isArray(options.commands)) {
-      this.commands = options.commands
-    }
   }
 
   setup ({

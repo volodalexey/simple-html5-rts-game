@@ -980,7 +980,7 @@ export class Game extends Container {
     life?: number
     selectable?: boolean
     commands?: ECommandName[]
-    orders?: IOrder
+    order?: IOrder
     teleport?: boolean
   }): Base | OilDerrick | Starport | GroundTurret
     | Transport | Harvester | ScoutTank | HeavyTank
