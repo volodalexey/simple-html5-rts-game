@@ -1210,6 +1210,11 @@
       "folder": ""
     },
     {
+      "name": "icon-command-attack.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-command-attack.png",
+      "folder": ""
+    },
+    {
       "name": "icon-command-move-follow.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-command-move-follow.png",
       "folder": ""
@@ -1527,6 +1532,86 @@
     {
       "name": "scout-tank-green-up.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scout-tank-green-up.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-down.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-blue-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-blue-up.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-down-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-down-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-down-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-down-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-down.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-down.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-up-left.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-up-left.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-up-right.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-up-right.png",
+      "folder": ""
+    },
+    {
+      "name": "scv-green-up.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/scv-green-up.png",
       "folder": ""
     },
     {

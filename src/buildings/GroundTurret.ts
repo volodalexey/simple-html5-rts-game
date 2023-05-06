@@ -112,6 +112,9 @@ export class GroundTurret extends AttackableBuilding {
       ...options,
       textures: GroundTurret.textures(options.team)
     })
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
+    }
     this.buildableGrid = GroundTurret.buildableGrid
     this.passableGrid = GroundTurret.passableGrid
     this.life = options.life ?? this.hitPoints

@@ -61,7 +61,7 @@ export class HeavyTank extends AttackableVehicle {
     emptyColor: 0xff0000,
     offset: {
       x: 3,
-      y: -8
+      y: -7
     }
   }
 
@@ -72,7 +72,7 @@ export class HeavyTank extends AttackableVehicle {
     fillColor: 0xc1a517,
     offset: {
       x: 3,
-      y: -3
+      y: -2
     }
   }
 

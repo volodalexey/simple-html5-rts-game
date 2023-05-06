@@ -1,21 +1,20 @@
 import { Team } from '../common'
-import { EItemName, type ProjectileName } from '../interfaces/IItem'
-import { AttackableVehicle } from './AttackableVehicle'
-import { type IVehicleOptions, type IVehicleTextures } from './Vehicle'
+import { EItemName } from '../interfaces/IItem'
+import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
-export type IScoutTankOptions = Pick<
+export type ISCVOptions = Pick<
 IVehicleOptions,
 Exclude<keyof IVehicleOptions, 'textures'>
 > & {
   initCenter?: boolean
 }
 
-export class ScoutTank extends AttackableVehicle {
-  public itemName = EItemName.ScoutTank
+export class SCV extends Vehicle {
+  public itemName = EItemName.SCV
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
   static textures (team: Team): IVehicleTextures {
-    return team === Team.blue ? ScoutTank.blueTextures : ScoutTank.greenTextures
+    return team === Team.blue ? SCV.blueTextures : SCV.greenTextures
   }
 
   static prepareTextures ({
@@ -25,29 +24,29 @@ export class ScoutTank extends AttackableVehicle {
     blueTextures: IVehicleTextures
     greenTextures: IVehicleTextures
   }): void {
-    ScoutTank.blueTextures = blueTextures
-    ScoutTank.greenTextures = greenTextures
+    SCV.blueTextures = blueTextures
+    SCV.greenTextures = greenTextures
   }
 
   public collisionOptions = {
-    width: 22,
-    height: 22,
+    width: 18,
+    height: 18,
     offset: {
-      x: 0,
-      y: 0
+      x: 6,
+      y: 6
     }
   }
 
   public drawSelectionOptions = {
     width: 0,
     height: 0,
-    radius: 11,
+    radius: 10,
     strokeWidth: 2,
-    strokeColor: 0,
+    strokeColor: 0xffff00,
     strokeSecondColor: 0xffffff,
     offset: {
-      x: -2,
-      y: -2
+      x: 3,
+      y: 3
     }
   }
 
@@ -55,42 +54,27 @@ export class ScoutTank extends AttackableVehicle {
     borderColor: 0xffffff,
     borderThickness: 1,
     borderAlpha: 0.5,
-    width: 22,
+    width: 18,
     height: 5,
     fillColor: 0x15803d,
     emptyColor: 0xff0000,
     offset: {
-      x: 0,
-      y: -9
+      x: 6,
+      y: -2
     }
   }
 
-  public drawReloadBarOptions = {
-    alpha: 1,
-    width: 22,
-    height: 2,
-    fillColor: 0xc1a517,
-    offset: {
-      x: 0,
-      y: -4
-    }
-  }
+  public radius = 15
+  public speed = 15
+  public sight = 3
+  static cost = 400
+  public hitPoints = 100
+  public turnSpeed = 2
 
-  public radius = 11
-  public speed = 20
-  public sight = 4
-  static cost = 500
-  public hitPoints = 50
-  public turnSpeed = 4
-  public projectile: ProjectileName = EItemName.Bullet
-  public canAttack = true
-  public canAttackLand = true
-  public canAttackAir = false
-
-  constructor (options: IScoutTankOptions) {
+  constructor (options: ISCVOptions) {
     super({
       ...options,
-      textures: ScoutTank.textures(options.team)
+      textures: SCV.textures(options.team)
     })
     if (Array.isArray(options.commands)) {
       this.commands = options.commands
@@ -102,8 +86,6 @@ export class ScoutTank extends AttackableVehicle {
     this.setPositionByXY({ x: options.initX, y: options.initY, center: options.initCenter })
     this.drawLifeBar()
     this.updateLife()
-    this.drawReloadBar()
-    this.updateReload()
     this.updateAnimation()
     if (options.teleport === true) {
       this.drawTeleport()

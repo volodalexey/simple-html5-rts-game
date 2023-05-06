@@ -1,24 +1,33 @@
 import { Container, type Texture } from 'pixi.js'
 import { compareArrays, type BaseActiveItem, type SelectableItem } from './common'
-import { EItemType } from './interfaces/IItem'
+import { EItemName, EItemType } from './interfaces/IItem'
 import { ECommandName } from './Command'
 import { type Game } from './Game'
 import { Button, type IButtonOptions } from './Button'
+import { SCV } from './vehicles/SCV'
+import { Harvester } from './vehicles/Harvester'
 
 export interface ICommandBarOptions {
   game: Game
 }
 
 export interface ICommandsBarTextures {
+  iconAttackTexture: Texture
   iconMoveFollowTexture: Texture
   iconAttackGuardTexture: Texture
   iconPatrolTexture: Texture
   iconDeselectTexture: Texture
+  iconConstructSCVTexture: Texture
+  iconConstructHarvesterTexture: Texture
 }
 
 interface ICommandDescription {
   iconTexture: Texture
   text: string
+  iconWidth: number
+  iconHeight: number
+  iconPaddingTop: number
+  iconPaddingLeft: number
 }
 
 type CommandsDic = Record<ECommandName, ICommandDescription>
@@ -31,19 +40,59 @@ export class CommandsBar extends Container {
     CommandsBar.commandsDic = {
       [ECommandName.deselect]: {
         iconTexture: textures.iconDeselectTexture,
-        text: 'deselect'
+        text: 'deselect',
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
       },
       [ECommandName.moveFollow]: {
         iconTexture: textures.iconMoveFollowTexture,
-        text: 'move\nfollow'
+        text: 'move\nfollow',
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.attack]: {
+        iconTexture: textures.iconAttackTexture,
+        text: 'attack',
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
       },
       [ECommandName.attackGuard]: {
         iconTexture: textures.iconAttackGuardTexture,
-        text: 'attack\nguard'
+        text: 'attack\nguard',
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
       },
       [ECommandName.patrol]: {
         iconTexture: textures.iconPatrolTexture,
-        text: 'patrol'
+        text: 'patrol',
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.constructSCV]: {
+        iconTexture: textures.iconConstructSCVTexture,
+        text: `SCV\n${SCV.cost}`,
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.constructHarvester]: {
+        iconTexture: textures.iconConstructHarvesterTexture,
+        text: `Harvester\n${Harvester.cost}`,
+        iconWidth: 30,
+        iconHeight: 30,
+        iconPaddingTop: 12,
+        iconPaddingLeft: 12
       }
     }
   }
@@ -65,54 +114,27 @@ export class CommandsBar extends Container {
   }
 
   prepareCommands (selectedItems: SelectableItem[]): boolean {
-    const commandNames = [ECommandName.deselect]
+    const commandNames = new Set<ECommandName>([ECommandName.deselect])
     if (selectedItems.length === 1) {
       const selectedItem = selectedItems[0]
       if (selectedItem.team === this.game.team) {
-        Array.prototype.push.apply(commandNames, selectedItem.commands)
+        selectedItem.commands.forEach(commandName => commandNames.add(commandName))
       }
-      return this.drawCommands(commandNames)
+      return this.drawCommands([...commandNames.values()])
     }
-    let hasMoveable = false
-    let hasBuilding = false
-    let hasMoveFollow = false
-    let hasAttackGuard = false
-    let hasPatrol = false;
+    // multiple units/buildings
+    const hasMoveable = selectedItems.some(selectedItem => selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles);
     (selectedItems as BaseActiveItem[]).forEach((selectedItem: BaseActiveItem) => {
       if (selectedItem.team !== this.game.team) {
         return
       }
-      if (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles) {
-        hasMoveable = true
+      if (hasMoveable && (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles)) {
+        selectedItem.commands.forEach(commandName => commandNames.add(commandName))
       } else if (selectedItem.type === EItemType.buildings) {
-        hasBuilding = true
-      }
-      if (selectedItem.commands.includes(ECommandName.moveFollow)) {
-        hasMoveFollow = true
-      }
-      if (selectedItem.commands.includes(ECommandName.attackGuard)) {
-        hasAttackGuard = true
-      }
-      if (selectedItem.commands.includes(ECommandName.patrol)) {
-        hasPatrol = true
+        selectedItem.commands.forEach(commandName => commandNames.add(commandName))
       }
     })
-    if (hasMoveable) {
-      if (hasMoveFollow) {
-        commandNames.push(ECommandName.moveFollow)
-      }
-      if (hasAttackGuard) {
-        commandNames.push(ECommandName.attackGuard)
-      }
-      if (hasPatrol) {
-        commandNames.push(ECommandName.patrol)
-      }
-    } else if (hasBuilding) {
-      if (hasAttackGuard) {
-        commandNames.push(ECommandName.attackGuard)
-      }
-    }
-    return this.drawCommands(commandNames)
+    return this.drawCommands([...commandNames.values()])
   }
 
   clearCommandTiles (): void {
@@ -121,7 +143,7 @@ export class CommandsBar extends Container {
     }
   }
 
-  deselectButtons (exceptCommandName?: ECommandName): void {
+  deselectTiles (exceptCommandName?: ECommandName): void {
     this.commandTiles.children.forEach(commandTile => {
       if (commandTile.commandName === exceptCommandName) {
         commandTile.setSelected(true)
@@ -140,20 +162,42 @@ export class CommandsBar extends Container {
     switch (commandName) {
       case ECommandName.moveFollow:
         return () => {
-          this.deselectButtons(ECommandName.moveFollow)
+          this.deselectTiles(ECommandName.moveFollow)
+        }
+      case ECommandName.attack:
+        return () => {
+          this.deselectTiles(ECommandName.attack)
         }
       case ECommandName.attackGuard:
         return () => {
-          this.deselectButtons(ECommandName.attackGuard)
+          this.deselectTiles(ECommandName.attackGuard)
         }
       case ECommandName.patrol:
         return () => {
-          this.deselectButtons(ECommandName.patrol)
+          this.deselectTiles(ECommandName.patrol)
         }
       case ECommandName.deselect:
         return () => {
-          this.deselectButtons()
+          this.deselectTiles()
           this.game.clearSelection(true)
+        }
+      case ECommandName.constructSCV:
+        return () => {
+          this.deselectTiles(ECommandName.constructSCV)
+          this.game.selectedItems.forEach(selectedItem => {
+            if (selectedItem.commands.includes(ECommandName.constructSCV)) {
+              selectedItem.order = { type: 'construct-unit', name: EItemName.SCV }
+            }
+          })
+        }
+      case ECommandName.constructHarvester:
+        return () => {
+          this.deselectTiles(ECommandName.constructHarvester)
+          this.game.selectedItems.forEach(selectedItem => {
+            if (selectedItem.commands.includes(ECommandName.constructHarvester)) {
+              selectedItem.order = { type: 'construct-unit', name: EItemName.Harvester }
+            }
+          })
         }
     }
   }
@@ -169,19 +213,16 @@ export class CommandsBar extends Container {
       const tile = new CommandTile({
         commandName,
         buttonRadius: 3,
-        iconPaddingTop: 6,
-        iconPaddingLeft: 6,
-        iconIdleAlpha: 0.5,
-        iconHoverAlpha: 0.5,
+        iconIdleAlpha: 0.3,
+        iconHoverAlpha: 0.4,
         textPaddingLeft: 0,
-        textPaddingTop: 6,
-        buttonWidth: 56,
+        textPaddingTop: 8,
+        buttonWidth: 60,
         fontSize: 10,
         textColor: 0xffffff,
         textColorHover: 0xffff00,
         iconColor: 0xffffff,
         iconColorHover: 0xffff00,
-        iconScale: 0.8,
         shadowTextColor: 0x800080,
         shadowThickness: 1,
         buttonHoverColor: 0x454545,

@@ -3,6 +3,7 @@ import { type IOrder } from './IOrder'
 import { type ECommandName } from '../Command'
 
 export enum EItemType {
+  none = 'none',
   buildings = 'buildings',
   vehicles = 'vehicles',
   airVehicles = 'airVehicles',
@@ -16,6 +17,7 @@ export enum EItemName {
   OilDerrick = 'oil-derrick',
   Starport = 'starport',
   GroundTurret = 'ground-turret',
+  SCV = 'scv',
   Harvester = 'harvester',
   Transport = 'transport',
   ScoutTank = 'scout-tank',
@@ -30,7 +32,9 @@ export enum EItemName {
 
 export type EItemNames = `${EItemName}`
 
-export type UnitName = EItemName.Harvester | EItemName.Transport | EItemName.ScoutTank | EItemName.HeavyTank
+export type UnitName = EItemName.SCV | EItemName.Harvester |
+EItemName.Transport | EItemName.ScoutTank | EItemName.HeavyTank |
+EItemName.Chopper | EItemName.Wraith
 export type ProjectileName = EItemName.Bullet | EItemName.CannonBall | EItemName.Rocket | EItemName.Laser
 
 export interface IItem {
@@ -39,10 +43,6 @@ export interface IItem {
   type: EItemType
   itemName: EItemName
   commands: ECommandName[]
-  getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => { gridX: number, gridY: number }
-  setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
-  setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
-  handleUpdate: (deltaMS: number) => void
   order: IOrder
   collisionGraphics: Graphics
   collisionOptions: {
@@ -53,8 +53,13 @@ export interface IItem {
       y: number
     }
   }
+  getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => { gridX: number, gridY: number }
+  setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
+  setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
+  handleUpdate: (deltaMS: number) => void
   drawCollision: () => void
   getCollisionPosition: (options: { center?: boolean, air?: boolean }) => { x: number, y: number }
   getCollisionBounds: () => { top: number, right: number, bottom: number, left: number }
   getGridCollisionBounds: () => { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number }
+  processOrders: () => boolean
 }

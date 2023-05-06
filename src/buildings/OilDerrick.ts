@@ -98,6 +98,9 @@ export class OilDerrick extends Building {
       ...options,
       textures: OilDerrick.textures(options.team)
     })
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
+    }
     this.buildableGrid = OilDerrick.buildableGrid
     this.passableGrid = OilDerrick.passableGrid
     this.life = options.life ?? this.hitPoints

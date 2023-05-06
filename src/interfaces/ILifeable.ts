@@ -17,8 +17,11 @@ export interface ILifeable {
       y: number
     }
   }
+  drawLifeBar: () => void
   isAlive: () => boolean
   isHealthy: () => boolean
   isDead: () => boolean
   subLife: (damage: number) => void
+  updateLife: () => void
+  updateAnimation: () => void
 }

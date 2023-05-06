@@ -167,10 +167,9 @@ export class CampaignScene extends Container implements IScene {
         },
         items: [
           /* Slightly damaged base */
-          { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
+          { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, commands: [], life: 100 },
           /* Player heavy tank */
           { name: 'heavy-tank', initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
-          { name: 'wraith', initGridX: 55, initGridY: 20, direction: EVectorDirection.downRight, team: Team.blue },
           /* Two transport vehicles waiting just outside the visible map */
           { name: 'transport', initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, commands: [] },
           { name: 'transport', initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, commands: [] },
@@ -285,7 +284,7 @@ export class CampaignScene extends Container implements IScene {
         startGridX: 36,
         startGridY: 0,
         cash: {
-          blue: 0,
+          blue: 100000,
           green: 0
         },
         items: [
@@ -306,9 +305,9 @@ export class CampaignScene extends Container implements IScene {
           { name: 'starport', initGridX: 4, initGridY: 32, team: Team.green, uid: -13 },
           { name: 'harvester', initGridX: 1, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 16, gridY: 7 } } },
           { name: 'harvester', initGridX: 10, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 20, gridY: 7 } } },
-          { name: 'ground-turret', initGridX: 5, initGridY: 28, team: Team.green },
-          { name: 'ground-turret', initGridX: 7, initGridY: 33, team: Team.green },
-          { name: 'ground-turret', initGridX: 8, initGridY: 37, team: Team.green }
+          { name: 'ground-turret', initGridX: 5, initGridY: 28, direction: EVectorDirection.up, team: Team.green },
+          { name: 'ground-turret', initGridX: 7, initGridY: 33, direction: EVectorDirection.upLeft, team: Team.green },
+          { name: 'ground-turret', initGridX: 8, initGridY: 37, direction: EVectorDirection.upRight, team: Team.green }
         ],
         triggers: [
           {

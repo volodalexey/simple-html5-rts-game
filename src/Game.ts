@@ -30,6 +30,7 @@ import { Wraith } from './air-vehicles/Wraith'
 import { SideBar } from './SideBar'
 import { CommandsBar } from './CommandsBar'
 import { ECommandName } from './Command'
+import { SCV } from './vehicles/SCV'
 
 export interface IGameOptions {
   viewWidth: number
@@ -177,6 +178,9 @@ export class Game extends Container {
       switch (selectedCommandName) {
         case ECommandName.moveFollow:
           order = { type: 'follow', to: underPointerItem }
+          break
+        case ECommandName.attack:
+          order = { type: 'attack', to: underPointerItem }
           break
         case ECommandName.attackGuard:
           if (underPointerItem.team === this.team) {
@@ -518,17 +522,15 @@ export class Game extends Container {
 
   drawOrders (): void {
     this.selectedItems.forEach(selectedItem => {
-      if (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles) {
-        let order = this.tileMap.orders.children.find(o => o.item === selectedItem)
-        if (order == null) {
-          order = new Order({ item: selectedItem })
-          this.tileMap.orders.addChild(order)
-        }
-        order.drawOrderLine({
-          selectedItem,
-          tileMap: this.tileMap
-        })
+      let order = this.tileMap.orders.children.find(o => o.item === selectedItem)
+      if (order == null) {
+        order = new Order({ item: selectedItem })
+        this.tileMap.orders.addChild(order)
       }
+      order.drawOrderLine({
+        selectedItem,
+        tileMap: this.tileMap
+      })
     })
   }
 
@@ -718,6 +720,29 @@ export class Game extends Container {
       }
     })
 
+    SCV.prepareTextures({
+      blueTextures: {
+        upTextures: [textures['scv-blue-up.png']],
+        upRightTextures: [textures['scv-blue-up-right.png']],
+        rightTextures: [textures['scv-blue-right.png']],
+        downRightTextures: [textures['scv-blue-down-right.png']],
+        downTextures: [textures['scv-blue-down.png']],
+        downLeftTextures: [textures['scv-blue-down-left.png']],
+        leftTextures: [textures['scv-blue-left.png']],
+        upLeftTextures: [textures['scv-blue-up-left.png']]
+      },
+      greenTextures: {
+        upTextures: [textures['scv-green-up.png']],
+        upRightTextures: [textures['scv-green-up-right.png']],
+        rightTextures: [textures['scv-green-right.png']],
+        downRightTextures: [textures['scv-green-down-right.png']],
+        downTextures: [textures['scv-green-down.png']],
+        downLeftTextures: [textures['scv-green-down-left.png']],
+        leftTextures: [textures['scv-green-left.png']],
+        upLeftTextures: [textures['scv-green-up-left.png']]
+      }
+    })
+
     Bullet.prepareTextures({
       textures: {
         upTextures: [textures['bullet-up.png']],
@@ -865,10 +890,13 @@ export class Game extends Container {
 
     CommandsBar.prepareTextures({
       textures: {
+        iconAttackTexture: textures['icon-command-attack.png'],
         iconMoveFollowTexture: textures['icon-command-move-follow.png'],
         iconAttackGuardTexture: textures['icon-command-attack-guard.png'],
         iconPatrolTexture: textures['icon-command-patrol.png'],
-        iconDeselectTexture: textures['icon-deselect.png']
+        iconDeselectTexture: textures['icon-deselect.png'],
+        iconConstructSCVTexture: textures['scv-blue-down-right.png'],
+        iconConstructHarvesterTexture: textures['harvester-blue-down-right.png']
       }
     })
   }
@@ -943,6 +971,8 @@ export class Game extends Container {
         return Starport.cost
       case EItemName.GroundTurret:
         return GroundTurret.cost
+      case EItemName.SCV:
+        return SCV.cost
       case EItemName.Transport:
         return Transport.cost
       case EItemName.Harvester:
@@ -983,7 +1013,7 @@ export class Game extends Container {
     order?: IOrder
     teleport?: boolean
   }): Base | OilDerrick | Starport | GroundTurret
-    | Transport | Harvester | ScoutTank | HeavyTank
+    | SCV | Transport | Harvester | ScoutTank | HeavyTank
     | Chopper | Wraith
     | undefined {
     let { initX = 0, initY = 0 } = options
@@ -1015,6 +1045,13 @@ export class Game extends Container {
         })
       case EItemName.GroundTurret:
         return new GroundTurret({
+          ...options,
+          game: this,
+          initX,
+          initY
+        })
+      case EItemName.SCV:
+        return new SCV({
           ...options,
           game: this,
           initX,

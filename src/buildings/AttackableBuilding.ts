@@ -6,6 +6,7 @@ import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType, type ProjectileName } from '../interfaces/IItem'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { Building, type IBuildingTextures, type IBuildingOptions, BuildingAnimation } from './Building'
+import { ECommandName } from '../Command'
 
 export interface IAttackableBuildingOptions extends IBuildingOptions {
   direction?: EVectorDirection
@@ -24,6 +25,7 @@ export interface IAttackableBuildingTextures extends IBuildingTextures {
 }
 
 export class AttackableBuilding extends Building implements ITurnable, IAttackable {
+  public commands = [ECommandName.attack]
   public reloadTimeLeft = 0
   public projectile!: ProjectileName
   public reloadBar!: ReloadBar

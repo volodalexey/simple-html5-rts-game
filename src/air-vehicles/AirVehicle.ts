@@ -1,16 +1,13 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../Vector'
-import { findAngle, type Team, angleDiff, wrapDirection, findAngleGrid, generateUid } from '../common'
-import { type ISelectable } from '../interfaces/ISelectable'
-import { type ILifeable } from '../interfaces/ILifeable'
-import { EItemName, EItemType, type IItem } from '../interfaces/IItem'
-import { type Game } from '../Game'
+import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../common'
+import { EItemType } from '../interfaces/IItem'
 import { type IMoveable } from '../interfaces/IMoveable'
-import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
+import { type IPointGridData } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
-import { logItemBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { ECommandName } from '../Command'
+import { TeleportableSelectableLifeableRoundItem, type ITeleportableSelectableLifeableRoundItemOptions } from '../TeleportableSelectableLifeableRoundItem'
 
 export interface IAirVehicleTextures {
   upTextures: Texture[]
@@ -23,21 +20,12 @@ export interface IAirVehicleTextures {
   upLeftTextures: Texture[]
 }
 
-export interface IAirVehicleOptions {
-  game: Game
-  uid?: number
-  initX: number
-  initY: number
-  team: Team
+export interface IAirVehicleOptions extends ITeleportableSelectableLifeableRoundItemOptions {
   textures: {
     body: IAirVehicleTextures
     shadow: IAirVehicleTextures
   }
   direction?: EVectorDirection
-  life?: number
-  selectable?: boolean
-  commands?: ECommandName[]
-  order?: IOrder
   teleport?: boolean
 }
 
@@ -47,56 +35,9 @@ enum ECollisionType {
   attraction = 'attraction',
 }
 
-export class AirVehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
+export class AirVehicle extends TeleportableSelectableLifeableRoundItem implements IMoveable, ITurnable {
   public commands = [ECommandName.moveFollow, ECommandName.patrol]
-  public collisionGraphics = new Graphics()
-  public collisionOptions = {
-    width: 0,
-    height: 0,
-    offset: {
-      x: 0,
-      y: 0
-    }
-  }
-
-  public selectedGraphics = new Graphics()
-  public selected = false
-  public selectable = true
-  public drawSelectionOptions = {
-    width: 0,
-    height: 0,
-    radius: 0,
-    strokeWidth: 0,
-    strokeColor: 0,
-    strokeSecondColor: 0,
-    offset: {
-      x: 0,
-      y: 0
-    }
-  }
-
-  public lifeBar!: LifeBar
-  public drawLifeBarOptions = {
-    borderColor: 0,
-    borderThickness: 0,
-    borderAlpha: 0,
-    width: 0,
-    height: 0,
-    fillColor: 0,
-    emptyColor: 0,
-    offset: {
-      x: 0,
-      y: 0
-    }
-  }
-
-  public game: Game
-  public uid: number
   public type = EItemType.airVehicles
-  public itemName = EItemName.None
-  public hitPoints = 0
-  public life = 0
-  public team: Team
   public bodyAnimation!: {
     upAnimation: AnimatedSprite
     upRightAnimation: AnimatedSprite
@@ -138,38 +79,29 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
-  public order: IOrder
-  public sight = 0
   public radius = 0
   public followRadius = 4
-  public teleportGraphics?: Graphics
 
   constructor (options: IAirVehicleOptions) {
-    super()
-    this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
-    this.game = options.game
-    this.team = options.team
-    this.order = options.order ?? { type: 'float' }
-    this.setup(options)
+    super(options)
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
     }
-    if (typeof options.selectable === 'boolean') {
-      this.selectable = options.selectable
-    }
+    this.setup(options)
   }
 
-  setup ({
-    textures: {
-      body,
-      shadow
-    },
-    teleport
-  }: IAirVehicleOptions): void {
+  override setup (options: IAirVehicleOptions): void {
     this.addChild(this.selectedGraphics)
     this.addChild(this.bodySpritesContainer)
     this.addChild(this.shadowSpritesContainer)
     this.addChild(this.collisionGraphics)
+    const {
+      textures: {
+        body,
+        shadow
+      },
+      teleport
+    } = options
     if (teleport === true) {
       this.teleportGraphics = new Graphics()
       this.addChild(this.teleportGraphics)
@@ -249,72 +181,6 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     this.addChild(this.lifeBar)
   }
 
-  setSelected (selected: boolean): void {
-    this.selectedGraphics.alpha = selected ? 0.5 : 0
-    this.selected = selected
-  }
-
-  getCollisionPosition ({ center = false, air = true } = {}): { x: number, y: number } {
-    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
-    const ret = {
-      x: this.x + colX,
-      y: this.y + colY
-    }
-    if (center) {
-      ret.x += (colWidth) / 2
-      ret.y += (colHeight) / 2
-    }
-    if (!air) {
-      const { offset } = this.drawShadowOptions
-      ret.y += offset.y
-    }
-    return ret
-  }
-
-  getCollisionBounds ({ air }: { air?: boolean } = {}): { top: number, right: number, bottom: number, left: number } {
-    const collisionPosition = this.getCollisionPosition({ air })
-    return {
-      top: collisionPosition.y,
-      right: collisionPosition.x + this.collisionGraphics.width,
-      bottom: collisionPosition.y + this.collisionGraphics.height,
-      left: collisionPosition.x
-    }
-  }
-
-  getGridCollisionBounds (): { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number } {
-    const bounds = this.getCollisionBounds()
-    const { gridSize } = this.game.tileMap
-    return {
-      topGridY: Math.ceil(bounds.top / gridSize),
-      rightGridX: Math.floor(bounds.right / gridSize),
-      bottomGridY: Math.floor(bounds.bottom / gridSize),
-      leftGridX: Math.ceil(bounds.left / gridSize)
-    }
-  }
-
-  getGridXY ({ floor = false, center = false, air = true } = {}): { gridX: number, gridY: number } {
-    const { gridSize } = this.game.tileMap
-    const collisionPosition = this.getCollisionPosition({ center, air })
-    const ret = { gridX: collisionPosition.x / gridSize, gridY: collisionPosition.y / gridSize }
-    if (floor) {
-      ret.gridX = Math.floor(ret.gridX)
-      ret.gridY = Math.floor(ret.gridY)
-    }
-    return ret
-  }
-
-  setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
-    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
-    const diffX = 0 - (colX + (center ? colWidth / 2 : 0))
-    const diffY = 0 - (colY + (center ? colHeight / 2 : 0))
-    this.position.set(x + diffX, y + diffY)
-  }
-
-  setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
-    const { gridSize } = this.game.tileMap
-    this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
-  }
-
   hideAllBodyAnimations (): void {
     this.bodySpritesContainer.children.forEach(spr => {
       spr.visible = false
@@ -373,70 +239,6 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     this.currentShadowAnimation.gotoAndPlay(0)
     this.currentBodyAnimation.visible = true
     this.currentShadowAnimation.visible = true
-  }
-
-  drawCollision (): void {
-    const { offset, width, height } = this.collisionOptions
-    const { collisionGraphics } = this
-    collisionGraphics.position.set(offset.x, offset.y)
-    collisionGraphics.beginFill(0xffffff)
-    collisionGraphics.drawRect(0, 0, width, height)
-    collisionGraphics.endFill()
-    collisionGraphics.alpha = logItemBounds.enabled ? 0.5 : 0
-  }
-
-  drawSelection (): void {
-    const { offset, strokeWidth, strokeColor, strokeSecondColor, radius } = this.drawSelectionOptions
-    const { selectedGraphics } = this
-    selectedGraphics.position.set(offset.x, offset.y)
-    const segmentsCount = 8
-    const segment = Math.PI * 2 / segmentsCount
-    const cx = radius + strokeWidth
-    const cy = radius + strokeWidth
-    for (let i = 0; i < segmentsCount; i++) {
-      selectedGraphics.beginFill(i % 2 === 0 ? strokeColor : strokeSecondColor)
-      const angleStart = segment * i
-      const angleEnd = segment * (i + 1)
-      const radiusStroke = radius + strokeWidth
-      selectedGraphics.moveTo(cx + radius * Math.cos(angleStart), cy + radius * Math.sin(angleStart))
-      selectedGraphics.lineTo(cx + radiusStroke * Math.cos(angleStart), cy + radiusStroke * Math.sin(angleStart))
-      selectedGraphics.arc(cx, cy, radiusStroke, angleStart, angleEnd)
-      selectedGraphics.lineTo(cx + radius * Math.cos(angleEnd), cy + radius * Math.sin(angleEnd))
-      selectedGraphics.arc(cx, cy, radius, angleEnd, angleStart, true)
-      selectedGraphics.endFill()
-    }
-    selectedGraphics.alpha = 0
-  }
-
-  drawLifeBar (): void {
-    this.lifeBar.draw(this.drawLifeBarOptions)
-    const { offset } = this.drawLifeBarOptions
-    this.lifeBar.position.set(offset.x, offset.y)
-  }
-
-  updateLife (): void {
-    this.lifeBar.updateLife(this.life / this.hitPoints)
-  }
-
-  isAlive (): boolean {
-    return this.life > 0
-  }
-
-  isHealthy (): boolean {
-    return this.life >= this.hitPoints * 0.4
-  }
-
-  isDead (): boolean {
-    return !this.isAlive()
-  }
-
-  subLife (damage: number): void {
-    this.life -= damage
-    if (this.life <= 0) {
-      this.removeAndDestroy()
-    } else {
-      this.updateLife()
-    }
   }
 
   processOrders (): boolean {
@@ -499,18 +301,10 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
   }
 
   handleUpdate (deltaMS: number): void {
+    super.handleUpdate(deltaMS)
     this.processOrders()
     this.updateAnimation()
     this.zIndex = this.y + this.height
-    if (this.teleportGraphics != null) {
-      if (this.teleportGraphics.alpha > 0) {
-        this.teleportGraphics.alpha -= 0.01
-      } else {
-        this.teleportGraphics.alpha = 0
-        this.teleportGraphics.removeFromParent()
-        this.teleportGraphics = undefined
-      }
-    }
   }
 
   checkCollisionObjects (distanceFromDestination: number): Array<{
@@ -649,28 +443,6 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     })
 
     return true
-  }
-
-  removeAndDestroy (): void {
-    const isItemSelected = this.game.isItemSelected(this)
-    this.game.deselectItem(this)
-    this.removeFromParent()
-    if (isItemSelected) {
-      this.game.sideBar.handleSelectedItems(this.game.selectedItems)
-    }
-  }
-
-  drawTeleport (): void {
-    const { offset, strokeWidth, radius } = this.drawSelectionOptions
-    const { teleportGraphics } = this
-    if (teleportGraphics != null) {
-      teleportGraphics.position.set(offset.x, offset.y)
-      const cx = radius + strokeWidth
-      const cy = radius + strokeWidth
-      teleportGraphics.beginFill(0xffffff)
-      teleportGraphics.drawCircle(cx, cy, radius + strokeWidth)
-      teleportGraphics.endFill()
-    }
   }
 
   setupShadow (): void {

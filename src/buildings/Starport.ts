@@ -117,6 +117,9 @@ export class Starport extends Building {
       ...options,
       textures: Starport.textures(options.team)
     })
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
+    }
     this.buildableGrid = Starport.buildableGrid
     this.passableGrid = Starport.passableGrid
     this.life = options.life ?? this.hitPoints

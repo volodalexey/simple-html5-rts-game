@@ -1,7 +1,10 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../common'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
-import { EItemName } from '../interfaces/IItem'
+import { EItemName, type UnitName } from '../interfaces/IItem'
+import { ECommandName } from '../Command'
+import { type IOrder } from '../interfaces/IOrder'
+import { EMessageCharacter } from '../StatusBar'
 
 export type IBaseOptions = Pick<
 IBuildingOptions,
@@ -12,8 +15,15 @@ export interface IBaseTextures extends IBuildingTextures {
   constructingTextures: Texture[]
 }
 
+export enum BaseAnimation {
+  constructing = 'constructing',
+  healthy = 'healthy',
+  damaged = 'damaged',
+}
+
 export class Base extends Building {
   public itemName = EItemName.Base
+  public commands = [ECommandName.constructSCV, ECommandName.constructHarvester]
   static blueTextures: IBaseTextures
   static greenTextures: IBaseTextures
   static textures (team: Team): IBaseTextures {
@@ -83,12 +93,24 @@ export class Base extends Building {
     [1, 1]
   ]
 
+  public constructUnit?: {
+    initGridX: number
+    initGridY: number
+    name: UnitName
+    team: Team
+    initCenter?: boolean
+    order?: IOrder
+    teleport?: boolean
+  }
+
   constructor (options: IBaseOptions) {
     super({
       ...options,
       textures: Base.textures(options.team)
     })
-    this.setupChild()
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
+    }
     this.life = options.life ?? this.hitPoints
     this.drawSelectionOptions.strokeColor = options.team === Team.blue ? 0x0000ff : 0x00ff00
     this.drawSelection()
@@ -101,10 +123,127 @@ export class Base extends Building {
     this.updateAnimation()
   }
 
-  setupChild (): void {
-    const { constructingTextures } = Base.textures(this.team)
+  override setup (options: IBaseOptions): void {
+    const textures = Base.textures(options.team)
+    super.setup({
+      ...options,
+      textures
+    })
+    const { constructingTextures } = textures
     const constructingAnimation = new AnimatedSprite(constructingTextures)
     this.spritesContainer.addChild(constructingAnimation)
     this.constructingAnimation = constructingAnimation
+  }
+
+  override switchAnimation <T>(animationName: T): void {
+    let newAnimation
+    switch (animationName) {
+      case BaseAnimation.constructing:
+        newAnimation = this.constructingAnimation
+        break
+      case BaseAnimation.healthy:
+        newAnimation = this.healthyAnimation
+        break
+      case BaseAnimation.damaged:
+        newAnimation = this.damagedAnimation
+        break
+    }
+    if (newAnimation === this.currentAnimation || newAnimation == null) {
+      return
+    }
+    this.currentAnimation = newAnimation
+    this.hideAllAnimations()
+    this.currentAnimation.gotoAndPlay(0)
+    this.currentAnimation.visible = true
+  }
+
+  isConstructing (): boolean {
+    return this.currentAnimation === this.constructingAnimation
+  }
+
+  override updateAnimation (): void {
+    if (this.isHealthy()) {
+      if (this.isConstructing()) {
+        if (this.constructingAnimation.currentFrame === this.constructingAnimation.totalFrames - 1) {
+          this.switchAnimation(BaseAnimation.healthy)
+          if (this.constructUnit != null) {
+            const item = this.game.createItem(this.constructUnit)
+            if (item != null) {
+              this.game.tileMap.addItem(item)
+            }
+          }
+        }
+      } else {
+        this.switchAnimation(BaseAnimation.healthy)
+      }
+    } else if (this.isAlive()) {
+      this.switchAnimation(BaseAnimation.damaged)
+    }
+  }
+
+  override processOrders (): boolean {
+    switch (this.order.type) {
+      case 'construct-unit': {
+        // damaged building cannot construct
+        if (!this.isHealthy()) {
+          return false
+        }
+        // First make sure there is some space near base
+        const { tileMap, team: gameTeam, cash } = this.game
+        tileMap.rebuildBuildableGrid()
+        const { currentMapBuildableGrid, mapGridWidth, mapGridHeight } = tileMap
+        const { buildableGrid } = this
+        const availablePlaces: Array<{ gridX: number, gridY: number }> = []
+        const thisGrid = this.getGridXY()
+        for (const gridY of [thisGrid.gridY - 1, thisGrid.gridY + buildableGrid.length]) {
+          for (const gridX of [thisGrid.gridX - 1, thisGrid.gridX + buildableGrid[0].length]) {
+            if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
+              continue
+            } else if (currentMapBuildableGrid[gridY][gridX] === 0) {
+              availablePlaces.push({ gridX, gridY })
+            }
+          }
+        }
+        if (availablePlaces.length <= 0) {
+          this.game.showMessage({
+            character: EMessageCharacter.system,
+            message: 'Warning! Cannot teleport unit while landing bay is occupied.'
+          })
+          this.order = { type: 'stand' }
+          return true
+        }
+
+        const cost = this.game.getItemCost(this.order.name)
+        if (typeof cost === 'number') {
+          if (cash[this.team] < cost) {
+            if (this.team === gameTeam) {
+              this.game.showMessage({
+                character: EMessageCharacter.system,
+                message: `Warning! Insufficient Funds. Need ${cost} credits.`
+              })
+            }
+          } else {
+            // Position new unit above center of starport
+            const availablePlace = availablePlaces[Math.floor(Math.random() * availablePlaces.length)]
+            // Teleport in unit and subtract the cost from player cash
+            cash[this.team] -= cost
+            this.constructUnit = {
+              initGridX: availablePlace.gridX + 0.5,
+              initGridY: availablePlace.gridY + 0.5,
+              initCenter: true,
+              team: this.team,
+              name: this.order.name,
+              order: this.order.unitOrder,
+              teleport: true
+            }
+            this.switchAnimation(BaseAnimation.constructing)
+          }
+        } else {
+          console.warn(`Unable to calc item (name=${this.order.name}) cost`)
+        }
+        this.order = { type: 'stand' }
+      }
+    }
+    return false
   }
 }
