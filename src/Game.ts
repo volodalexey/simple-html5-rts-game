@@ -154,7 +154,7 @@ export class Game extends Container {
       if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < Game.options.doubleTapMaxTime) {
         if (Math.abs(e.globalX - previousPointerTapEvent.globalX) < 10 && Math.abs(e.globalY - previousPointerTapEvent.globalY) < 10) {
           logPointerEvent('Game pointerdoubletap')
-          this.clearSelection(true)
+          this.clearSelection()
           const { activeItems } = this.tileMap
           for (let i = 0; i < activeItems.children.length; i++) {
             const item = activeItems.children[i]

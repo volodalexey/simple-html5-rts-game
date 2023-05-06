@@ -2,6 +2,7 @@ import { Container, Graphics } from 'pixi.js'
 import { type Game } from './Game'
 import { CommandsBar } from './CommandsBar'
 import { type SelectableItem } from './common'
+import { logSideBar } from './logger'
 
 interface ISideBarOptions {
   game: Game
@@ -89,6 +90,7 @@ export class SideBar extends Container {
   }
 
   handleSelectedItems (selectedItems: SelectableItem[]): void {
+    logSideBar(`handleSelectedItems (${selectedItems.length}) opened=${this.opened} toOpen=${this.toOpen} toClose=${this.toClose}`)
     if (selectedItems.length > 0) {
       const commandsChanged = this.commandsBar.prepareCommands(selectedItems)
       if ((!this.opened && !this.toOpen) || commandsChanged) {
@@ -102,6 +104,7 @@ export class SideBar extends Container {
   }
 
   open (): void {
+    logSideBar('open()')
     const { initWidth } = SideBar.options
     this.toOpen = true
     this.toClose = false
@@ -109,6 +112,7 @@ export class SideBar extends Container {
   }
 
   close (): void {
+    logSideBar('close()')
     this.toOpen = false
     this.toClose = true
     this.content.position.set(0, 0)

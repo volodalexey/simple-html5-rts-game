@@ -79,6 +79,9 @@ export class CommandsBar extends Container {
     let hasAttackGuard = false
     let hasPatrol = false;
     (selectedItems as BaseActiveItem[]).forEach((selectedItem: BaseActiveItem) => {
+      if (selectedItem.team !== this.game.team) {
+        return
+      }
       if (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles) {
         hasMoveable = true
       } else if (selectedItem.type === EItemType.buildings) {
@@ -109,8 +112,7 @@ export class CommandsBar extends Container {
         commandNames.push(ECommandName.attackGuard)
       }
     }
-
-    return true
+    return this.drawCommands(commandNames)
   }
 
   clearCommandTiles (): void {
