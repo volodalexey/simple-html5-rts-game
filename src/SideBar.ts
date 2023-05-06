@@ -14,6 +14,7 @@ export class SideBar extends Container {
   public toOpen = false
   public toClose = false
   public opened = false
+  public closed = true
   public content!: Container
   public commandsBar!: CommandsBar
   public contentMask!: Graphics
@@ -74,6 +75,7 @@ export class SideBar extends Container {
         this.content.position.x = 0
         this.toOpen = false
         this.opened = true
+        this.closed = false
       } else {
         this.content.position.x += (0 - this.content.position.x) * 0.1
       }
@@ -83,6 +85,7 @@ export class SideBar extends Container {
         this.content.position.x = -initWidth
         this.toClose = false
         this.opened = false
+        this.closed = true
       } else {
         this.content.position.x -= (initWidth - this.content.position.x) * 0.1
       }
@@ -97,7 +100,7 @@ export class SideBar extends Container {
         this.open()
       }
     } else {
-      if (this.opened || !this.toClose) {
+      if (!this.closed || (this.opened && !this.toClose)) {
         this.close()
       }
     }

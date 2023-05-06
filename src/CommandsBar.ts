@@ -123,7 +123,9 @@ export class CommandsBar extends Container {
 
   deselectButtons (exceptCommandName?: ECommandName): void {
     this.commandTiles.children.forEach(commandTile => {
-      if (commandTile.commandName !== exceptCommandName) {
+      if (commandTile.commandName === exceptCommandName) {
+        commandTile.setSelected(true)
+      } else {
         commandTile.setSelected(false)
       }
     })
