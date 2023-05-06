@@ -95,18 +95,18 @@ export class Harvester extends Vehicle {
     if (super.processOrders()) {
       return true
     }
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'deploy': {
         const { tileMap, turnSpeedAdjustmentFactor } = this.game
         tileMap.rebuildBuildableGrid(this)
         const { currentMapBuildableGrid } = tileMap
         const { buildableGrid } = OilDerrick
-        const { toPoint } = this.orders
+        const { toPoint } = this.order
         for (let y = buildableGrid.length - 1; y >= 0; y--) {
           for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
             if (currentMapBuildableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
               // If oilfield has been used already, then cancel order
-              this.orders = { type: 'stand' }
+              this.order = { type: 'stand' }
               return true
             }
           }
@@ -143,11 +143,11 @@ export class Harvester extends Vehicle {
           }
         } else {
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
-          const moving = this._moveTo({ type: EItemType.terrain, ...this.orders.toPoint }, distanceFromDestination)
+          const moving = this._moveTo({ type: EItemType.terrain, ...this.order.toPoint }, distanceFromDestination)
 
           // Pathfinding couldn't find a path so stop
           if (!moving) {
-            this.orders = { type: 'stand' }
+            this.order = { type: 'stand' }
           }
         }
         break

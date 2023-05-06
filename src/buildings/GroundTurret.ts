@@ -97,7 +97,7 @@ export class GroundTurret extends AttackableBuilding {
   public canAttackAir = false
   public turnSpeed = 4
   public projectile: ProjectileName = EItemName.CannonBall
-  public orders: IOrder = { type: 'sentry' }
+  public order: IOrder = { type: 'sentry' }
 
   static buildableGrid = [
     [1]

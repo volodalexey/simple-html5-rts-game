@@ -18,9 +18,9 @@ export class Order extends Graphics {
 
   getLineColor (type: IOrder['type']): number {
     switch (type) {
-      case 'move':
+      case 'move': case 'follow':
         return 0x00ff00
-      case 'attack':
+      case 'attack': case 'move-and-attack':
         return 0xff0000
       case 'patrol':
         return 0xffff00
@@ -35,7 +35,7 @@ export class Order extends Graphics {
 
   getDestinationColor (type: IOrder['type']): number {
     switch (type) {
-      case 'move':
+      case 'move': case 'move-and-attack': case 'follow':
         return 0x00ff00
       case 'attack':
         return 0xff0000
@@ -61,7 +61,7 @@ export class Order extends Graphics {
 
   getDestinationRadius (type: IOrder['type']): number {
     switch (type) {
-      case 'attack': case 'guard':
+      case 'attack': case 'guard': case 'follow':
         return 15
       default:
         return 3
@@ -72,15 +72,15 @@ export class Order extends Graphics {
     const selectedItemPosition = selectedItem.getCollisionPosition({ center: true })
     let from: { x: number, y: number } | undefined
     let to: { x: number, y: number } | undefined
-    switch (selectedItem.orders.type) {
-      case 'move': {
+    switch (selectedItem.order.type) {
+      case 'move': case 'move-and-attack': {
         from = selectedItemPosition
-        to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
+        to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
         break
       }
-      case 'attack': case 'guard': {
-        const toTarget = selectedItem.orders.toUid != null ? tileMap.getItemByUid(selectedItem.orders.toUid) : selectedItem.orders.to
-        if (toTarget != null) {
+      case 'attack': case 'follow': case 'guard': {
+        const toTarget = selectedItem.order.to
+        if (toTarget?.isAlive()) {
           const toGrid = toTarget.getCollisionPosition({ center: true })
           from = selectedItemPosition
           to = toGrid
@@ -88,13 +88,13 @@ export class Order extends Graphics {
         break
       }
       case 'patrol': {
-        from = { x: selectedItem.orders.fromPoint.gridX * tileMap.gridSize, y: selectedItem.orders.fromPoint.gridY * tileMap.gridSize }
-        to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
+        from = { x: selectedItem.order.fromPoint.gridX * tileMap.gridSize, y: selectedItem.order.fromPoint.gridY * tileMap.gridSize }
+        to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
         break
       }
       case 'deploy': {
         from = selectedItemPosition
-        to = { x: selectedItem.orders.toPoint.gridX * tileMap.gridSize, y: selectedItem.orders.toPoint.gridY * tileMap.gridSize }
+        to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
         break
       }
     }
@@ -103,7 +103,7 @@ export class Order extends Graphics {
       this.clear()
       return
     }
-    const { type } = selectedItem.orders
+    const { type } = selectedItem.order
 
     const { dash, gap, lineWidth } = Order.options
     this.clear()

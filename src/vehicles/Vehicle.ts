@@ -11,7 +11,7 @@ import { type IPointGridData, type IOrder } from '../interfaces/IOrder'
 import { LifeBar } from '../LifeBar'
 import { logItemBounds } from '../logger'
 import { type ITurnable } from '../interfaces/ITurnable'
-import { type ECommandName } from '../Command'
+import { ECommandName } from '../Command'
 
 export interface IVehicleTextures {
   upTextures: Texture[]
@@ -34,8 +34,8 @@ export interface IVehicleOptions {
   direction?: EVectorDirection
   life?: number
   selectable?: boolean
-  ordersable?: boolean
-  orders?: IOrder
+  commands?: ECommandName[]
+  order?: IOrder
   teleport?: boolean
 }
 
@@ -51,7 +51,7 @@ interface IPathPoint {
 }
 
 export class Vehicle extends Container implements IItem, ISelectable, ILifeable, IMoveable, ITurnable {
-  public commands: ECommandName[] = []
+  public commands = [ECommandName.moveFollow, ECommandName.patrol]
   public collisionGraphics = new Graphics()
   public collisionOptions = {
     width: 0,
@@ -97,7 +97,6 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public uid: number
   public type = EItemType.vehicles
   public itemName = EItemName.None
-  public ordersable = true
   public hitPoints = 0
   public life = 0
   public team: Team
@@ -118,9 +117,10 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
-  public orders: IOrder
+  public order: IOrder
   public sight = 0
   public radius = 0
+  public followRadius = 3
   public teleportGraphics?: Graphics
 
   constructor (options: IVehicleOptions) {
@@ -128,7 +128,7 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.team = options.team
-    this.orders = options.orders ?? { type: 'stand' }
+    this.order = options.order ?? { type: 'stand' }
     this.setup(options)
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
@@ -136,8 +136,8 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
     }
-    if (typeof options.ordersable === 'boolean') {
-      this.ordersable = options.ordersable
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
     }
   }
 
@@ -368,18 +368,18 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   processOrders (): boolean {
     const { tileMap } = this.game
     const thisGrid = this.getGridXY({ center: true })
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'move': {
         this.collisionCount = 0
         // Move towards destination until distance from destination is less than vehicle radius
-        const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
+        const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
           // Stop when within one radius of the destination
-          this.orders = { type: 'stand' }
+          this.order = { type: 'stand' }
           return true
         } else if (this.colliding && distanceFromDestinationSquared < Math.pow(this.radius * 3 / tileMap.gridSize, 2)) {
           // Stop when within 3 radius of the destination if colliding with something
-          this.orders = { type: 'stand' }
+          this.order = { type: 'stand' }
           return true
         } else {
           if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
@@ -391,38 +391,39 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
             }
             // Stop if more than 30 collisions occur
             if (this.collisionCount > 30) {
-              this.orders = { type: 'stand' }
+              this.order = { type: 'stand' }
               return true
             }
           }
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
-          const moving = this._moveTo(this.orders.toPoint, distanceFromDestination)
+          const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
           // Pathfinding couldn't find a path so stop
           if (!moving) {
-            this.orders = { type: 'stand' }
+            this.order = { type: 'stand' }
             return true
           }
         }
         return true
       }
       case 'follow': {
-        if (this.orders.to.isDead()) {
-          if (this.orders.nextOrder != null) {
-            this.orders = this.orders.nextOrder
+        if (this.order.to.isDead()) {
+          if (this.order.nextOrder != null) {
+            this.order = this.order.nextOrder
           } else {
-            this.orders = { type: 'stand' }
+            this.order = { type: 'stand' }
           }
           return true
         }
-        const toGrid = this.orders.to.getGridXY({ center: true })
+        const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
-        if (distanceFromDestinationSquared < Math.pow(this.sight - 1, 2)) {
+        if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
           // do nothing
         } else {
-          const toGrid = this.orders.to.getGridXY({ center: true })
-          this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
+          const toGrid = this.order.to.getGridXY({ center: true })
+          this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
         }
+        return true
       }
     }
     return false
@@ -633,8 +634,12 @@ export class Vehicle extends Container implements IItem, ISelectable, ILifeable,
   }
 
   removeAndDestroy (): void {
+    const isItemSelected = this.game.isItemSelected(this)
     this.game.deselectItem(this)
     this.removeFromParent()
+    if (isItemSelected) {
+      this.game.sideBar.handleSelectedItems(this.game.selectedItems)
+    }
   }
 
   drawTeleport (): void {

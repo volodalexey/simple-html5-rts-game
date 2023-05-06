@@ -8,11 +8,12 @@ import { ScoutTank } from './vehicles/ScoutTank'
 import { EMessageCharacter } from './StatusBar'
 import { type IOrder } from './interfaces/IOrder'
 import { type Trigger, type ITrigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger } from './Trigger'
-import { EItemName } from './interfaces/IItem'
+import { EItemName, type EItemNames } from './interfaces/IItem'
 import { Chopper } from './air-vehicles/Chopper'
+import { type ECommandName } from './Command'
 
 interface IMissionItem {
-  name: EItemName
+  name: EItemNames
   initGridX: number
   initGridY: number
   initCenter?: boolean
@@ -21,8 +22,8 @@ interface IMissionItem {
   uid?: number
   life?: number
   selectable?: boolean
-  ordersable?: boolean
-  orders?: IOrder
+  commands?: ECommandName[]
+  order?: IOrder
 }
 
 interface IMission {
@@ -166,18 +167,15 @@ export class CampaignScene extends Container implements IScene {
         },
         items: [
           /* Slightly damaged base */
-          { name: EItemName.Base, initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
-
+          { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, life: 100 },
           /* Player heavy tank */
-          { name: EItemName.HeavyTank, initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
-
+          { name: 'heavy-tank', initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
           /* Two transport vehicles waiting just outside the visible map */
-          { name: EItemName.Transport, initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, ordersable: false },
-          { name: EItemName.Transport, initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, ordersable: false },
-
+          { name: 'transport', initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, commands: [] },
+          { name: 'transport', initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, commands: [] },
           /* Two damaged enemy scout-tanks patroling the area */
-          { name: EItemName.ScoutTank, initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, orders: { type: 'patrol', fromPoint: { gridX: 34, gridY: 20 }, toPoint: { gridX: 42, gridY: 26 } } },
-          { name: EItemName.ScoutTank, initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 21, orders: { type: 'patrol', fromPoint: { gridX: 14, gridY: 0 }, toPoint: { gridX: 14, gridY: 14 } } }
+          { name: 'scout-tank', initGridX: 40, initGridY: 20, direction: EVectorDirection.up, team: Team.green, uid: -2, life: 21, order: { type: 'patrol', fromPoint: { gridX: 34, gridY: 20 }, toPoint: { gridX: 42, gridY: 26 } } },
+          { name: 'scout-tank', initGridX: 14, initGridY: 0, direction: EVectorDirection.down, team: Team.green, uid: -5, life: 21, order: { type: 'patrol', fromPoint: { gridX: 14, gridY: 0 }, toPoint: { gridX: 14, gridY: 14 } } }
         ],
         triggers: [
           {
@@ -256,7 +254,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.driver,
                   message: 'Thank you. We thought we would never get out of here alive.'
                 })
-                this.game.processCommand([-3, -4], { type: 'follow', to: hero })
+                this.game.processCommand({ uids: [-3, -4], order: { type: 'follow', to: hero } })
               }
             }
           },
@@ -290,26 +288,26 @@ export class CampaignScene extends Container implements IScene {
           green: 0
         },
         items: [
-          { name: EItemName.Base, initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
-          { name: EItemName.GroundTurret, initGridX: 53, initGridY: 17, direction: EVectorDirection.up, team: Team.blue },
-          { name: EItemName.HeavyTank, initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, orders: { type: 'sentry' } },
+          { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
+          { name: 'ground-turret', initGridX: 53, initGridY: 17, direction: EVectorDirection.up, team: Team.blue },
+          { name: 'heavy-tank', initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, order: { type: 'sentry' } },
           /* The first wave of attacks */
-          { name: EItemName.ScoutTank, initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
-          { name: EItemName.ScoutTank, initGridX: 53, initGridY: 36, direction: EVectorDirection.down, team: Team.green, orders: { type: 'hunt' } },
+          { name: 'scout-tank', initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, order: { type: 'hunt' } },
+          { name: 'scout-tank', initGridX: 53, initGridY: 36, direction: EVectorDirection.down, team: Team.green, order: { type: 'hunt' } },
           /* Enemies patrolling the area */
-          { name: EItemName.ScoutTank, initGridX: 5, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 5, gridY: 5 }, toPoint: { gridX: 20, gridY: 20 } } },
-          { name: EItemName.ScoutTank, initGridX: 5, initGridY: 15, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 5, gridY: 15 }, toPoint: { gridX: 20, gridY: 30 } } },
-          { name: EItemName.ScoutTank, initGridX: 25, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 25, gridY: 5 }, toPoint: { gridX: 25, gridY: 20 } } },
-          { name: EItemName.ScoutTank, initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, orders: { type: 'patrol', fromPoint: { gridX: 35, gridY: 5 }, toPoint: { gridX: 35, gridY: 30 } } },
+          { name: 'scout-tank', initGridX: 5, initGridY: 5, direction: EVectorDirection.down, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 5, gridY: 5 }, toPoint: { gridX: 20, gridY: 20 } } },
+          { name: 'scout-tank', initGridX: 5, initGridY: 15, direction: EVectorDirection.down, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 5, gridY: 15 }, toPoint: { gridX: 20, gridY: 30 } } },
+          { name: 'scout-tank', initGridX: 25, initGridY: 5, direction: EVectorDirection.down, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 25, gridY: 5 }, toPoint: { gridX: 25, gridY: 20 } } },
+          { name: 'scout-tank', initGridX: 35, initGridY: 5, direction: EVectorDirection.down, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 35, gridY: 5 }, toPoint: { gridX: 35, gridY: 30 } } },
           /* The Enemy Rebel Base */
-          { name: EItemName.Base, initGridX: 5, initGridY: 36, team: Team.green, uid: -11 },
-          { name: EItemName.Starport, initGridX: 1, initGridY: 30, team: Team.green, uid: -12 },
-          { name: EItemName.Starport, initGridX: 4, initGridY: 32, team: Team.green, uid: -13 },
-          { name: EItemName.Harvester, initGridX: 1, initGridY: 38, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 16, gridY: 7 } } },
-          { name: EItemName.Harvester, initGridX: 10, initGridY: 38, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 20, gridY: 7 } } },
-          { name: EItemName.GroundTurret, initGridX: 5, initGridY: 28, team: Team.green },
-          { name: EItemName.GroundTurret, initGridX: 7, initGridY: 33, team: Team.green },
-          { name: EItemName.GroundTurret, initGridX: 8, initGridY: 37, team: Team.green }
+          { name: 'base', initGridX: 5, initGridY: 36, team: Team.green, uid: -11 },
+          { name: 'starport', initGridX: 1, initGridY: 30, team: Team.green, uid: -12 },
+          { name: 'starport', initGridX: 4, initGridY: 32, team: Team.green, uid: -13 },
+          { name: 'harvester', initGridX: 1, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 16, gridY: 7 } } },
+          { name: 'harvester', initGridX: 10, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 20, gridY: 7 } } },
+          { name: 'ground-turret', initGridX: 5, initGridY: 28, team: Team.green },
+          { name: 'ground-turret', initGridX: 7, initGridY: 33, team: Team.green },
+          { name: 'ground-turret', initGridX: 8, initGridY: 37, team: Team.green }
         ],
         triggers: [
           {
@@ -325,10 +323,10 @@ export class CampaignScene extends Container implements IScene {
                   message: 'Commander!! Reinforcements have arrived from the colony.'
                 })
                 tileMap.addItem(new ScoutTank({
-                  game: this.game, initX: tileMap.gridSize * 58, initY: tileMap.gridSize * 22, team: Team.blue, orders: { type: 'guard', to: hero }
+                  game: this.game, initX: tileMap.gridSize * 58, initY: tileMap.gridSize * 22, team: Team.blue, order: { type: 'guard', to: hero }
                 }))
                 tileMap.addItem(new ScoutTank({
-                  game: this.game, initX: tileMap.gridSize * 60, initY: tileMap.gridSize * 21, team: Team.blue, orders: { type: 'guard', to: hero }
+                  game: this.game, initX: tileMap.gridSize * 60, initY: tileMap.gridSize * 21, team: Team.blue, order: { type: 'guard', to: hero }
                 }))
               }
             }
@@ -351,8 +349,8 @@ export class CampaignScene extends Container implements IScene {
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
               if (this.game.cash[Team.green] > 1000 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
-                this.game.processCommand([-12], { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } })
-                this.game.processCommand([-13], { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } })
+                this.game.processCommand({ uids: [-12], order: { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } } })
+                this.game.processCommand({ uids: [-13], order: { type: 'construct-unit', name: EItemName.ScoutTank, orders: { type: 'hunt' } } })
               }
             }
           },
@@ -368,10 +366,10 @@ export class CampaignScene extends Container implements IScene {
                 })
                 const { tileMap } = this.game
                 tileMap.addItem(new ScoutTank({
-                  game: this.game, initX: tileMap.gridSize * 62, initY: tileMap.gridSize * 22, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 55, gridY: 21 } }
+                  game: this.game, initX: tileMap.gridSize * 62, initY: tileMap.gridSize * 22, team: Team.blue, order: { type: 'move-and-attack', toPoint: { gridX: 55, gridY: 21 } }
                 }))
                 tileMap.addItem(new HeavyTank({
-                  game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 23, team: Team.blue, orders: { type: 'move', toPoint: { gridX: 56, gridY: 23 } }
+                  game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 23, team: Team.blue, order: { type: 'move-and-attack', toPoint: { gridX: 56, gridY: 23 } }
                 }))
               }
             }
@@ -387,7 +385,7 @@ export class CampaignScene extends Container implements IScene {
               })
               const { tileMap } = this.game
               tileMap.addItem(new Chopper({
-                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, ordersable: false, team: Team.blue, orders: { type: 'hunt' }
+                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, commands: [], team: Team.blue, order: { type: 'hunt' }
               }))
             }
           },
@@ -426,32 +424,32 @@ export class CampaignScene extends Container implements IScene {
         },
         items: [
           /* The Rebel Base now in our hands */
-          { name: EItemName.Base, initGridX: 5, initGridY: 36, team: Team.blue, uid: -11 },
-          { name: EItemName.Starport, initGridX: 1, initGridY: 28, team: Team.blue, uid: -12 },
-          { name: EItemName.Starport, initGridX: 4, initGridY: 32, team: Team.blue, uid: -13 },
-          { name: EItemName.Harvester, initGridX: 1.5, initGridY: 38.5, initCenter: true, team: Team.blue, orders: { type: 'deploy', toPoint: { gridX: 1.5, gridY: 38.5 } } },
-          { name: EItemName.GroundTurret, initGridX: 7, initGridY: 28, team: Team.blue },
-          { name: EItemName.GroundTurret, initGridX: 8, initGridY: 32, team: Team.blue },
-          { name: EItemName.GroundTurret, initGridX: 11, initGridY: 37, team: Team.blue },
+          { name: 'base', initGridX: 5, initGridY: 36, team: Team.blue, uid: -11 },
+          { name: 'starport', initGridX: 1, initGridY: 28, team: Team.blue, uid: -12 },
+          { name: 'starport', initGridX: 4, initGridY: 32, team: Team.blue, uid: -13 },
+          { name: 'harvester', initGridX: 1.5, initGridY: 38.5, initCenter: true, team: Team.blue, order: { type: 'deploy', toPoint: { gridX: 1.5, gridY: 38.5 } } },
+          { name: 'ground-turret', initGridX: 7, initGridY: 28, team: Team.blue },
+          { name: 'ground-turret', initGridX: 8, initGridY: 32, team: Team.blue },
+          { name: 'ground-turret', initGridX: 11, initGridY: 37, team: Team.blue },
           /* The transports that need to be protected */
-          { name: EItemName.Transport, initGridX: 2, initGridY: 33, team: Team.blue, ordersable: false, uid: -1 },
-          { name: EItemName.Transport, initGridX: 1, initGridY: 34, team: Team.blue, ordersable: false, uid: -2 },
-          { name: EItemName.Transport, initGridX: 2, initGridY: 35, team: Team.blue, ordersable: false, uid: -3 },
-          { name: EItemName.Transport, initGridX: 1, initGridY: 36, team: Team.blue, ordersable: false, uid: -4 },
+          { name: 'transport', initGridX: 2, initGridY: 33, team: Team.blue, commands: [], uid: -1 },
+          { name: 'transport', initGridX: 1, initGridY: 34, team: Team.blue, commands: [], uid: -2 },
+          { name: 'transport', initGridX: 2, initGridY: 35, team: Team.blue, commands: [], uid: -3 },
+          { name: 'transport', initGridX: 1, initGridY: 36, team: Team.blue, commands: [], uid: -4 },
           /* The chopper pilot from the last mission */
-          { name: EItemName.Chopper, initGridX: 15, initGridY: 40, team: Team.blue, ordersable: false, uid: -5, orders: { type: 'patrol', fromPoint: { gridX: 15, gridY: 40 }, toPoint: { gridX: 0, gridY: 25 } } },
+          { name: 'chopper', initGridX: 15, initGridY: 40, team: Team.blue, commands: [], uid: -5, order: { type: 'patrol', fromPoint: { gridX: 15, gridY: 40 }, toPoint: { gridX: 0, gridY: 25 } } },
           /* The first wave of attacks */
-          { name: EItemName.ScoutTank, initGridX: 15, initGridY: 16, team: Team.green, orders: { type: 'hunt' } },
-          { name: EItemName.ScoutTank, initGridX: 17, initGridY: 16, team: Team.green, orders: { type: 'hunt' } },
+          { name: 'scout-tank', initGridX: 15, initGridY: 16, team: Team.green, order: { type: 'hunt' } },
+          { name: 'scout-tank', initGridX: 17, initGridY: 16, team: Team.green, order: { type: 'hunt' } },
           /* Secret Rebel bases */
-          { name: EItemName.Starport, initGridX: 35, initGridY: 37, team: Team.green, uid: -23 },
-          { name: EItemName.Starport, initGridX: 33, initGridY: 37, team: Team.green, uid: -24 },
-          { name: EItemName.Harvester, initGridX: 28.5, initGridY: 39.5, initCenter: true, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 28, gridY: 39 } } },
-          { name: EItemName.Harvester, initGridX: 30.5, initGridY: 39.5, initCenter: true, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 30, gridY: 39 } } },
-          { name: EItemName.Starport, initGridX: 3, initGridY: 0, team: Team.green, uid: -21 },
-          { name: EItemName.Starport, initGridX: 6, initGridY: 0, team: Team.green, uid: -22 },
-          { name: EItemName.Harvester, initGridX: 0, initGridY: 2, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 0, gridY: 2 } } },
-          { name: EItemName.Harvester, initGridX: 0, initGridY: 4, team: Team.green, orders: { type: 'deploy', toPoint: { gridX: 0, gridY: 4 } } }
+          { name: 'starport', initGridX: 35, initGridY: 37, team: Team.green, uid: -23 },
+          { name: 'starport', initGridX: 33, initGridY: 37, team: Team.green, uid: -24 },
+          { name: 'harvester', initGridX: 28.5, initGridY: 39.5, initCenter: true, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 28, gridY: 39 } } },
+          { name: 'harvester', initGridX: 30.5, initGridY: 39.5, initCenter: true, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 30, gridY: 39 } } },
+          { name: 'starport', initGridX: 3, initGridY: 0, team: Team.green, uid: -21 },
+          { name: 'starport', initGridX: 6, initGridY: 0, team: Team.green, uid: -22 },
+          { name: 'harvester', initGridX: 0, initGridY: 2, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 0, gridY: 2 } } },
+          { name: 'harvester', initGridX: 0, initGridY: 4, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 0, gridY: 4 } } }
         ],
         triggers: [
           {

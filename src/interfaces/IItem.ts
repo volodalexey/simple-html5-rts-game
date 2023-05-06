@@ -28,6 +28,8 @@ export enum EItemName {
   Laser = 'laser',
 }
 
+export type EItemNames = `${EItemName}`
+
 export type UnitName = EItemName.Harvester | EItemName.Transport | EItemName.ScoutTank | EItemName.HeavyTank
 export type ProjectileName = EItemName.Bullet | EItemName.CannonBall | EItemName.Rocket | EItemName.Laser
 
@@ -36,13 +38,12 @@ export interface IItem {
   sight: number
   type: EItemType
   itemName: EItemName
-  ordersable: boolean
   commands: ECommandName[]
   getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => { gridX: number, gridY: number }
   setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
   setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
   handleUpdate: (deltaMS: number) => void
-  orders: IOrder
+  order: IOrder
   collisionGraphics: Graphics
   collisionOptions: {
     width: number

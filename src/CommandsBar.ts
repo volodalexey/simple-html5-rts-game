@@ -1,9 +1,9 @@
 import { Container, type Texture } from 'pixi.js'
-import { compareNumericArrays, type BaseActiveItem, type SelectableItem } from './common'
+import { compareArrays, type BaseActiveItem, type SelectableItem } from './common'
 import { EItemType } from './interfaces/IItem'
 import { ECommandName } from './Command'
 import { type Game } from './Game'
-import { Button } from './Button'
+import { Button, type IButtonOptions } from './Button'
 
 export interface ICommandBarOptions {
   game: Game
@@ -51,7 +51,7 @@ export class CommandsBar extends Container {
   static commandsDic: CommandsDic = {} as unknown as CommandsDic
 
   public game!: Game
-  public commands = new Container()
+  public commandTiles = new Container<CommandTile>()
   public commandNames: ECommandName[] = []
   constructor (options: ICommandBarOptions) {
     super()
@@ -61,13 +61,17 @@ export class CommandsBar extends Container {
   }
 
   setup (): void {
-    this.addChild(this.commands)
+    this.addChild(this.commandTiles)
   }
 
   prepareCommands (selectedItems: SelectableItem[]): boolean {
+    const commandNames = [ECommandName.deselect]
     if (selectedItems.length === 1) {
       const selectedItem = selectedItems[0]
-      return this.drawCommands([ECommandName.deselect, ...selectedItem.commands])
+      if (selectedItem.team === this.game.team) {
+        Array.prototype.push.apply(commandNames, selectedItem.commands)
+      }
+      return this.drawCommands(commandNames)
     }
     let hasMoveable = false
     let hasBuilding = false
@@ -90,7 +94,6 @@ export class CommandsBar extends Container {
         hasPatrol = true
       }
     })
-    const commandNames = [ECommandName.deselect]
     if (hasMoveable) {
       if (hasMoveFollow) {
         commandNames.push(ECommandName.moveFollow)
@@ -110,36 +113,57 @@ export class CommandsBar extends Container {
     return true
   }
 
-  clearCommands (): void {
-    while (this.commands.children.length > 0) {
-      this.commands.children[0].removeFromParent()
+  clearCommandTiles (): void {
+    while (this.commandTiles.children.length > 0) {
+      this.commandTiles.children[0].removeFromParent()
     }
+  }
+
+  deselectButtons (exceptCommandName?: ECommandName): void {
+    this.commandTiles.children.forEach(commandTile => {
+      if (commandTile.commandName !== exceptCommandName) {
+        commandTile.setSelected(false)
+      }
+    })
+  }
+
+  getSelectedCommandName (): ECommandName | undefined {
+    const selectedCommandTile = this.commandTiles.children.find(commandTile => commandTile.selected)
+    return (selectedCommandTile != null) ? selectedCommandTile.commandName : undefined
   }
 
   calcClickHandler = (commandName: ECommandName): (attackBtn: Button) => void => {
     switch (commandName) {
       case ECommandName.moveFollow:
-        return () => {}
+        return () => {
+          this.deselectButtons(ECommandName.moveFollow)
+        }
       case ECommandName.attackGuard:
-        return () => {}
+        return () => {
+          this.deselectButtons(ECommandName.attackGuard)
+        }
       case ECommandName.patrol:
-        return () => {}
+        return () => {
+          this.deselectButtons(ECommandName.patrol)
+        }
       case ECommandName.deselect:
         return () => {
+          this.deselectButtons()
           this.game.clearSelection(true)
         }
     }
   }
 
   drawCommands (commandNames: ECommandName[]): boolean {
-    if (compareNumericArrays(this.commandNames, commandNames)) {
+    if (compareArrays(this.commandNames, commandNames)) {
       return false
     }
-    this.clearCommands()
+    this.clearCommandTiles()
     this.commandNames = commandNames
     this.commandNames.forEach(commandName => {
       const commandDescription = CommandsBar.commandsDic[commandName]
-      const button = new Button({
+      const tile = new CommandTile({
+        commandName,
         buttonRadius: 3,
         iconPaddingTop: 6,
         iconPaddingLeft: 6,
@@ -165,9 +189,21 @@ export class CommandsBar extends Container {
         ...commandDescription,
         onClick: this.calcClickHandler(commandName)
       })
-      button.position.set(0, this.commands.height)
-      this.commands.addChild(button)
+      tile.position.set(0, this.commandTiles.height)
+      this.commandTiles.addChild(tile)
     })
     return true
+  }
+}
+
+interface ICommandTileOptions extends IButtonOptions {
+  commandName: ECommandName
+}
+
+class CommandTile extends Button {
+  public commandName!: ECommandName
+  constructor (options: ICommandTileOptions) {
+    super(options)
+    this.commandName = options.commandName
   }
 }

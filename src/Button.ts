@@ -10,28 +10,35 @@ export interface IButtonOptions {
   iconPaddingLeft?: number
   iconIdleAlpha?: number
   iconHoverAlpha?: number
+  iconSelectedAlpha?: number
   textPaddingTop?: number
   textPaddingLeft?: number
   fontSize?: number
   textColor?: number
   textColorHover?: number
+  textColorSelected?: number
   shadowTextColor?: number
   shadowThickness?: number
   buttonIdleColor?: number
   buttonIdleAlpha?: number
   buttonHoverColor?: number
+  buttonSelectedColor?: number
   buttonBorderWidth?: number
+  buttonSelectedAlpha?: number
   buttonHoverAlpha?: number
   buttonBorderColor?: number
+  buttonBorderSelectedColor?: number
   buttonBorderHoverColor?: number
   buttonBorderAlpha?: number
   buttonBorderHoverAlpha?: number
+  buttonBorderSelectedAlpha?: number
   initX?: number
   initY?: number
   iconTexture?: Texture
   iconScale?: number
   iconColor?: number
   iconColorHover?: number
+  iconColorSelected?: number
   flexDirection?: 'row' | 'col' | 'col-center'
 }
 
@@ -44,23 +51,30 @@ export class Button extends Container {
   public iconPaddingLeft !: number
   public iconIdleAlpha !: number
   public iconHoverAlpha !: number
+  public iconSelectedAlpha !: number
   public textPaddingTop !: number
   public textPaddingLeft !: number
   public buttonIdleColor !: number
   public buttonIdleAlpha !: number
   public buttonHoverColor !: number
+  public buttonSelectedColor !: number
   public buttonHoverAlpha !: number
+  public buttonSelectedAlpha !: number
   public buttonBorderWidth !: number
   public buttonBorderColor !: number
   public buttonBorderHoverColor !: number
+  public buttonBorderSelectedColor !: number
   public buttonBorderAlpha !: number
   public buttonBorderHoverAlpha !: number
+  public buttonBorderSelectedAlpha !: number
   public textColor !: number
   public textColorHover !: number
+  public textColorSelected !: number
   public shadowTextColor !: number
   public shadowThickness !: number
   public iconColor !: number
   public iconColorHover !: number
+  public iconColorSelected !: number
   public fontSize !: number
   public flexDirection !: IButtonOptions['flexDirection']
   public onClick!: IButtonOptions['onClick']
@@ -74,6 +88,7 @@ export class Button extends Container {
     this.iconPaddingLeft = options.iconPaddingLeft ?? 20
     this.iconIdleAlpha = options.iconIdleAlpha ?? 1
     this.iconHoverAlpha = options.iconHoverAlpha ?? 1
+    this.iconSelectedAlpha = options.iconSelectedAlpha ?? 1
     this.textPaddingTop = options.textPaddingTop ?? 20
     this.textPaddingLeft = options.textPaddingLeft ?? 20
     this.fontSize = options.fontSize ?? 16
@@ -83,6 +98,7 @@ export class Button extends Container {
     this.shadowThickness = options.shadowThickness ?? 0
 
     this.iconColor = options.iconColor ?? 0x000000
+    this.iconColorSelected = options.iconColorSelected ?? this.iconColor ?? 0x000000
     this.iconColorHover = options.iconColorHover ?? 0x000000
 
     this.buttonIdleColor = options.buttonIdleColor ?? 0x000000
@@ -94,10 +110,15 @@ export class Button extends Container {
     this.buttonBorderHoverColor = options.buttonBorderHoverColor ?? options.buttonIdleColor ?? 0x000000
     this.buttonBorderAlpha = options.buttonBorderAlpha ?? 1
     this.buttonBorderHoverAlpha = options.buttonBorderHoverAlpha ?? 1
+    this.buttonSelectedColor = options.buttonSelectedColor ?? options.buttonIdleColor ?? 0x000000
+    this.buttonSelectedAlpha = options.buttonSelectedAlpha ?? 1
+    this.buttonBorderSelectedColor = options.buttonBorderSelectedColor ?? this.buttonBorderColor ?? 0x000000
+    this.buttonBorderSelectedAlpha = options.buttonBorderSelectedAlpha ?? 1
+    this.textColorSelected = options.textColorSelected ?? this.textColor ?? 0x000000
     this.flexDirection = options.flexDirection ?? 'row'
     this.setup(options)
     this.draw(options)
-    this.idleColor()
+    this.selected ? this.selectedColor() : this.idleColor()
     if (typeof options.initX === 'number') {
       this.position.x = options.initX
     }
@@ -180,12 +201,12 @@ export class Button extends Container {
     })
     this.on('pointerleave', (e) => {
       if (e.pointerType === 'mouse') {
-        this.idleColor()
+        this.selected ? this.selectedColor() : this.idleColor()
       }
     })
     this.on('pointerup', (e) => {
       if (e.pointerType === 'touch') {
-        this.idleColor()
+        this.selected ? this.selectedColor() : this.idleColor()
       }
     })
   }
@@ -279,5 +300,30 @@ export class Button extends Container {
     iconAlpha?: number
   } = {}): void {
     this.color({ bgAlpha, brdAlpha, brdColor, bgColor, txtColor, iconColor, iconAlpha })
+  }
+
+  selectedColor ({
+    bgAlpha = this.buttonSelectedAlpha,
+    brdColor = this.buttonBorderSelectedColor,
+    brdAlpha = this.buttonBorderSelectedAlpha,
+    bgColor = this.buttonSelectedColor,
+    txtColor = this.textColorSelected,
+    iconColor = this.iconColorSelected,
+    iconAlpha = this.iconSelectedAlpha
+  }: {
+    brdColor?: number
+    brdAlpha?: number
+    bgAlpha?: number
+    bgColor?: number
+    txtColor?: number
+    iconColor?: number
+    iconAlpha?: number
+  } = {}): void {
+    this.color({ bgAlpha, brdAlpha, brdColor, bgColor, txtColor, iconColor, iconAlpha })
+  }
+
+  setSelected (selected: boolean): void {
+    this.selected = selected
+    this.selected ? this.selectedColor() : this.idleColor()
   }
 }

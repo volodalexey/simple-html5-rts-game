@@ -36,8 +36,8 @@ export interface IAirVehicleOptions {
   direction?: EVectorDirection
   life?: number
   selectable?: boolean
-  ordersable?: boolean
-  orders?: IOrder
+  commands?: ECommandName[]
+  order?: IOrder
   teleport?: boolean
 }
 
@@ -94,7 +94,6 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
   public uid: number
   public type = EItemType.airVehicles
   public itemName = EItemName.None
-  public ordersable = true
   public hitPoints = 0
   public life = 0
   public team: Team
@@ -139,9 +138,10 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
-  public orders: IOrder
+  public order: IOrder
   public sight = 0
   public radius = 0
+  public followRadius = 4
   public teleportGraphics?: Graphics
 
   constructor (options: IAirVehicleOptions) {
@@ -149,7 +149,7 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.team = options.team
-    this.orders = options.orders ?? { type: 'float' }
+    this.order = options.order ?? { type: 'float' }
     this.setup(options)
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
@@ -157,8 +157,8 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
     }
-    if (typeof options.ordersable === 'boolean') {
-      this.ordersable = options.ordersable
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
     }
   }
 
@@ -445,13 +445,13 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
   processOrders (): boolean {
     const { tileMap } = this.game
     const thisGrid = this.getGridXY({ center: true })
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'move': {
         this.collisionCount = 0
         // Move towards destination until distance from destination is less than aircraft radius
-        const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
+        const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
-          this.orders = { type: 'float' }
+          this.order = { type: 'float' }
           return true
         } else {
           if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
@@ -463,38 +463,39 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
             }
             // Stop if more than 30 collisions occur
             if (this.collisionCount > 30) {
-              this.orders = { type: 'float' }
+              this.order = { type: 'float' }
               return true
             }
           }
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
-          const moving = this._moveTo(this.orders.toPoint, distanceFromDestination)
+          const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
           // Pathfinding couldn't find a path so stop
           if (!moving) {
-            this.orders = { type: 'float' }
+            this.order = { type: 'float' }
             return true
           }
         }
         return true
       }
       case 'follow': {
-        if (this.orders.to.isDead()) {
-          if (this.orders.nextOrder != null) {
-            this.orders = this.orders.nextOrder
+        if (this.order.to.isDead()) {
+          if (this.order.nextOrder != null) {
+            this.order = this.order.nextOrder
           } else {
-            this.orders = { type: 'float' }
+            this.order = { type: 'float' }
           }
           return true
         }
-        const toGrid = this.orders.to.getGridXY({ center: true })
+        const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
-        if (distanceFromDestinationSquared < Math.pow(this.sight - 1, 2)) {
+        if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
           // do nothing
         } else {
-          const toGrid = this.orders.to.getGridXY({ center: true })
-          this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
+          const toGrid = this.order.to.getGridXY({ center: true })
+          this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
         }
+        return true
       }
     }
     return false
@@ -654,8 +655,12 @@ export class AirVehicle extends Container implements IItem, ISelectable, ILifeab
   }
 
   removeAndDestroy (): void {
+    const isItemSelected = this.game.isItemSelected(this)
     this.game.deselectItem(this)
     this.removeFromParent()
+    if (isItemSelected) {
+      this.game.sideBar.handleSelectedItems(this.game.selectedItems)
+    }
   }
 
   drawTeleport (): void {

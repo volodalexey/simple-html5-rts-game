@@ -204,32 +204,32 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
     if (!this.isHealthy()) {
       return false
     }
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'sentry': {
         const target = this.findTargetInSight()
         if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+          this.order = { type: 'attack', to: target, nextOrder: this.order }
         }
         break
       }
       case 'attack': {
-        if (this.orders.to == null) {
+        if (this.order.to == null) {
           return true
         }
         const thisGrid = this.getGridXY({ center: true })
-        const toGrid = this.orders.to.getGridXY({ center: true })
+        const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestination = Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)
-        if (this.orders.to.isDead() || !this.isValidTarget(this.orders.to) ||
+        if (this.order.to.isDead() || !this.isValidTarget(this.order.to) ||
           distanceFromDestination > Math.pow(this.sight, 2)
         ) {
           const target = this.findTargetInSight()
           if (target != null) {
-            this.orders.to = target
+            this.order.to = target
           } else {
-            this.orders = { type: 'sentry' }
+            this.order = { type: 'sentry' }
           }
         }
-        if (this.orders.type !== 'attack' || this.orders.to == null) {
+        if (this.order.type !== 'attack' || this.order.to == null) {
           return true
         }
         const { turnSpeedAdjustmentFactor, tileMap } = this.game
@@ -261,7 +261,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
                 initX: bulletX * tileMap.gridSize,
                 initY: bulletY * tileMap.gridSize,
                 direction: newDirection,
-                target: this.orders.to
+                target: this.order.to
               })
               if (projectile != null) {
                 tileMap.addItem(projectile)

@@ -121,7 +121,7 @@ export function generateUid (): number {
   return ++uid
 }
 
-export function compareNumericArrays<T> (arr1: T[], arr2: T[]): boolean {
+export function compareArrays<T> (arr1: T[], arr2: T[]): boolean {
   if (arr1.length !== arr2.length) {
     return false
   }

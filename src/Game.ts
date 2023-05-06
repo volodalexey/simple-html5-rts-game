@@ -9,9 +9,8 @@ import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
-import { EItemName, EItemType } from './interfaces/IItem'
-import { type IAttackable } from './interfaces/IAttackable'
-import { type IOrder } from './interfaces/IOrder'
+import { EItemName, type EItemNames, EItemType } from './interfaces/IItem'
+import { type OrderTypes, type IOrder } from './interfaces/IOrder'
 import { AUDIO } from './audio'
 import { Bullet } from './projectiles/Bullet'
 import { CannonBall } from './projectiles/CannonBall'
@@ -30,6 +29,7 @@ import { Chopper } from './air-vehicles/Chopper'
 import { Wraith } from './air-vehicles/Wraith'
 import { SideBar } from './SideBar'
 import { CommandsBar } from './CommandsBar'
+import { ECommandName } from './Command'
 
 export interface IGameOptions {
   viewWidth: number
@@ -148,8 +148,7 @@ export class Game extends Container {
     const point = this.tileMap.toLocal(e)
     const underPointerItem = this.tileMap.itemUnderPointer(point)
     const { previousPointerTapEvent } = this
-    if (previousPointerTapEvent != null && underPointerItem != null &&
-      (underPointerItem.type === EItemType.vehicles || underPointerItem.type === EItemType.airVehicles)) {
+    if (previousPointerTapEvent != null && underPointerItem != null) {
       const isPreviousMouse = previousPointerTapEvent.pointerType === 'mouse' && e.pointerType === 'mouse' && previousPointerTapEvent.pointerId === e.pointerId
       const isPreviousTouch = previousPointerTapEvent.pointerType === 'touch' && e.pointerType === 'touch' && previousPointerTapEvent.pointerId + 1 === e.pointerId
       if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < Game.options.doubleTapMaxTime) {
@@ -161,53 +160,107 @@ export class Game extends Container {
             const item = activeItems.children[i]
             if (underPointerItem.itemName === item.itemName && item.team === underPointerItem.team) {
               // select all the same items include under pointer item
-              this.selectItem(item, false)
+              this.selectItem(item)
             }
           }
+          this.sideBar.handleSelectedItems(this.selectedItems)
           return
         }
       }
     }
+    let selectedCommandName = this.sideBar.commandsBar.getSelectedCommandName()
+
+    let order: IOrder | undefined
+
     const uids: number[] = []
     if (underPointerItem != null) {
-      const teamItemsCount = this.selectedItems.filter(si => si.team === this.team).length
-      if (teamItemsCount === 0 || underPointerItem.team === this.team) {
-        // Pressing shift adds to existing selection. If shift is not pressed, clear existing selection
-        if (!e.shiftKey || underPointerItem.type === EItemType.buildings) {
-          this.clearSelection()
-        }
-        this.selectItem(underPointerItem, e.shiftKey)
-      } else if (underPointerItem.type !== EItemType.terrain) {
-        // Player clicked on an enemy item
-        // identify selected items from players team that can attack
-        for (let i = this.selectedItems.length - 1; i >= 0; i--) {
-          const item = this.selectedItems[i]
-          if (item.team === this.team && item.ordersable && (item as unknown as IAttackable).canAttack) {
-            if (item.uid != null) {
+      switch (selectedCommandName) {
+        case ECommandName.moveFollow:
+          order = { type: 'follow', to: underPointerItem }
+          break
+        case ECommandName.attackGuard:
+          if (underPointerItem.team === this.team) {
+            order = { type: 'guard', to: underPointerItem }
+          } else {
+            order = { type: 'attack', to: underPointerItem }
+          }
+          break
+      }
+      const teamItemsCount = this.selectedItems.filter(si => si.team === this.team && si !== underPointerItem).length
+      if (underPointerItem.team === this.team) {
+        if (selectedCommandName != null && teamItemsCount > 0 && order != null) {
+          // identify selected items from players team that can process command
+          for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+            const item = this.selectedItems[i]
+            if (item.team === this.team && underPointerItem !== item &&
+            item.commands.includes(selectedCommandName)) {
               uids.push(item.uid)
             }
           }
+          if (uids.length > 0) {
+            this.processCommand({ uids, order })
+          }
+        } else {
+          this.clearSelection()
+          this.selectItem(underPointerItem)
         }
-        // then command them to attack the clicked item
-        if (uids.length > 0) {
-          this.processCommand(uids, { type: 'attack', toUid: underPointerItem.uid })
+      } else {
+        // Player clicked on an enemy item
+        if (teamItemsCount > 0) {
+          if (selectedCommandName == null) {
+            selectedCommandName = ECommandName.attackGuard
+            order = { type: 'attack', to: underPointerItem }
+          }
+          // identify selected items from players team that can process command
+          for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+            const item = this.selectedItems[i]
+            if (item.team === this.team && underPointerItem !== item &&
+              item.commands.includes(selectedCommandName)) {
+              uids.push(item.uid)
+            }
+          }
+          if (uids.length > 0) {
+            this.processCommand({ uids, order })
+          }
+        } else {
+          this.clearSelection()
+          this.selectItem(underPointerItem)
         }
       }
     } else {
       // Player clicked on the ground
-      // identify selected items from players team that can move
+      if (selectedCommandName == null) {
+        selectedCommandName = ECommandName.moveFollow
+      }
+      const { gridSize } = this.tileMap
+      const gridX = point.x / gridSize
+      const gridY = point.y / gridSize
+      switch (selectedCommandName) {
+        case ECommandName.moveFollow:
+          order = { type: 'move', toPoint: { gridX, gridY } }
+          break
+        case ECommandName.attackGuard:
+          order = { type: 'move-and-attack', toPoint: { gridX, gridY } }
+          break
+      }
+      // identify selected items from players team that can process command
       for (let i = this.selectedItems.length - 1; i >= 0; i--) {
         const item = this.selectedItems[i]
-        if (item.team === this.team && item.ordersable && (item.type === EItemType.vehicles || item.type === EItemType.airVehicles)) {
-          if (item.uid != null) {
+        if (item.team === this.team &&
+          (item.type === EItemType.vehicles || item.type === EItemType.airVehicles) &&
+          item.commands.includes(selectedCommandName)) {
+          if (selectedCommandName === ECommandName.patrol) {
+            // process patrol order individually
+            const thisGrid = item.getGridXY({ center: true })
+            this.processCommand({ uids: [item.uid], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
+          } else {
             uids.push(item.uid)
           }
         }
       }
       // then command them to move to the clicked location
       if (uids.length > 0) {
-        const { gridSize } = this.tileMap
-        this.processCommand(uids, { type: 'move', toPoint: { gridX: point.x / gridSize, gridY: point.y / gridSize } })
+        this.processCommand({ uids, order })
       }
     }
 
@@ -249,9 +302,7 @@ export class Game extends Container {
     this.pointerMainDownId = this.pointerMainDownX = this.pointerSecondDownY = -1
     logPointerEvent('Game pointer up')
     if (this.dragSelect.width > 0) {
-      if (!e.shiftKey) {
-        this.clearSelection()
-      }
+      this.clearSelection()
       const dragSelectBounds = this.dragSelect.getBounds()
       const startPoint = this.tileMap.toLocal({ x: dragSelectBounds.left, y: dragSelectBounds.top })
       const endPoint = this.tileMap.toLocal({ x: dragSelectBounds.right, y: dragSelectBounds.bottom })
@@ -272,7 +323,7 @@ export class Game extends Container {
           itemPosition.y >= top &&
           itemPosition.y <= bottom
         ) {
-          this.selectItem(moveableItem, true)
+          this.selectItem(moveableItem)
         }
       })
       this.sideBar.handleSelectedItems(this.selectedItems)
@@ -370,10 +421,8 @@ export class Game extends Container {
     return this.selectedItems.includes(item)
   }
 
-  selectItem (item: SelectableItem, shiftPressed: boolean): void {
-    // Pressing shift and clicking on a selected item will deselect it
-    if (shiftPressed && item.selected) {
-      this.deselectItem(item)
+  selectItem (item: SelectableItem): void {
+    if (item.selected) {
       return
     }
 
@@ -825,15 +874,18 @@ export class Game extends Container {
   }
 
   // Receive command from singleplayer or multiplayer object and send it to units
-  processCommand (uids: number[], orders: IOrder): void {
+  processCommand ({ uids, order, toUid, orderType }: { uids: number[], order?: IOrder, orderType?: OrderTypes, toUid?: number }): boolean {
     // In case the target "to" object is in terms of uid, fetch the target object
     let toObject
-    if (orders.type === 'attack' || orders.type === 'guard') {
-      if (typeof orders.toUid === 'number') {
-        toObject = this.tileMap.getItemByUid(orders.toUid)
+    let unitOrder: IOrder | undefined
+    if (orderType === 'attack' || orderType === 'guard' || orderType === 'follow') {
+      if (typeof toUid === 'number') {
+        toObject = this.tileMap.getItemByUid(toUid)
         if ((toObject == null) || toObject.isDead()) {
           // To object no longer exists. Invalid command
-          return
+          return false
+        } else {
+          unitOrder = { type: orderType, to: toObject }
         }
       }
     }
@@ -841,9 +893,9 @@ export class Game extends Container {
     for (const uid of uids) {
       const item = this.tileMap.getItemByUid(uid)
       // if uid is a valid item, set the order for the item
-      if (item != null) {
-        item.orders = Object.assign({}, orders)
-        if (orders.type === 'move') {
+      if (item != null && ((order != null) || (unitOrder != null))) {
+        item.order = (order ?? unitOrder) as IOrder
+        if (orderType === 'move') {
           if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-yes')
           } else if (item.itemName === EItemName.HeavyTank) {
@@ -855,7 +907,7 @@ export class Game extends Container {
           } else {
             AUDIO.play('acknowledge-moving')
           }
-        } else if (orders.type === 'attack') {
+        } else if (orderType === 'attack') {
           if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-attack')
           } else if (item.itemName === EItemName.HeavyTank) {
@@ -868,11 +920,12 @@ export class Game extends Container {
             AUDIO.play('acknowledge-attacking')
           }
         }
-        if (toObject != null && (item.orders.type === 'attack' || item.orders.type === 'guard')) {
-          item.orders.to = toObject
+        if (toObject != null && (item.order.type === 'attack' || item.order.type === 'guard')) {
+          item.order.to = toObject
         }
       }
     }
+    return true
   }
 
   showMessage ({ character, message, playSound = true }: { character: EMessageCharacter, message: string, playSound?: boolean }): void {
@@ -915,7 +968,7 @@ export class Game extends Container {
   }
 
   createItem (options: {
-    name: EItemName
+    name: EItemNames
     initGridX?: number
     initGridY?: number
     initX?: number
@@ -926,7 +979,7 @@ export class Game extends Container {
     uid?: number
     life?: number
     selectable?: boolean
-    ordersable?: boolean
+    commands?: ECommandName[]
     orders?: IOrder
     teleport?: boolean
   }): Base | OilDerrick | Starport | GroundTurret

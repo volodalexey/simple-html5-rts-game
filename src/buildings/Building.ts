@@ -23,7 +23,7 @@ export interface IBuildingOptions {
   textures: IBuildingTextures
   life?: number
   selectable?: boolean
-  ordersable?: boolean
+  commands?: ECommandName[]
   orders?: IOrder
 }
 
@@ -75,7 +75,7 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   public buildableGrid: number[][] = []
   public passableGrid: number[][] = []
 
-  public orders: IOrder
+  public order: IOrder
   public hitPoints = 0
   public life = 0
 
@@ -86,7 +86,6 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   public uid: number
   public type = EItemType.buildings
   public itemName = EItemName.None
-  public ordersable = true
   public team: Team
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite
@@ -99,15 +98,15 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.team = options.team
-    this.orders = options.orders ?? { type: 'stand' }
+    this.order = options.orders ?? { type: 'stand' }
     if (options.life != null) {
       this.life = options.life
     }
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
     }
-    if (typeof options.ordersable === 'boolean') {
-      this.ordersable = options.ordersable
+    if (Array.isArray(options.commands)) {
+      this.commands = options.commands
     }
     this.setup(options)
   }
@@ -299,8 +298,12 @@ export class Building extends Container implements IItem, ISelectable, ILifeable
   }
 
   removeAndDestroy (): void {
+    const isItemSelected = this.game.isItemSelected(this)
     this.game.deselectItem(this)
     this.removeFromParent()
+    if (isItemSelected) {
+      this.game.sideBar.handleSelectedItems(this.game.selectedItems)
+    }
     this.game.tileMap.rebuildPassableRequired = true
   }
 

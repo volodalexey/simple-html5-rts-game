@@ -74,41 +74,41 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
     }
     const { tileMap, turnSpeedAdjustmentFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'float': {
         const target = this.findTargetInSight()
         if (target != null) {
-          this.orders = { type: 'attack', to: target }
+          this.order = { type: 'attack', to: target }
         }
         return true
       }
       case 'sentry': {
         const target = this.findTargetInSight(2)
         if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+          this.order = { type: 'attack', to: target, nextOrder: this.order }
         }
         return true
       }
       case 'hunt': {
         const target = this.findTargetInSight(100)
         if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+          this.order = { type: 'attack', to: target, nextOrder: this.order }
         }
         return true
       }
       case 'attack': {
-        if (this.orders.to == null) {
+        if (this.order.to == null) {
           return true
         }
-        if (this.orders.to.isDead() || !this.isValidTarget(this.orders.to)) {
-          if (this.orders.nextOrder != null) {
-            this.orders = this.orders.nextOrder
+        if (this.order.to.isDead() || !this.isValidTarget(this.order.to)) {
+          if (this.order.nextOrder != null) {
+            this.order = this.order.nextOrder
           } else {
-            this.orders = { type: 'float' }
+            this.order = { type: 'float' }
           }
           return true
         }
-        const toGrid = this.orders.to.getGridXY({ center: true })
+        const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestination = Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)
         if (distanceFromDestination < Math.pow(this.sight, 2)) {
           // Turn towards target and then start attacking when within range of the target
@@ -140,7 +140,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
                   initX: bulletX * tileMap.gridSize,
                   initY: bulletY * tileMap.gridSize,
                   direction: newDirection,
-                  target: this.orders.to
+                  target: this.order.to
                 })
                 if (projectile != null) {
                   tileMap.addItem(projectile)
@@ -150,11 +150,11 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
           }
         } else {
           const distanceFromDestinationSquared = Math.pow(distanceFromDestination, 0.5)
-          const moving = this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
+          const moving = this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
           if (!moving) {
             // Pathfinding couldn't find a path so stop
             // e.g. enemy is in hard collide state
-            this.orders = { type: 'float' }
+            this.order = { type: 'float' }
           }
         }
         return true
@@ -162,55 +162,75 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       case 'patrol': {
         const target = this.findTargetInSight(1)
         if (target != null) {
-          this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+          this.order = { type: 'attack', to: target, nextOrder: this.order }
           return true
         }
-        const distanceFromDestinationSquared = (Math.pow(this.orders.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.orders.toPoint.gridY - thisGrid.gridY, 2))
+        const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.sight / tileMap.gridSize, 2)) {
-          const to = this.orders.toPoint
-          this.orders.toPoint = this.orders.fromPoint
-          this.orders.fromPoint = to
+          const to = this.order.toPoint
+          this.order.toPoint = this.order.fromPoint
+          this.order.fromPoint = to
         } else {
-          this._moveTo(this.orders.toPoint, distanceFromDestinationSquared)
+          this._moveTo(this.order.toPoint, distanceFromDestinationSquared)
         }
         return true
       }
       case 'guard': {
-        if (this.orders.to.isDead()) {
-          if (this.orders.nextOrder != null) {
-            this.orders = this.orders.nextOrder
+        if (this.order.to.isDead()) {
+          if (this.order.nextOrder != null) {
+            this.order = this.order.nextOrder
           } else {
-            this.orders = { type: 'float' }
+            this.order = { type: 'float' }
           }
           return true
         }
-        const toGrid = this.orders.to.getGridXY({ center: true })
+        const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
-        if (distanceFromDestinationSquared < Math.pow(this.sight - 1, 2)) {
+        if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
           const target = this.findTargetInSight(1)
           if (target != null) {
-            this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+            this.order = { type: 'attack', to: target, nextOrder: this.order }
             return true
           }
-          // const targetToAttackTo = this.orders.to.findTargetInSight(1)
-          if (this.orders.to.orders.type === 'attack') {
-            this.orders = {
+          if (this.order.to.order.type === 'attack') {
+            this.order = {
               type: 'attack',
-              to: this.orders.to.orders.to,
-              toUid: this.orders.to.orders.toUid,
-              nextOrder: this.orders
+              to: this.order.to.order.to,
+              nextOrder: this.order
             }
           }
         } else {
           const target = this.findTargetInSight(1)
           if (target != null) {
-            this.orders = { type: 'attack', to: target, nextOrder: this.orders }
+            this.order = { type: 'attack', to: target, nextOrder: this.order }
           } else {
-            const toGrid = this.orders.to.getGridXY({ center: true })
-            this._moveTo({ type: this.orders.to.type, ...toGrid }, distanceFromDestinationSquared)
+            const toGrid = this.order.to.getGridXY({ center: true })
+            this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
           }
         }
+        return true
+      }
+      case 'move-and-attack': {
+        const target = this.findTargetInSight()
+        if (target != null) {
+          this.order = { type: 'attack', to: target, nextOrder: this.order }
+          return true
+        }
+        const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
+        if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
+          // Stop when within one radius of the destination
+          this.order = { type: 'float' }
+          return true
+        }
+        const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
+        const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
+        // Pathfinding couldn't find a path so stop
+        if (!moving) {
+          this.order = { type: 'float' }
+          return true
+        }
+        return true
       }
     }
     return false

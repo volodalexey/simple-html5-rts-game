@@ -1,7 +1,25 @@
 import { type BaseActiveItem } from '../common'
 import { type UnitName, type EItemType } from './IItem'
 
-export type IOrder = IMoveOrder
+export enum EOrderType {
+  move = 'move',
+  fire = 'fire',
+  attack = 'attack',
+  patrol = 'patrol',
+  stand = 'stand',
+  float = 'float',
+  sentry = 'sentry',
+  hunt = 'hunt',
+  guard = 'guard',
+  follow = 'follow',
+  deploy = 'deploy',
+  constructUnit = 'construct-unit',
+  moveAndAttack = 'move-and-attack',
+}
+
+export type OrderTypes = `${EOrderType}`
+
+export type IOrder = IMoveOrder | IMoveAndAttack
 | IFireOrder | IAttackOrder | IPatrolOrder
 | IStandOrder | IFloatOrder
 | ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder | IDeployOrder | IConstructUnitOrder
@@ -18,9 +36,20 @@ export interface IFireOrder {
 
 interface IAttackOrder {
   type: 'attack'
-  to?: BaseActiveItem
+  to: BaseActiveItem
   nextOrder?: IOrder
-  toUid?: number
+}
+
+interface IGuardOrder {
+  type: 'guard'
+  to: BaseActiveItem
+  nextOrder?: IOrder
+}
+
+interface IFollowOrder {
+  type: 'follow'
+  to: BaseActiveItem
+  nextOrder?: IOrder
 }
 
 export interface IPointGridData {
@@ -51,20 +80,6 @@ interface IHuntOrder {
   type: 'hunt'
 }
 
-interface IGuardOrder {
-  type: 'guard'
-  toUid?: number
-  to: BaseActiveItem
-  nextOrder?: IOrder
-}
-
-interface IFollowOrder {
-  type: 'follow'
-  toUid?: number
-  to: BaseActiveItem
-  nextOrder?: IOrder
-}
-
 interface IDeployOrder {
   type: 'deploy'
   toPoint: IPointGridData
@@ -74,4 +89,10 @@ interface IConstructUnitOrder {
   type: 'construct-unit'
   name: UnitName
   orders?: IOrder
+}
+
+interface IMoveAndAttack {
+  type: 'move-and-attack'
+  toPoint: IPointGridData
+  nextOrder?: IOrder
 }

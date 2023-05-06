@@ -47,19 +47,19 @@ export class Projectile extends Container implements IItem, IMoveable {
   public sight = 0
   public type = EItemType.projectiles
   public itemName = EItemName.None
-  public ordersable = true
   public range = 0
   public damage = 0
   public distanceTravelled = 0
   public vector = new Vector({ direction: EVectorDirection.down })
   public speed = 0
   public radius = 0
+  public followRadius = 0
   public turnSpeed = 0
   public moveTurning = false
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
-  public orders: IOrder
+  public order: IOrder
 
   public upAnimation!: AnimatedSprite
   public upRightAnimation!: AnimatedSprite
@@ -77,7 +77,7 @@ export class Projectile extends Container implements IItem, IMoveable {
     super()
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
-    this.orders = { type: 'fire', to: options.target }
+    this.order = { type: 'fire', to: options.target }
     this.setup(options)
     this.vector.setDirection({ direction: options.direction })
     this.switchAnimation()
@@ -253,9 +253,9 @@ export class Projectile extends Container implements IItem, IMoveable {
   }
 
   reachedTarget (): boolean {
-    if (this.orders.type === 'fire') {
+    if (this.order.type === 'fire') {
       const thisBounds = this.getCollisionBounds()
-      const toBounds = this.orders.to.getCollisionBounds()
+      const toBounds = this.order.to.getCollisionBounds()
       return checkCollision(thisBounds, toBounds) > 0.5
     }
     return false
@@ -268,7 +268,7 @@ export class Projectile extends Container implements IItem, IMoveable {
   }
 
   processOrders (): void {
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'fire': {
         // Move towards destination and stop when close by or if travelled past range
         const reachedTarget = this.reachedTarget()
@@ -276,15 +276,15 @@ export class Projectile extends Container implements IItem, IMoveable {
           if (reachedTarget) {
             this.playHitSound()
 
-            this.orders.to.subLife(this.damage)
+            this.order.to.subLife(this.damage)
             this.switchToExplodeAnimation()
-            this.orders = { type: 'stand' }
+            this.order = { type: 'stand' }
           } else {
             // Bullet fizzles out without hitting target
             this.removeFromParent()
           }
         } else {
-          this._moveTo(this.orders.to)
+          this._moveTo(this.order.to)
         }
         break
       }

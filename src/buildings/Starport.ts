@@ -216,7 +216,7 @@ export class Starport extends Building {
   }
 
   override processOrders (): boolean {
-    switch (this.orders.type) {
+    switch (this.order.type) {
       case 'construct-unit': {
         // damaged building cannot construct
         if (!this.isHealthy()) {
@@ -236,7 +236,7 @@ export class Starport extends Building {
           }
         }
 
-        const cost = this.game.getItemCost(this.orders.name)
+        const cost = this.game.getItemCost(this.order.name)
         if (typeof cost === 'number') {
           if (unitOnTop) {
             if (this.team === gameTeam) {
@@ -262,16 +262,16 @@ export class Starport extends Building {
               initY: thisPosition.y,
               initCenter: true,
               team: this.team,
-              name: this.orders.name,
-              orders: this.orders.orders,
+              name: this.order.name,
+              orders: this.order.orders,
               teleport: true
             }
             this.switchAnimation(StarportAnimation.open)
           }
         } else {
-          console.warn(`Unable to calc item (name=${this.orders.name}) cost`)
+          console.warn(`Unable to calc item (name=${this.order.name}) cost`)
         }
-        this.orders = { type: 'stand' }
+        this.order = { type: 'stand' }
       }
     }
     return false

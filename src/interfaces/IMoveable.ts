@@ -4,4 +4,5 @@ export interface IMoveable {
   hardCollision: boolean
   collisionCount: number
   colliding: boolean
+  followRadius: number
 }
