@@ -895,7 +895,7 @@ export class Game extends Container {
       // if uid is a valid item, set the order for the item
       if (item != null && ((order != null) || (unitOrder != null))) {
         item.order = (order ?? unitOrder) as IOrder
-        if (orderType === 'move') {
+        if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
           if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-yes')
           } else if (item.itemName === EItemName.HeavyTank) {
@@ -907,7 +907,7 @@ export class Game extends Container {
           } else {
             AUDIO.play('acknowledge-moving')
           }
-        } else if (orderType === 'attack') {
+        } else if (['attack', 'move-and-attack'].includes(item.order.type)) {
           if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-attack')
           } else if (item.itemName === EItemName.HeavyTank) {
