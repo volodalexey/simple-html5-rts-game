@@ -28,7 +28,7 @@ export class SideBar extends Container {
   public viewWidth!: number
 
   static options = {
-    initWidth: 64,
+    initWidth: 70,
     initHeight: 300
   }
 
@@ -111,7 +111,7 @@ export class SideBar extends Container {
   }
 
   getToggleText (): string {
-    return `${this.align === 'left' ? '>>>' : '<<<'}\ncash: ${this.game.cash[this.game.team]}`
+    return `${this.align === 'left' ? '>>>' : '<<<'}\ncash:\n${this.game.cash[this.game.team]}`
   }
 
   drawStaticContent (): void {
@@ -122,9 +122,13 @@ export class SideBar extends Container {
       textColorHover: 0xffff00,
       shadowTextColor: 0x800080,
       shadowThickness: 1,
-      buttonSelectedAlpha: 0,
-      buttonIdleAlpha: 0,
-      buttonHoverAlpha: 0,
+      buttonWidth: SideBar.options.initWidth,
+      buttonBorderHoverColor: 0xffff00,
+      buttonHoverColor: 0x454545,
+      buttonIdleColor: 0x454545,
+      buttonSelectedColor: 0x454545,
+      buttonBorderWidth: 2,
+      buttonBorderColor: 0x181716,
       onClick: () => {
         this.align = this.align === 'left' ? 'right' : 'left'
         this.setAlignment()

@@ -204,9 +204,17 @@ export class Button extends Container {
       } else {
         text.position.set(buttonBorderWidth + textPaddingLeft, icon.y + icon.height + textPaddingTop)
       }
-    } else if (buttonWidth != null && buttonHeight != null) {
-      text.anchor.set(0.5, 0.5)
-      text.position.set(buttonWidth / 2, buttonHeight / 2)
+    } else if (buttonWidth != null || buttonHeight != null) {
+      if (buttonWidth != null && buttonHeight != null) {
+        text.anchor.set(0.5, 0.5)
+        text.position.set(buttonWidth / 2, buttonHeight / 2)
+      } else if (buttonWidth == null && buttonHeight != null) {
+        text.anchor.set(0, 0.5)
+        text.position.set(0, buttonHeight / 2)
+      } else if (buttonWidth != null && buttonHeight == null) {
+        text.anchor.set(0.5, 0)
+        text.position.set(buttonWidth / 2, 0)
+      }
     }
     this.addChild(text)
     this.text = text
