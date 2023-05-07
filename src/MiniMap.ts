@@ -1,7 +1,7 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, type Texture } from 'pixi.js'
 import { logPointerEvent } from './logger'
 import { type Game } from './Game'
-import { Team } from './common'
+import { type BaseActiveItem, Team } from './common'
 import { EItemType } from './interfaces/IItem'
 
 export interface IMiniMapOptions {
@@ -18,7 +18,9 @@ export class MiniMap extends Container {
     cameraRectColor: 0xc1a517,
     cameraRectThickness: 2,
     itemBlueTeamClor: 0x0000ff,
-    itemGreeTeamClor: 0x00ff00
+    itemBlueTeamAttackClor: 0xff0000,
+    itemGreeTeamClor: 0x00ff00,
+    itemGreenTeamAttackClor: 0xff0000
   }
 
   public game!: Game
@@ -205,18 +207,25 @@ export class MiniMap extends Container {
     }
   }
 
+  getItemColor (item: BaseActiveItem): number {
+    const { itemBlueTeamClor, itemGreeTeamClor, itemBlueTeamAttackClor, itemGreenTeamAttackClor } = MiniMap.options
+    if (item.order.type === 'attack') {
+      return item.team === Team.blue ? itemBlueTeamAttackClor : itemGreenTeamAttackClor
+    }
+    return item.team === Team.blue ? itemBlueTeamClor : itemGreeTeamClor
+  }
+
   drawItems (): void {
     while (this.activeItems.children.length > 0) {
       this.activeItems.children[0].removeFromParent()
     }
     const { width, height } = this.background.texture
     const bgBounds = { top: 0, right: 0 + width, bottom: 0 + height, left: 0 }
-    const { itemBlueTeamClor, itemGreeTeamClor } = MiniMap.options
     const { activeItems } = this.game.tileMap
     for (let i = 0; i < activeItems.children.length; i++) {
       const activeItem = activeItems.children[i]
       const graphics = new Graphics()
-      graphics.beginFill(activeItem.team === Team.blue ? itemBlueTeamClor : itemGreeTeamClor)
+      graphics.beginFill(this.getItemColor(activeItem))
       const itemBounds = activeItem.getCollisionBounds()
       if ((itemBounds.left < bgBounds.left && itemBounds.right < bgBounds.left) ||
         (itemBounds.left > bgBounds.right && itemBounds.right > bgBounds.right) ||

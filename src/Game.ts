@@ -2,7 +2,7 @@ import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphi
 import { type EMessageCharacter, StatusBar } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
-import { logLayout, logPointerEvent } from './logger'
+import { logDoubleTapEvent, logLayout, logPointerEvent } from './logger'
 import { Team, type SelectableItem, type BaseActiveItem } from './common'
 import { Base } from './buildings/Base'
 import { Harvester } from './vehicles/Harvester'
@@ -68,6 +68,8 @@ export class Game extends Container {
   public dragSelect = new Graphics()
   static options = {
     doubleTapMaxTime: 300,
+    doubleTapThreasholdX: 10,
+    doubleTapThreasholdY: 10,
     wheelScaleFactor: 1.5,
     pinchScaleFactor: 1
   }
@@ -149,12 +151,20 @@ export class Game extends Container {
     const point = this.tileMap.toLocal(e)
     const underPointerItem = this.tileMap.itemUnderPointer(point)
     const { previousPointerTapEvent } = this
+    logDoubleTapEvent(`ppte ${previousPointerTapEvent?.pointerId}<>${e.pointerId} ${previousPointerTapEvent?.pointerType}<>${e.pointerType}`)
     if (previousPointerTapEvent != null && underPointerItem != null) {
       const isPreviousMouse = previousPointerTapEvent.pointerType === 'mouse' && e.pointerType === 'mouse' && previousPointerTapEvent.pointerId === e.pointerId
-      const isPreviousTouch = previousPointerTapEvent.pointerType === 'touch' && e.pointerType === 'touch' && previousPointerTapEvent.pointerId + 1 === e.pointerId
-      if ((isPreviousMouse || isPreviousTouch) && e.timeStamp - previousPointerTapEvent.timeStamp < Game.options.doubleTapMaxTime) {
-        if (Math.abs(e.globalX - previousPointerTapEvent.globalX) < 10 && Math.abs(e.globalY - previousPointerTapEvent.globalY) < 10) {
-          logPointerEvent('Game pointerdoubletap')
+      const isPreviousTouch = previousPointerTapEvent.pointerType === 'touch' && e.pointerType === 'touch' &&
+      (previousPointerTapEvent.pointerId === e.pointerId || previousPointerTapEvent.pointerId + 1 === e.pointerId)
+      const timeDiff = e.timeStamp - previousPointerTapEvent.timeStamp
+      const { doubleTapMaxTime, doubleTapThreasholdX, doubleTapThreasholdY } = Game.options
+      logDoubleTapEvent(`isPreviousMouse=${isPreviousMouse} isPreviousTouch=${isPreviousTouch} timeDiff=${timeDiff} doubleTapMaxTime=${doubleTapMaxTime}`)
+      if ((isPreviousMouse || isPreviousTouch) && timeDiff < doubleTapMaxTime) {
+        const absDiffX = Math.abs(e.globalX - previousPointerTapEvent.globalX)
+        const absDiffY = Math.abs(e.globalY - previousPointerTapEvent.globalY)
+        const isInThreshold = absDiffX < doubleTapThreasholdX && absDiffY < doubleTapThreasholdY
+        logDoubleTapEvent(`absDiffX=${absDiffX} absDiffY=${absDiffY} isInThreshold=${isInThreshold}`)
+        if (isInThreshold) {
           this.clearSelection()
           const { activeItems } = this.tileMap
           for (let i = 0; i < activeItems.children.length; i++) {
