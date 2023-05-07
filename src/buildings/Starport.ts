@@ -4,6 +4,7 @@ import { Building, type IBuildingOptions, type IBuildingTextures } from './Build
 import { EItemName, type UnitName } from '../interfaces/IItem'
 import { EMessageCharacter } from '../StatusBar'
 import { type IOrder } from '../interfaces/IOrder'
+import { ECommandName } from '../Command'
 
 export type IStarportOptions = Pick<
 IBuildingOptions,
@@ -27,6 +28,7 @@ export interface IStarportTextures extends IBuildingTextures {
 }
 
 export class Starport extends Building {
+  public commands = [ECommandName.constructScoutTank, ECommandName.constructHeavyTank, ECommandName.constructChopper, ECommandName.constructWraith]
   public itemName = EItemName.Starport
   static blueTextures: IStarportTextures
   static greenTextures: IStarportTextures

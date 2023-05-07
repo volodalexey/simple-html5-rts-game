@@ -9,8 +9,8 @@ export enum ECommandName {
   buildStarport = 'buildStarport',
   constructSCV = 'constructSCV',
   constructHarvester = 'constructHarvester',
-  // constructScoutTank = 'constructScoutTank',
-  // constructHeavyTank = 'constructHeavyTank',
-  // constructChopper = 'constructChopper',
-  // constructWraith = 'constructWraith',
+  constructScoutTank = 'constructScoutTank',
+  constructHeavyTank = 'constructHeavyTank',
+  constructChopper = 'constructChopper',
+  constructWraith = 'constructWraith',
 }

@@ -8,6 +8,10 @@ import { SCV } from './vehicles/SCV'
 import { Harvester } from './vehicles/Harvester'
 import { GroundTurret } from './buildings/GroundTurret'
 import { Starport } from './buildings/Starport'
+import { ScoutTank } from './vehicles/ScoutTank'
+import { HeavyTank } from './vehicles/HeavyTank'
+import { Chopper } from './air-vehicles/Chopper'
+import { Wraith } from './air-vehicles/Wraith'
 
 export interface ICommandBarOptions {
   game: Game
@@ -23,6 +27,10 @@ export interface ICommandsBarTextures {
   iconBuildStarportTexture: Texture
   iconConstructSCVTexture: Texture
   iconConstructHarvesterTexture: Texture
+  iconConstructScoutTankTexture: Texture
+  iconConstructHeavyTankTexture: Texture
+  iconConstructChopperTexture: Texture
+  iconConstructWraithTexture: Texture
 }
 
 interface ICommandDescription {
@@ -113,6 +121,38 @@ export class CommandsBar extends Container {
         iconHeight: 30,
         iconPaddingTop: 12,
         iconPaddingLeft: 12
+      },
+      [ECommandName.constructScoutTank]: {
+        iconTexture: textures.iconConstructScoutTankTexture,
+        text: `Scout Tank\n${ScoutTank.cost}`,
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.constructHeavyTank]: {
+        iconTexture: textures.iconConstructHeavyTankTexture,
+        text: `Heavy Tank\n${HeavyTank.cost}`,
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.constructChopper]: {
+        iconTexture: textures.iconConstructChopperTexture,
+        text: `Chopper\n${Chopper.cost}`,
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.constructWraith]: {
+        iconTexture: textures.iconConstructWraithTexture,
+        text: `Wraith\n${Wraith.cost}`,
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
       }
     }
   }
@@ -204,12 +244,10 @@ export class CommandsBar extends Container {
       case ECommandName.buildTurret:
         return (e: FederatedPointerEvent) => {
           this.deselectTiles(ECommandName.buildTurret)
-          this.game.tileMap.toggleBuildableGrid(true)
         }
       case ECommandName.buildStarport:
         return (e: FederatedPointerEvent) => {
           this.deselectTiles(ECommandName.buildStarport)
-          this.game.tileMap.toggleBuildableGrid(true)
         }
       case ECommandName.constructSCV:
         return () => {
@@ -226,6 +264,42 @@ export class CommandsBar extends Container {
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructHarvester)) {
               selectedItem.order = { type: 'construct-unit', name: EItemName.Harvester }
+            }
+          })
+        }
+      case ECommandName.constructScoutTank:
+        return () => {
+          this.deselectTiles(ECommandName.constructScoutTank)
+          this.game.selectedItems.forEach(selectedItem => {
+            if (selectedItem.commands.includes(ECommandName.constructScoutTank)) {
+              selectedItem.order = { type: 'construct-unit', name: EItemName.ScoutTank }
+            }
+          })
+        }
+      case ECommandName.constructHeavyTank:
+        return () => {
+          this.deselectTiles(ECommandName.constructHeavyTank)
+          this.game.selectedItems.forEach(selectedItem => {
+            if (selectedItem.commands.includes(ECommandName.constructHeavyTank)) {
+              selectedItem.order = { type: 'construct-unit', name: EItemName.HeavyTank }
+            }
+          })
+        }
+      case ECommandName.constructChopper:
+        return () => {
+          this.deselectTiles(ECommandName.constructChopper)
+          this.game.selectedItems.forEach(selectedItem => {
+            if (selectedItem.commands.includes(ECommandName.constructChopper)) {
+              selectedItem.order = { type: 'construct-unit', name: EItemName.Chopper }
+            }
+          })
+        }
+      case ECommandName.constructWraith:
+        return () => {
+          this.deselectTiles(ECommandName.constructWraith)
+          this.game.selectedItems.forEach(selectedItem => {
+            if (selectedItem.commands.includes(ECommandName.constructWraith)) {
+              selectedItem.order = { type: 'construct-unit', name: EItemName.Wraith }
             }
           })
         }

@@ -915,7 +915,11 @@ export class Game extends Container {
         iconBuildTurretTexture: textures['ground-turret-blue-healthy-down-right.png'],
         iconBuildStarportTexture: textures['starport-blue-healthy-0.png'],
         iconConstructSCVTexture: textures['scv-blue-down-right.png'],
-        iconConstructHarvesterTexture: textures['harvester-blue-down-right.png']
+        iconConstructHarvesterTexture: textures['harvester-blue-down-right.png'],
+        iconConstructScoutTankTexture: textures['scout-tank-blue-down-right.png'],
+        iconConstructHeavyTankTexture: textures['heavy-tank-blue-down-right.png'],
+        iconConstructChopperTexture: textures['chopper-blue-down-right-0.png'],
+        iconConstructWraithTexture: textures['wraith-blue-down-right.png']
       }
     })
   }
@@ -1004,6 +1008,10 @@ export class Game extends Container {
         return HeavyTank.cost
       case EItemName.ScoutTank:
         return ScoutTank.cost
+      case EItemName.Chopper:
+        return Chopper.cost
+      case EItemName.Wraith:
+        return Wraith.cost
     }
   }
 
