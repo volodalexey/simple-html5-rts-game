@@ -74,30 +74,44 @@ export class SideBar extends Container {
     }
   }
 
-  setHideableContentAlignment ({ forceOpen = false, forceClose = false }: { forceOpen?: boolean, forceClose?: boolean } = {}): void {
-    if (forceOpen) {
+  setHideableContentPosition (): void {
+    if (this.closed) {
       if (this.align === 'left') {
         this.hideableContent.position.x = -this.width
-        this.toX = 0
       } else {
         this.hideableContent.position.x = this.width
-        this.toX = 0
       }
-      logSideBar(`to open/closed hideable-${this.align} (${this.hideableContent.position.x}) toX=${this.toX}`)
-    } else if (forceClose) {
+      logSideBar(`closed hideable-${this.align} ${this.hideableContent.position.x}`)
+    } else if (this.opened) {
       if (this.align === 'left') {
-        this.hideableContent.position.x = 0
-        this.toX = -this.width
+        this.hideableContent.position.x = this.width > this.hideableContent.width ? this.width - this.hideableContent.width : 0
       } else {
         this.hideableContent.position.x = 0
+      }
+      logSideBar(`opened hideable-${this.align} ${this.hideableContent.position.x}`)
+    }
+  }
+
+  calcHideableContentPosition ({ forceOpen = false, forceClose = false }: { forceOpen?: boolean, forceClose?: boolean } = {}): void {
+    if (forceOpen) {
+      if (this.align === 'left') {
+        this.toX = this.width > this.hideableContent.width ? this.width - this.hideableContent.width : 0
+      } else {
+        this.toX = 0
+      }
+      logSideBar(`force open hideable-${this.align} toX=${this.toX}`)
+    } else if (forceClose) {
+      if (this.align === 'left') {
+        this.toX = -this.width
+      } else {
         this.toX = this.width
       }
-      logSideBar(`to close/opened hideable-${this.align} (${this.hideableContent.position.x}) toX=${this.toX}`)
+      logSideBar(`force close hideable-${this.align} toX=${this.toX}`)
     }
   }
 
   getToggleText (): string {
-    return `${this.align === 'left' ? '>>>' : '<<<'}\ncash:\n${this.game.cash[this.game.team]}`
+    return `${this.align === 'left' ? '>>>' : '<<<'}\ncash: ${this.game.cash[this.game.team]}`
   }
 
   drawStaticContent (): void {
@@ -114,7 +128,8 @@ export class SideBar extends Container {
       onClick: () => {
         this.align = this.align === 'left' ? 'right' : 'left'
         this.setAlignment()
-        this.setHideableContentAlignment({ forceOpen: this.toOpen, forceClose: this.toClose })
+        this.setHideableContentPosition()
+        this.calcHideableContentPosition({ forceOpen: this.toOpen, forceClose: this.toClose })
       }
     })
     this.staticContent.addChild(this.toggleButton)
@@ -124,7 +139,7 @@ export class SideBar extends Container {
     const { initWidth, initHeight } = SideBar.options
     this.contentMask.clear()
     this.contentMask.beginFill(0xffffff)
-    this.contentMask.drawRect(0, 0, initWidth, height ?? initHeight)
+    this.contentMask.drawRect(0, 0, Math.max(initWidth, this.width), height ?? initHeight)
     this.contentMask.endFill()
     this.contentMask.position.set(0, this.staticContent.height)
     this.hideableContent.position.set(0, this.staticContent.height)
@@ -199,13 +214,15 @@ export class SideBar extends Container {
     logSideBar('open()')
     this.toOpen = true
     this.toClose = false
-    this.setHideableContentAlignment({ forceOpen: true })
+    this.setHideableContentPosition()
+    this.calcHideableContentPosition({ forceOpen: true })
   }
 
   close (): void {
     logSideBar('close()')
     this.toOpen = false
     this.toClose = true
-    this.setHideableContentAlignment({ forceClose: true })
+    this.setHideableContentPosition()
+    this.calcHideableContentPosition({ forceClose: true })
   }
 }
