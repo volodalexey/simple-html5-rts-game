@@ -60,6 +60,8 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
   public colliding = false
   public radius = 0
   public followRadius = 3
+  public elapsedSwitchFrames = 0
+  public switchFrames = 30 // allow to switch animation direction only once per some time to avoid jumping on edges
 
   constructor (options: IVehicleOptions) {
     super(options)
@@ -134,16 +136,15 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
     })
   }
 
-  updateAnimation (): void {
-    this.switchAnimation(this.vector.direction)
+  updateAnimation (allowSwitch = false): void {
+    this.switchAnimation(this.vector.direction, allowSwitch)
   }
 
-  switchAnimation (direction: EVectorDirection): void {
+  switchAnimation (direction: EVectorDirection, allowSwitch: boolean): void {
     let newAnimation
     const step = 0.5
     if ((direction >= EVectorDirection.upLeft + step && direction <= EVectorDirection.upLeft + 1) ||
         (direction >= EVectorDirection.up && direction <= EVectorDirection.upRight - step)) {
-      // special case because of max direction
       newAnimation = this.upAnimation
     } else if (direction >= EVectorDirection.upRight + step && direction <= EVectorDirection.downRight - step) {
       newAnimation = this.rightAnimation
@@ -160,7 +161,7 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
     } else {
       newAnimation = this.upLeftAnimation
     }
-    if (newAnimation === this.currentAnimation) {
+    if (newAnimation === this.currentAnimation || !allowSwitch) {
       return
     }
     this.currentAnimation = newAnimation
@@ -247,7 +248,13 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
   handleUpdate (deltaMS: number): void {
     super.handleUpdate(deltaMS)
     this.processOrders()
-    this.updateAnimation()
+    if (this.elapsedSwitchFrames >= this.switchFrames) {
+      this.updateAnimation(true)
+      this.elapsedSwitchFrames = 0
+    } else {
+      this.updateAnimation(this.moveTurning || this.elapsedSwitchFrames === 0)
+    }
+    this.elapsedSwitchFrames += 1
     this.zIndex = this.y + this.height
   }
 

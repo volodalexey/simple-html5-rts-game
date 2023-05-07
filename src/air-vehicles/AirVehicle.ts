@@ -82,6 +82,8 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
   public colliding = false
   public radius = 0
   public followRadius = 4
+  public elapsedSwitchFrames = 0
+  public switchFrames = 30 // allow to switch animation direction only once per some time to avoid jumping on edges
 
   constructor (options: IAirVehicleOptions) {
     super(options)
@@ -194,11 +196,11 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     })
   }
 
-  updateAnimation (): void {
-    this.switchAnimation(this.vector.direction)
+  updateAnimation (allowSwitch = false): void {
+    this.switchAnimation(this.vector.direction, allowSwitch)
   }
 
-  switchAnimation (direction: EVectorDirection): void {
+  switchAnimation (direction: EVectorDirection, allowSwitch: boolean): void {
     let newBodyAnimation
     let newShadowAnimation
     const step = 0.5
@@ -229,7 +231,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
       newBodyAnimation = this.bodyAnimation.upLeftAnimation
       newShadowAnimation = this.shadowAnimation.upLeftAnimation
     }
-    if (newBodyAnimation === this.currentBodyAnimation) {
+    if (newBodyAnimation === this.currentBodyAnimation || !allowSwitch) {
       return
     }
     this.currentBodyAnimation = newBodyAnimation
@@ -315,7 +317,13 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
   handleUpdate (deltaMS: number): void {
     super.handleUpdate(deltaMS)
     this.processOrders()
-    this.updateAnimation()
+    if (this.elapsedSwitchFrames >= this.switchFrames) {
+      this.updateAnimation(true)
+      this.elapsedSwitchFrames = 0
+    } else {
+      this.updateAnimation(this.moveTurning || this.elapsedSwitchFrames === 0)
+    }
+    this.elapsedSwitchFrames += 1
     this.zIndex = this.y + this.height
   }
 
