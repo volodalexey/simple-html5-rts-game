@@ -10,7 +10,7 @@ import { type IOrder } from './interfaces/IOrder'
 import { type Trigger, type ITrigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger } from './Trigger'
 import { EItemName, type EItemNames } from './interfaces/IItem'
 import { Chopper } from './air-vehicles/Chopper'
-import { type ECommandName } from './Command'
+import { ECommandName } from './Command'
 import { Transport } from './vehicles/Transport'
 import { Wraith } from './air-vehicles/Wraith'
 
@@ -287,11 +287,11 @@ export class CampaignScene extends Container implements IScene {
         startGridX: 36,
         startGridY: 0,
         cash: {
-          blue: 100000,
+          blue: 0,
           green: 0
         },
         items: [
-          { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, uid: -1 },
+          { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, commands: [ECommandName.constructSCV], uid: -1 },
           { name: 'ground-turret', initGridX: 53, initGridY: 17, direction: EVectorDirection.up, team: Team.blue },
           { name: 'heavy-tank', initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, order: { type: 'sentry' } },
           /* The first wave of attacks */
@@ -306,8 +306,8 @@ export class CampaignScene extends Container implements IScene {
           { name: 'base', initGridX: 5, initGridY: 36, team: Team.green, uid: -11 },
           { name: 'starport', initGridX: 1, initGridY: 30, team: Team.green, uid: -12 },
           { name: 'starport', initGridX: 4, initGridY: 32, team: Team.green, uid: -13 },
-          { name: 'harvester', initGridX: 1, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 16, gridY: 7 } } },
-          { name: 'harvester', initGridX: 10, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 20, gridY: 7 } } },
+          { name: 'harvester', initGridX: 1, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 1, gridY: 38 } } },
+          { name: 'harvester', initGridX: 10, initGridY: 38, team: Team.green, order: { type: 'deploy', toPoint: { gridX: 10, gridY: 38 } } },
           { name: 'ground-turret', initGridX: 5, initGridY: 28, direction: EVectorDirection.up, team: Team.green },
           { name: 'ground-turret', initGridX: 7, initGridY: 33, direction: EVectorDirection.upLeft, team: Team.green },
           { name: 'ground-turret', initGridX: 8, initGridY: 37, direction: EVectorDirection.upRight, team: Team.green }
@@ -343,7 +343,7 @@ export class CampaignScene extends Container implements IScene {
                 character: EMessageCharacter.op,
                 message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
               })
-              this.game.cash[Team.blue] += 1500
+              this.game.cash[Team.blue] += 1900
             }
           },
           {
@@ -389,6 +389,9 @@ export class CampaignScene extends Container implements IScene {
               const { tileMap } = this.game
               tileMap.addItem(new Chopper({
                 game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 22, commands: [], team: Team.blue, order: { type: 'hunt' }
+              }))
+              tileMap.addItem(new Chopper({
+                game: this.game, initX: tileMap.gridSize * 61, initY: tileMap.gridSize * 20, team: Team.blue, order: { type: 'hunt' }
               }))
             }
           },

@@ -83,7 +83,7 @@ export class OilDerrick extends Building {
   public deployAnimation!: AnimatedSprite
   public elapsedTime = 0
   public harvestInterval = 1000
-  public harvestAmount = 2
+  public harvestAmount = 10
 
   static buildableGrid = [
     [1, 1]
