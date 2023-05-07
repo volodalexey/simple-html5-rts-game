@@ -474,6 +474,8 @@ export class Game extends Container {
   }): void => {
     this.gameEnded = false
     this.time = 0
+    this.clearSelection()
+    this.dragSelect.clear()
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
     this.topBar.miniMap.assignBackgroundTexture({ texture: this.tileMap.background.texture })

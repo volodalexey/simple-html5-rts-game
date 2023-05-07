@@ -557,11 +557,69 @@ export class CampaignScene extends Container implements IScene {
               return false
             },
             action: () => {
-              this.game.cash[Team.blue] += 1200
+              this.game.cash[Team.blue] += 2000
               this.game.showMessage({
                 character: EMessageCharacter.driver,
                 message: 'The rebels came out of nowhere. There was nothing we could do. She saved our lives. Hope these supplies were worth it.'
               })
+            }
+          },
+          {
+            // Send in waves of enemies every 150 seconds
+            type: ETriggerType.interval,
+            interval: 150000,
+            action: () => {
+              // Count aircraft and tanks already available to bad guys
+              let wraithCount = 0
+              let heavyTankCount = 0
+              const { moveableItems } = this.game.tileMap
+              for (let i = 0; i < moveableItems.length; i++) {
+                const item = moveableItems[i]
+                if (item.team === Team.green) {
+                  switch (item.itemName) {
+                    case 'wraith':
+                      wraithCount++
+                      break
+                    case 'heavy-tank':
+                      heavyTankCount++
+                      break
+                  }
+                }
+              }
+
+              // Make sure enemy has atleast two wraiths and two heavy tanks, and use the remaining starports to build choppers and scouts
+              if (wraithCount === 0) {
+                // No wraiths alive. Ask both starports to make wraiths
+                this.game.processCommand({ uids: [-23, -24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+              } else if (wraithCount === 1) {
+                // One wraith alive. Ask starports to make one wraith and one chopper
+                this.game.processCommand({ uids: [-23], order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
+                this.game.processCommand({ uids: [-24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+              } else {
+                // Two wraiths alive. Ask both starports to make choppers
+                this.game.processCommand({ uids: [-23, -24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+              }
+
+              if (heavyTankCount === 0) {
+                // No heavy-tanks alive. Ask both starports to make heavy-tanks
+                this.game.processCommand({ uids: [-21, -22], order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+              } else if (heavyTankCount === 1) {
+                // One heavy-tank alive. Ask starports to make one heavy-tank and one scout-tank
+                this.game.processCommand({ uids: [-21], order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+                this.game.processCommand({ uids: [-22], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+              } else {
+                // Two heavy-tanks alive. Ask both starports to make scout-tanks
+                this.game.processCommand({ uids: [-21, -22], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+              }
+              // Ask any units on the field to attack
+              const uids = []
+              for (let i = 0; i < moveableItems.length; i++) {
+                const item = moveableItems[i]
+                if (item.team === Team.green) {
+                  uids.push(item.uid)
+                }
+              };
+              this.game.processCommand({ uids, order: { type: 'hunt' } })
             }
           },
           {
