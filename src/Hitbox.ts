@@ -1,47 +1,52 @@
-import { Graphics, Sprite, type Texture } from 'pixi.js'
-import { SceneManager } from './SceneManager'
+import { Graphics } from 'pixi.js'
 
-interface IHitboxOptions {
-  initX: number
-  initY: number
-  initGridX: number
-  initGridY: number
-  initWidth: number
-  initHeight: number
-  occupied: boolean
-}
-
-export class Hitbox extends Sprite {
-  static texturesCache: Texture
-  public initGridX!: number
-  public initGridY!: number
-  public occupied = false
-  static options = {
-    borderWidth: 2
+export class Hitboxes extends Graphics {
+  draw ({
+    currentMapBuildableGrid, tileWidth, tileHeight, borderWidth
+  }: {
+    currentMapBuildableGrid: Array<Array<1 | 0>>
+    tileWidth: number
+    tileHeight: number
+    borderWidth: number
+  }): void {
+    this.clear()
+    for (let y = 0; y < currentMapBuildableGrid.length; y++) {
+      for (let x = 0; x < currentMapBuildableGrid[y].length; x++) {
+        const initX = tileWidth * x
+        const initY = tileWidth * y
+        this.beginFill(currentMapBuildableGrid[y][x] === 1 ? 0xff0000 : 0x00ff00)
+        this.drawRect(initX, initY, tileWidth, tileHeight)
+        this.endFill()
+        this.beginHole()
+        this.drawRect(initX + borderWidth, initY + borderWidth, tileWidth - borderWidth * 2, tileHeight - borderWidth * 2)
+        this.endHole()
+      }
+    }
   }
 
-  constructor ({ initX, initY, initGridX, initGridY, occupied }: IHitboxOptions) {
-    super(Hitbox.texturesCache)
-    this.initGridX = initGridX
-    this.initGridY = initGridY
-    this.position.set(initX, initY)
-    this.setOccupied(occupied)
-  }
-
-  setOccupied (occupied: boolean): void {
-    this.occupied = occupied
-    this.tint = occupied ? 0xff0000 : 0x00ff00
-  }
-
-  static prepareRectTexture ({ initWidth, initHeight }: { initWidth: number, initHeight: number }): void {
-    const { borderWidth } = Hitbox.options
-    const gr = new Graphics()
-    gr.beginFill(0xffffff)
-    gr.drawRect(0, 0, initWidth, initHeight)
-    gr.endFill()
-    gr.beginHole()
-    gr.drawRect(borderWidth, borderWidth, initWidth - borderWidth * 2, initHeight - borderWidth * 2)
-    gr.endHole()
-    Hitbox.texturesCache = SceneManager.app.renderer.generateTexture(gr)
+  toggleBuildableGrid ({
+    toggle,
+    currentMapBuildableGrid,
+    tileWidth,
+    tileHeight,
+    borderWidth
+  }: {
+    toggle: boolean
+    currentMapBuildableGrid: Array<Array<1 | 0>>
+    tileWidth: number
+    tileHeight: number
+    borderWidth: number
+  }): void {
+    if (toggle) {
+      this.draw({
+        currentMapBuildableGrid,
+        tileWidth,
+        tileHeight,
+        borderWidth
+      })
+      this.visible = true
+    } else {
+      this.visible = false
+    }
   }
 }

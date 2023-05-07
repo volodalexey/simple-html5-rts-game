@@ -1,6 +1,6 @@
-import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics, ParticleContainer } from 'pixi.js'
+import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics } from 'pixi.js'
 import { MapSettings, type IMapSettings } from './MapSettings'
-import { Hitbox } from './Hitbox'
+import { Hitboxes } from './Hitbox'
 import { manifest } from './LoaderScene'
 import { type Building } from './buildings/Building'
 import { type Vehicle } from './vehicles/Vehicle'
@@ -33,7 +33,7 @@ export class TileMap extends Container {
   private _currentMapPassableGrid: GridArray = []
   private _currentMapBuildableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
-  public hitboxes!: ParticleContainer
+  public hitboxes = new Hitboxes()
   public activeItems = new ActiveItems()
   public orders = new Container<Order>()
   public projectiles = new Container<Projectile>()
@@ -65,6 +65,7 @@ export class TileMap extends Container {
   setup (): void {
     this.addChild(this.background)
     this.addChild(this.activeItems)
+    this.addChild(this.hitboxes)
     this.addChild(this.orders)
     this.addChild(this.projectiles)
   }
@@ -99,12 +100,6 @@ export class TileMap extends Container {
     this.mapGridWidth = settings.width
     this.mapGridHeight = settings.height
 
-    if (this.hitboxes != null) {
-      this.hitboxes.removeFromParent()
-    }
-    this.hitboxes = new ParticleContainer(this.mapGridWidth * this.mapGridHeight, { tint: true })
-    this.addChild(this.hitboxes)
-    Hitbox.prepareRectTexture({ initWidth: settings.tilewidth, initHeight: settings.tileheight })
     this.currentMapTerrainGrid = []
 
     for (let y = 0; y < this.mapGridHeight; y++) {
@@ -115,19 +110,9 @@ export class TileMap extends Container {
         const foundInPoints = hitboxesPoints.some(hp => hp.x === initX && hp.y === initY)
         // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
         this.currentMapTerrainGrid[y][x] = foundInPoints ? 1 : 0
-        this.hitboxes.addChild(new Hitbox({
-          initX,
-          initY,
-          initGridX: x,
-          initGridY: y,
-          initWidth: settings.tilewidth,
-          initHeight: settings.tileheight,
-          occupied: foundInPoints
-        }))
       }
     }
     this.hitboxes.alpha = 0.3
-    this.toggleBuildableGrid(false)
 
     if (logGrid.enabled) {
       for (let x = 0; x < this.mapGridWidth; x++) {
@@ -217,11 +202,7 @@ export class TileMap extends Container {
 
   cleanFromAll (): void {
     this.pivot.set(0, 0)
-    if (this.hitboxes != null) {
-      while (this.hitboxes.children[0] != null) {
-        this.hitboxes.children[0].removeFromParent()
-      }
-    }
+    this.hitboxes.clear()
     while (this.activeItems.children[0] != null) {
       this.activeItems.children[0].removeFromParent()
     }
@@ -242,9 +223,15 @@ export class TileMap extends Container {
     const selectedCommandName = this.game.sideBar.commandsBar.getSelectedCommandName()
     if (selectedCommandName === ECommandName.buildTurret || selectedCommandName === ECommandName.buildStarport || logHitboxes.enabled) {
       this.rebuildBuildableGrid()
-      this.toggleBuildableGrid(true)
+      this.hitboxes.draw({
+        currentMapBuildableGrid: this.currentMapBuildableGrid,
+        tileWidth: this.gridSize,
+        tileHeight: this.gridSize,
+        borderWidth: 2
+      })
+      this.hitboxes.visible = true
     } else {
-      this.toggleBuildableGrid(false)
+      this.hitboxes.visible = false
     }
   }
 
@@ -467,25 +454,5 @@ export class TileMap extends Container {
     this.checkScaleLimits()
     this.calcPivotLimits()
     this.checkPivotLimits()
-  }
-
-  toggleBuildableGrid (toggle: boolean): void {
-    if (toggle) {
-      const { _currentMapBuildableGrid } = this
-      for (let y = 0; y < _currentMapBuildableGrid.length; y++) {
-        for (let x = 0; x < _currentMapBuildableGrid[y].length; x++) {
-          this.hitboxes.children.some((hb) => {
-            const ret = (hb as Hitbox).initGridX === x && (hb as Hitbox).initGridY === y
-            if (ret) {
-              (hb as Hitbox).setOccupied(Boolean(_currentMapBuildableGrid[y][x]))
-            }
-            return ret
-          })
-        }
-      }
-      this.hitboxes.visible = true
-    } else {
-      this.hitboxes.visible = false
-    }
   }
 }
