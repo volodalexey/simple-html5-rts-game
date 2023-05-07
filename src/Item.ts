@@ -105,25 +105,29 @@ export class Item extends Container implements IItem {
   getGridCollisionBounds (): { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number } {
     const bounds = this.getCollisionBounds()
     const { gridSize } = this.game.tileMap
-    const retTrunc = {
-      topGridY: Math.trunc(bounds.top / gridSize),
-      rightGridX: Math.trunc(bounds.right / gridSize),
-      bottomGridY: Math.trunc(bounds.bottom / gridSize),
-      leftGridX: Math.trunc(bounds.left / gridSize)
+    const ret = {
+      topGridY: bounds.top / gridSize,
+      rightGridX: bounds.right / gridSize,
+      bottomGridY: bounds.bottom / gridSize,
+      leftGridX: bounds.left / gridSize
+    }
+    const retFloor = {
+      topGridY: Math.floor(ret.topGridY),
+      rightGridX: Math.floor(ret.rightGridX),
+      bottomGridY: Math.floor(ret.bottomGridY),
+      leftGridX: Math.floor(ret.leftGridX)
     }
     return {
-      topGridY: retTrunc.topGridY === retTrunc.bottomGridY
-        ? retTrunc.topGridY
-        : Math.ceil(bounds.top / gridSize),
-      rightGridX: retTrunc.leftGridX === retTrunc.rightGridX
-        ? retTrunc.rightGridX
-        : Math.floor(bounds.right / gridSize),
-      bottomGridY: retTrunc.topGridY === retTrunc.bottomGridY
-        ? retTrunc.bottomGridY
-        : Math.floor(bounds.bottom / gridSize),
-      leftGridX: retTrunc.leftGridX === retTrunc.rightGridX
-        ? retTrunc.leftGridX
-        : Math.ceil(bounds.left / gridSize)
+      topGridY: retFloor.topGridY,
+      leftGridX: retFloor.leftGridX,
+      // if [y.00] === [y]
+      // unit is directly on edges, return low grid value
+      rightGridX: ret.rightGridX === retFloor.rightGridX && ret.leftGridX === ret.rightGridX - 1
+        ? retFloor.leftGridX
+        : retFloor.rightGridX,
+      bottomGridY: ret.bottomGridY === retFloor.bottomGridY && ret.topGridY === ret.bottomGridY - 1
+        ? retFloor.topGridY
+        : retFloor.bottomGridY
     }
   }
 

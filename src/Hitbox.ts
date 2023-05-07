@@ -1,5 +1,5 @@
-import { Graphics } from 'pixi.js'
-import { logHitboxes } from './logger'
+import { Graphics, Sprite, type Texture } from 'pixi.js'
+import { SceneManager } from './SceneManager'
 
 interface IHitboxOptions {
   initX: number
@@ -8,33 +8,40 @@ interface IHitboxOptions {
   initGridY: number
   initWidth: number
   initHeight: number
+  occupied: boolean
 }
 
-export class Hitbox extends Graphics {
+export class Hitbox extends Sprite {
+  static texturesCache: Texture
   public initGridX!: number
   public initGridY!: number
-  constructor ({ initX, initY, initGridX, initGridY, initWidth, initHeight }: IHitboxOptions) {
-    super()
-    this.initGridX = initGridX
-    this.initGridY = initGridY
-    this.beginFill(0xff0000)
-    this.drawRect(0, 0, initWidth, initHeight)
-    this.endFill()
-    this.alpha = logHitboxes.enabled ? 0.5 : 0
-    this.position.set(initX, initY)
+  public occupied = false
+  static options = {
+    borderWidth: 2
   }
 
-  getRectBounds (): {
-    top: number
-    right: number
-    bottom: number
-    left: number
-  } {
-    return {
-      top: this.y,
-      right: this.x + this.width,
-      bottom: this.y + this.height,
-      left: this.x
-    }
+  constructor ({ initX, initY, initGridX, initGridY, occupied }: IHitboxOptions) {
+    super(Hitbox.texturesCache)
+    this.initGridX = initGridX
+    this.initGridY = initGridY
+    this.position.set(initX, initY)
+    this.setOccupied(occupied)
+  }
+
+  setOccupied (occupied: boolean): void {
+    this.occupied = occupied
+    this.tint = occupied ? 0xff0000 : 0x00ff00
+  }
+
+  static prepareRectTexture ({ initWidth, initHeight }: { initWidth: number, initHeight: number }): void {
+    const { borderWidth } = Hitbox.options
+    const gr = new Graphics()
+    gr.beginFill(0xffffff)
+    gr.drawRect(0, 0, initWidth, initHeight)
+    gr.endFill()
+    gr.beginHole()
+    gr.drawRect(borderWidth, borderWidth, initWidth - borderWidth * 2, initHeight - borderWidth * 2)
+    gr.endHole()
+    Hitbox.texturesCache = SceneManager.app.renderer.generateTexture(gr)
   }
 }

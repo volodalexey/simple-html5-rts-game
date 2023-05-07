@@ -1,4 +1,4 @@
-import { Container, type Texture } from 'pixi.js'
+import { Container, type FederatedPointerEvent, type Texture } from 'pixi.js'
 import { compareArrays, type BaseActiveItem, type SelectableItem } from './common'
 import { EItemName, EItemType } from './interfaces/IItem'
 import { ECommandName } from './Command'
@@ -6,6 +6,8 @@ import { type Game } from './Game'
 import { Button, type IButtonOptions } from './Button'
 import { SCV } from './vehicles/SCV'
 import { Harvester } from './vehicles/Harvester'
+import { GroundTurret } from './buildings/GroundTurret'
+import { Starport } from './buildings/Starport'
 
 export interface ICommandBarOptions {
   game: Game
@@ -17,6 +19,8 @@ export interface ICommandsBarTextures {
   iconAttackGuardTexture: Texture
   iconPatrolTexture: Texture
   iconDeselectTexture: Texture
+  iconBuildTurretTexture: Texture
+  iconBuildStarportTexture: Texture
   iconConstructSCVTexture: Texture
   iconConstructHarvesterTexture: Texture
 }
@@ -77,6 +81,22 @@ export class CommandsBar extends Container {
         iconHeight: 40,
         iconPaddingTop: 8,
         iconPaddingLeft: 8
+      },
+      [ECommandName.buildTurret]: {
+        iconTexture: textures.iconBuildTurretTexture,
+        text: `Turret\n${GroundTurret.cost}`,
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
+      },
+      [ECommandName.buildStarport]: {
+        iconTexture: textures.iconBuildStarportTexture,
+        text: `Starport\n${Starport.cost}`,
+        iconWidth: 36,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 10
       },
       [ECommandName.constructSCV]: {
         iconTexture: textures.iconConstructSCVTexture,
@@ -158,7 +178,7 @@ export class CommandsBar extends Container {
     return (selectedCommandTile != null) ? selectedCommandTile.commandName : undefined
   }
 
-  calcClickHandler = (commandName: ECommandName): (attackBtn: Button) => void => {
+  calcClickHandler = (commandName: ECommandName): (e: FederatedPointerEvent) => void => {
     switch (commandName) {
       case ECommandName.moveFollow:
         return () => {
@@ -180,6 +200,16 @@ export class CommandsBar extends Container {
         return () => {
           this.deselectTiles()
           this.game.clearSelection(true)
+        }
+      case ECommandName.buildTurret:
+        return (e: FederatedPointerEvent) => {
+          this.deselectTiles(ECommandName.buildTurret)
+          this.game.tileMap.toggleBuildableGrid(true)
+        }
+      case ECommandName.buildStarport:
+        return (e: FederatedPointerEvent) => {
+          this.deselectTiles(ECommandName.buildStarport)
+          this.game.tileMap.toggleBuildableGrid(true)
         }
       case ECommandName.constructSCV:
         return () => {

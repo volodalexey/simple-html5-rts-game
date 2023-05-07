@@ -1,4 +1,4 @@
-import { OilDerrick, OilDerrickAnimation } from '../buildings/OilDerrick'
+import { OilDerrick } from '../buildings/OilDerrick'
 import { wrapDirection, Team, angleDiff } from '../common'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { EVectorDirection } from '../Vector'
@@ -95,7 +95,7 @@ export class Harvester extends Vehicle {
     }
   }
 
-  processOrders (): boolean {
+  override processOrders (): boolean {
     if (super.processOrders()) {
       return true
     }
@@ -142,7 +142,7 @@ export class Harvester extends Vehicle {
               initX: Math.floor(thisGrid.gridX) * tileMap.gridSize,
               initY: Math.floor(thisGrid.gridY) * tileMap.gridSize,
               team: this.team,
-              initialAnimation: OilDerrickAnimation.deploy
+              deploy: true
             }))
           }
         } else {
@@ -154,7 +154,7 @@ export class Harvester extends Vehicle {
             this.order = { type: 'stand' }
           }
         }
-        break
+        return true
       }
     }
     return false

@@ -1,4 +1,4 @@
-import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics } from 'pixi.js'
+import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics, ParticleContainer } from 'pixi.js'
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitbox } from './Hitbox'
 import { manifest } from './LoaderScene'
@@ -9,8 +9,9 @@ import { type Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
 import { EItemType } from './interfaces/IItem'
-import { logGrid } from './logger'
+import { logGrid, logHitboxes } from './logger'
 import { type AirVehicle } from './air-vehicles/AirVehicle'
+import { ECommandName } from './Command'
 
 export interface ITileMapOptions {
   game: Game
@@ -32,7 +33,7 @@ export class TileMap extends Container {
   private _currentMapPassableGrid: GridArray = []
   private _currentMapBuildableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
-  public hitboxes = new Container<Hitbox>()
+  public hitboxes!: ParticleContainer
   public activeItems = new ActiveItems()
   public orders = new Container<Order>()
   public projectiles = new Container<Projectile>()
@@ -63,7 +64,6 @@ export class TileMap extends Container {
 
   setup (): void {
     this.addChild(this.background)
-    this.addChild(this.hitboxes)
     this.addChild(this.activeItems)
     this.addChild(this.orders)
     this.addChild(this.projectiles)
@@ -95,20 +95,40 @@ export class TileMap extends Container {
       layerName: 'Water,Clay,Lava,Rock-Fence'
     })
 
-    hitboxesPoints.forEach(cp => {
-      this.hitboxes.addChild(new Hitbox({
-        initX: cp.x,
-        initY: cp.y,
-        initGridX: Math.floor(cp.x / settings.tilewidth),
-        initGridY: Math.floor(cp.y / settings.tileheight),
-        initWidth: cp.width,
-        initHeight: cp.height
-      }))
-    })
-
     this.gridSize = settings.tilewidth
     this.mapGridWidth = settings.width
     this.mapGridHeight = settings.height
+
+    if (this.hitboxes != null) {
+      this.hitboxes.removeFromParent()
+    }
+    this.hitboxes = new ParticleContainer(this.mapGridWidth * this.mapGridHeight, { tint: true })
+    this.addChild(this.hitboxes)
+    Hitbox.prepareRectTexture({ initWidth: settings.tilewidth, initHeight: settings.tileheight })
+    this.currentMapTerrainGrid = []
+
+    for (let y = 0; y < this.mapGridHeight; y++) {
+      this.currentMapTerrainGrid[y] = []
+      for (let x = 0; x < this.mapGridWidth; x++) {
+        const initX = x * settings.tilewidth
+        const initY = y * settings.tileheight
+        const foundInPoints = hitboxesPoints.some(hp => hp.x === initX && hp.y === initY)
+        // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
+        this.currentMapTerrainGrid[y][x] = foundInPoints ? 1 : 0
+        this.hitboxes.addChild(new Hitbox({
+          initX,
+          initY,
+          initGridX: x,
+          initGridY: y,
+          initWidth: settings.tilewidth,
+          initHeight: settings.tileheight,
+          occupied: foundInPoints
+        }))
+      }
+    }
+    this.hitboxes.alpha = 0.3
+    this.toggleBuildableGrid(false)
+
     if (logGrid.enabled) {
       for (let x = 0; x < this.mapGridWidth; x++) {
         for (let y = 0; y < this.mapGridHeight; y++) {
@@ -135,18 +155,6 @@ export class TileMap extends Container {
       }
     }
 
-    // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
-    this.currentMapTerrainGrid = []
-    for (let y = 0; y < settings.height; y++) {
-      this.currentMapTerrainGrid[y] = []
-      for (let x = 0; x < settings.width; x++) {
-        this.currentMapTerrainGrid[y][x] = 0
-      }
-    }
-    for (let i = this.hitboxes.children.length - 1; i >= 0; i--) {
-      const obstruction = this.hitboxes.children[i]
-      this.currentMapTerrainGrid[obstruction.initGridY][obstruction.initGridX] = 1
-    }
     this._currentMapPassableGrid = []
     this._currentMapBuildableGrid = []
 
@@ -209,8 +217,10 @@ export class TileMap extends Container {
 
   cleanFromAll (): void {
     this.pivot.set(0, 0)
-    while (this.hitboxes.children[0] != null) {
-      this.hitboxes.children[0].removeFromParent()
+    if (this.hitboxes != null) {
+      while (this.hitboxes.children[0] != null) {
+        this.hitboxes.children[0].removeFromParent()
+      }
     }
     while (this.activeItems.children[0] != null) {
       this.activeItems.children[0].removeFromParent()
@@ -229,6 +239,13 @@ export class TileMap extends Container {
       item.handleUpdate(deltaMS)
     }
     this.game.tileMap.activeItems.sortChildren()
+    const selectedCommandName = this.game.sideBar.commandsBar.getSelectedCommandName()
+    if (selectedCommandName === ECommandName.buildTurret || selectedCommandName === ECommandName.buildStarport || logHitboxes.enabled) {
+      this.rebuildBuildableGrid()
+      this.toggleBuildableGrid(true)
+    } else {
+      this.toggleBuildableGrid(false)
+    }
   }
 
   addItem (item: BaseItem): void {
@@ -450,5 +467,25 @@ export class TileMap extends Container {
     this.checkScaleLimits()
     this.calcPivotLimits()
     this.checkPivotLimits()
+  }
+
+  toggleBuildableGrid (toggle: boolean): void {
+    if (toggle) {
+      const { _currentMapBuildableGrid } = this
+      for (let y = 0; y < _currentMapBuildableGrid.length; y++) {
+        for (let x = 0; x < _currentMapBuildableGrid[y].length; x++) {
+          this.hitboxes.children.some((hb) => {
+            const ret = (hb as Hitbox).initGridX === x && (hb as Hitbox).initGridY === y
+            if (ret) {
+              (hb as Hitbox).setOccupied(Boolean(_currentMapBuildableGrid[y][x]))
+            }
+            return ret
+          })
+        }
+      }
+      this.hitboxes.visible = true
+    } else {
+      this.hitboxes.visible = false
+    }
   }
 }

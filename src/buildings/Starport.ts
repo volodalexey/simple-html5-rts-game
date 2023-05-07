@@ -9,7 +9,7 @@ export type IStarportOptions = Pick<
 IBuildingOptions,
 Exclude<keyof IBuildingOptions, 'textures'>
 > & {
-  initialAnimation?: StarportAnimation
+  teleport?: boolean
 }
 
 export enum StarportAnimation {
@@ -45,7 +45,7 @@ export class Starport extends Building {
     Starport.greenTextures = greenTextures
   }
 
-  public collisionOptions = {
+  static collisionOptions = {
     width: 40,
     height: 55,
     offset: {
@@ -85,8 +85,8 @@ export class Starport extends Building {
   static cost = 2000
   public hitPoints = 300
   public life = this.hitPoints
-  public teleportingAnimationSpeed = 0.1
-  public teleportingAnimation!: AnimatedSprite
+  public teleportAnimationSpeed = 0.1
+  public teleportAnimation!: AnimatedSprite
   public closingAnimationSpeed = 0.1
   public closingAnimation!: AnimatedSprite
   public openingAnimation!: AnimatedSprite
@@ -98,6 +98,7 @@ export class Starport extends Building {
     initCenter?: boolean
     order?: IOrder
     teleport?: boolean
+    cost: number
   }
 
   static buildableGrid = [
@@ -117,6 +118,7 @@ export class Starport extends Building {
       ...options,
       textures: Starport.textures(options.team)
     })
+    this.collisionOptions = Starport.collisionOptions
     if (Array.isArray(options.commands)) {
       this.commands = options.commands
     }
@@ -130,10 +132,14 @@ export class Starport extends Building {
     this.drawLifeBar()
     this.updateLife()
 
-    this.teleportingAnimation.animationSpeed = this.teleportingAnimationSpeed
+    this.teleportAnimation.animationSpeed = this.teleportAnimationSpeed
     this.closingAnimation.animationSpeed = this.closingAnimationSpeed
     this.openingAnimation.animationSpeed = this.closingAnimationSpeed
-    this.updateAnimation()
+    if (options.teleport === true) {
+      this.switchAnimation(StarportAnimation.teleport)
+    } else {
+      this.updateAnimation()
+    }
   }
 
   calcZIndex (): void {
@@ -147,10 +153,10 @@ export class Starport extends Building {
       textures
     })
     const { teleportTextures, closingTextures, openingTextures } = textures
-    const teleportingAnimation = new AnimatedSprite(teleportTextures)
-    teleportingAnimation.loop = false
-    this.spritesContainer.addChild(teleportingAnimation)
-    this.teleportingAnimation = teleportingAnimation
+    const teleportAnimation = new AnimatedSprite(teleportTextures)
+    teleportAnimation.loop = false
+    this.spritesContainer.addChild(teleportAnimation)
+    this.teleportAnimation = teleportAnimation
 
     const closingAnimation = new AnimatedSprite(closingTextures)
     closingAnimation.loop = false
@@ -163,6 +169,10 @@ export class Starport extends Building {
     this.openingAnimation = openingAnimation
   }
 
+  isTeleporting (): boolean {
+    return this.currentAnimation === this.teleportAnimation
+  }
+
   isOpening (): boolean {
     return this.currentAnimation === this.openingAnimation
   }
@@ -173,12 +183,17 @@ export class Starport extends Building {
 
   override updateAnimation (): void {
     if (this.isHealthy()) {
-      if (this.isOpening()) {
+      if (this.isTeleporting()) {
+        if (this.teleportAnimation.currentFrame === this.teleportAnimation.totalFrames - 1) {
+          this.switchAnimation(StarportAnimation.healthy)
+        }
+      } else if (this.isOpening()) {
         if (this.openingAnimation.currentFrame === this.openingAnimation.totalFrames - 1) {
           this.switchAnimation(StarportAnimation.close)
           if (this.constructUnit != null) {
             const item = this.game.createItem(this.constructUnit)
             if (item != null) {
+              this.game.cash[this.team] -= this.constructUnit.cost
               this.game.tileMap.addItem(item)
             }
           }
@@ -196,6 +211,9 @@ export class Starport extends Building {
   override switchAnimation <T>(animationName: T): void {
     let newAnimation
     switch (animationName) {
+      case StarportAnimation.teleport:
+        newAnimation = this.teleportAnimation
+        break
       case StarportAnimation.open:
         newAnimation = this.openingAnimation
         break
@@ -259,7 +277,6 @@ export class Starport extends Building {
             // Position new unit above center of starport
             const thisPosition = this.getCollisionPosition({ center: true })
             // Teleport in unit and subtract the cost from player cash
-            cash[this.team] -= cost
             this.constructUnit = {
               initX: thisPosition.x,
               initY: thisPosition.y,
@@ -267,7 +284,8 @@ export class Starport extends Building {
               team: this.team,
               name: this.order.name,
               order: this.order.unitOrder,
-              teleport: true
+              teleport: true,
+              cost
             }
             this.switchAnimation(StarportAnimation.open)
           }

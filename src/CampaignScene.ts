@@ -138,6 +138,7 @@ export class CampaignScene extends Container implements IScene {
         this.game.tileMap.addItem(item)
       }
     })
+    this.game.tileMap.rebuildBuildableGrid()
 
     this.game.cash[Team.blue] = mission.cash.blue
     this.game.cash[Team.green] = mission.cash.green
@@ -164,7 +165,7 @@ export class CampaignScene extends Container implements IScene {
         startGridX: 36,
         startGridY: 0,
         cash: {
-          blue: 0,
+          blue: 50000,
           green: 0
         },
         items: [
@@ -172,6 +173,7 @@ export class CampaignScene extends Container implements IScene {
           { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, commands: [], life: 100 },
           /* Player heavy tank */
           { name: 'heavy-tank', initGridX: 57, initGridY: 12, direction: EVectorDirection.downRight, team: Team.blue, uid: -1 },
+          { name: 'scv', initGridX: 57, initGridY: 14, direction: EVectorDirection.downRight, team: Team.blue },
           /* Two transport vehicles waiting just outside the visible map */
           { name: 'transport', initGridX: -3, initGridY: 2, direction: EVectorDirection.right, team: Team.blue, uid: -3, commands: [] },
           { name: 'transport', initGridX: -3, initGridY: 4, direction: EVectorDirection.left, team: Team.blue, uid: -4, commands: [] },

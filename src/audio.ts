@@ -52,6 +52,14 @@ import wraithYes0Audio from './assets/audio/wraith-yes-0.mp3'
 import wraithYes1Audio from './assets/audio/wraith-yes-1.mp3'
 import wraithYes2Audio from './assets/audio/wraith-yes-2.mp3'
 import wraithYes3Audio from './assets/audio/wraith-yes-3.mp3'
+import scvYes0Audio from './assets/audio/scv-yes-0.mp3'
+import scvYes1Audio from './assets/audio/scv-yes-1.mp3'
+import scvYes2Audio from './assets/audio/scv-yes-2.mp3'
+import scvYes3Audio from './assets/audio/scv-yes-3.mp3'
+import scvYes4Audio from './assets/audio/scv-yes-4.mp3'
+import scvYes5Audio from './assets/audio/scv-yes-5.mp3'
+import scvYes6Audio from './assets/audio/scv-yes-6.mp3'
+import scvError0Audio from './assets/audio/scv-error-0.mp3'
 
 export const AUDIO = {
   bullet1: new Howl({
@@ -213,12 +221,37 @@ export const AUDIO = {
   wraithAttack3: new Howl({
     src: wraithAttack3Audio
   }),
+  scvYes0: new Howl({
+    src: scvYes0Audio
+  }),
+  scvYes1: new Howl({
+    src: scvYes1Audio
+  }),
+  scvYes2: new Howl({
+    src: scvYes2Audio
+  }),
+  scvYes3: new Howl({
+    src: scvYes3Audio
+  }),
+  scvYes4: new Howl({
+    src: scvYes4Audio
+  }),
+  scvYes5: new Howl({
+    src: scvYes5Audio
+  }),
+  scvYes6: new Howl({
+    src: scvYes6Audio
+  }),
+  scvError0: new Howl({
+    src: scvError0Audio
+  }),
   play (name: '' | 'acknowledge-attacking' | 'acknowledge-moving'
   | 'bullet' | 'bullet-hit'
   | 'rocket' | 'rocket-hit'
   | 'laser' | 'laser-hit'
   | 'cannon-ball' | 'cannon-hit'
   | 'message-received'
+  | 'scv-yes' | 'scv-error'
   | 'scout-tank-attack' | 'scout-tank-yes'
   | 'heavy-tank-attack' | 'heavy-tank-yes'
   | 'chopper-attack' | 'chopper-yes'
@@ -273,6 +306,13 @@ export const AUDIO = {
     } else if (name === 'wraith-yes') {
       stopPrevious = true
       sounds = [this.wraithYes0, this.wraithYes1, this.wraithYes2, this.wraithYes3]
+    } else if (name === 'scv-yes') {
+      stopPrevious = true
+      sounds = [this.scvYes0, this.scvYes1, this.scvYes2, this.scvYes3, this.scvYes4, this.scvYes5, this.scvYes6]
+    } else if (name === 'scv-error') {
+      stopPrevious = true;
+      [this.scvYes0, this.scvYes1, this.scvYes2, this.scvYes3, this.scvYes4, this.scvYes5, this.scvYes6].forEach(s => s.stop())
+      sounds = [this.scvError0]
     }
     if (sounds.length > 0) {
       if (stopPrevious) {

@@ -35,6 +35,7 @@ export type EItemNames = `${EItemName}`
 export type UnitName = EItemName.SCV | EItemName.Harvester |
 EItemName.Transport | EItemName.ScoutTank | EItemName.HeavyTank |
 EItemName.Chopper | EItemName.Wraith
+export type BuildName = EItemName.GroundTurret | EItemName.Starport
 export type ProjectileName = EItemName.Bullet | EItemName.CannonBall | EItemName.Rocket | EItemName.Laser
 
 export interface IItem {

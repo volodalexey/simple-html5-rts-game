@@ -3,11 +3,14 @@ import { Team } from '../common'
 import { type IOrder } from '../interfaces/IOrder'
 import { type IAttackableBuildingTextures, type IAttackableBuildingOptions, AttackableBuilding } from './AttackableBuilding'
 import { EItemName, type ProjectileName } from '../interfaces/IItem'
+import { BuildingAnimation } from './Building'
 
 export type IGroundTurretOptions = Pick<
 IAttackableBuildingOptions,
 Exclude<keyof IAttackableBuildingOptions, 'textures'>
->
+> & {
+  teleport?: boolean
+}
 
 export interface IGroundTurretTextures extends IAttackableBuildingTextures {
   teleportTextures: Texture[]
@@ -38,7 +41,7 @@ export class GroundTurret extends AttackableBuilding {
     GroundTurret.greenTextures = greenTextures
   }
 
-  public collisionOptions = {
+  static collisionOptions = {
     width: 22,
     height: 19,
     offset: {
@@ -89,9 +92,8 @@ export class GroundTurret extends AttackableBuilding {
   static cost = 1500
   public hitPoints = 200
   public life = this.hitPoints
-  public teleportingAnimationSpeed = 0.1
-  public teleportingAnimation!: AnimatedSprite
-
+  public teleportAnimationSpeed = 0.1
+  public teleportAnimation!: AnimatedSprite
   public canAttack = true
   public canAttackLand = true
   public canAttackAir = false
@@ -112,6 +114,7 @@ export class GroundTurret extends AttackableBuilding {
       ...options,
       textures: GroundTurret.textures(options.team)
     })
+    this.collisionOptions = GroundTurret.collisionOptions
     if (Array.isArray(options.commands)) {
       this.commands = options.commands
     }
@@ -127,8 +130,12 @@ export class GroundTurret extends AttackableBuilding {
     this.drawReloadBar()
     this.updateReload()
 
-    this.teleportingAnimation.animationSpeed = this.teleportingAnimationSpeed
-    this.updateAnimation()
+    this.teleportAnimation.animationSpeed = this.teleportAnimationSpeed
+    if (options.teleport === true) {
+      this.switchAnimation(GroundTurretAnimation.teleport)
+    } else {
+      this.updateAnimation()
+    }
   }
 
   override setup (options: IGroundTurretOptions): void {
@@ -138,8 +145,50 @@ export class GroundTurret extends AttackableBuilding {
       textures
     })
 
-    const teleportingAnimation = new AnimatedSprite(textures.teleportTextures)
-    this.spritesContainer.addChild(teleportingAnimation)
-    this.teleportingAnimation = teleportingAnimation
+    const teleportAnimation = new AnimatedSprite(textures.teleportTextures)
+    this.spritesContainer.addChild(teleportAnimation)
+    this.teleportAnimation = teleportAnimation
+  }
+
+  isTeleporting (): boolean {
+    return this.currentAnimation === this.teleportAnimation
+  }
+
+  override updateAnimation (): void {
+    if (this.isHealthy()) {
+      if (this.isTeleporting()) {
+        if (this.teleportAnimation.currentFrame === this.teleportAnimation.totalFrames - 1) {
+          this.switchAnimation(GroundTurretAnimation.healthy)
+        }
+      } else {
+        this.switchAnimation(GroundTurretAnimation.healthy)
+      }
+    } else if (this.isAlive()) {
+      this.switchAnimation(GroundTurretAnimation.damaged)
+    }
+  }
+
+  override switchAnimation <T>(animationName: T): void {
+    let newAnimation
+    switch (animationName) {
+      case GroundTurretAnimation.teleport:
+        newAnimation = this.teleportAnimation
+        break
+    }
+    if (newAnimation == null) {
+      if (animationName === GroundTurretAnimation.healthy) {
+        super.switchAnimation(BuildingAnimation.healthy)
+      } else {
+        super.switchAnimation(BuildingAnimation.damaged)
+      }
+      return
+    }
+    if (newAnimation === this.currentAnimation || newAnimation == null) {
+      return
+    }
+    this.currentAnimation = newAnimation
+    this.hideAllAnimations()
+    this.currentAnimation.gotoAndPlay(0)
+    this.currentAnimation.visible = true
   }
 }

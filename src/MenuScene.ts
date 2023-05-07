@@ -70,6 +70,7 @@ export class MenuScene extends Container implements IScene {
       textColorHover: 0xffff00,
       shadowTextColor: 0x800080,
       shadowThickness: 2,
+      buttonSelectedAlpha: 0,
       buttonIdleAlpha: 0,
       buttonHoverAlpha: 0
     }
@@ -105,6 +106,7 @@ export class MenuScene extends Container implements IScene {
       shadowTextColor: 0x800080,
       shadowThickness: 2,
       buttonIdleAlpha: 0,
+      buttonSelectedAlpha: 0,
       buttonHoverAlpha: 0
     }
     const homeButton = new Button({

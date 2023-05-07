@@ -1,10 +1,14 @@
-import { Graphics } from 'pixi.js'
-import { type SelectableItem } from './common'
+import { Graphics, Sprite } from 'pixi.js'
+import { Team, type SelectableItem } from './common'
 import { type IOrder } from './interfaces/IOrder'
 import { type TileMap } from './TileMap'
+import { EItemName } from './interfaces/IItem'
+import { GroundTurret } from './buildings/GroundTurret'
+import { Starport } from './buildings/Starport'
 
 export class Order extends Graphics {
   public item!: SelectableItem
+  public buildSprite?: Sprite
   static options = {
     dash: 16,
     gap: 8,
@@ -26,7 +30,7 @@ export class Order extends Graphics {
         return 0xffff00
       case 'guard':
         return 0x0000ff
-      case 'deploy':
+      case 'build': case 'deploy':
         return 0xff00ff
       default:
         return 0xffffff
@@ -43,7 +47,7 @@ export class Order extends Graphics {
         return 0x00ffff
       case 'guard':
         return 0x0000ff
-      case 'deploy':
+      case 'build': case 'deploy':
         return 0xff00ff
       default:
         return 0xffffff
@@ -63,17 +67,19 @@ export class Order extends Graphics {
     switch (type) {
       case 'attack': case 'guard': case 'follow':
         return 15
+      case 'build': case 'deploy':
+        return 0
       default:
         return 3
     }
   }
 
-  drawOrderLine ({ selectedItem, tileMap }: { selectedItem: SelectableItem, tileMap: TileMap }): void {
+  drawOrder ({ selectedItem, tileMap }: { selectedItem: SelectableItem, tileMap: TileMap }): void {
     const selectedItemPosition = selectedItem.getCollisionPosition({ center: true })
     let from: { x: number, y: number } | undefined
     let to: { x: number, y: number } | undefined
     switch (selectedItem.order.type) {
-      case 'move': case 'move-and-attack': {
+      case 'move': case 'move-and-attack': case 'build': case 'deploy': {
         from = selectedItemPosition
         to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
         break
@@ -92,11 +98,9 @@ export class Order extends Graphics {
         to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
         break
       }
-      case 'deploy': {
-        from = selectedItemPosition
-        to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
-        break
-      }
+    }
+    if (this.buildSprite != null) {
+      this.buildSprite.visible = false
     }
 
     if (from == null || to == null) {
@@ -135,5 +139,37 @@ export class Order extends Graphics {
     this.drawCircle(to.x, to.y, this.getDestinationRadius(type))
     this.endFill()
     this.alpha = 0.5
+    this.drawOrderSprite({ selectedItem, tileMap, to })
+  }
+
+  drawOrderSprite ({ selectedItem, tileMap, to }: { selectedItem: SelectableItem, tileMap: TileMap, to: { x: number, y: number } }): void {
+    let texture
+    let offset = { x: 0, y: 0 }
+    if (selectedItem.order.type === 'build') {
+      if (selectedItem.order.name === EItemName.GroundTurret) {
+        texture = selectedItem.team === Team.blue
+          ? GroundTurret.blueTextures.downRightTextures[0]
+          : GroundTurret.greenTextures.downRightTextures[0]
+        offset = GroundTurret.collisionOptions.offset
+      } else if (selectedItem.order.name === EItemName.Starport) {
+        texture = selectedItem.team === Team.blue
+          ? Starport.blueTextures.healthyTextures[0]
+          : Starport.greenTextures.healthyTextures[0]
+        offset = Starport.collisionOptions.offset
+      }
+    }
+    if (texture == null) {
+      return
+    }
+    if (this.buildSprite == null) {
+      this.buildSprite = new Sprite()
+      this.addChild(this.buildSprite)
+    }
+    this.buildSprite.texture = texture
+    this.buildSprite.position.set(
+      Math.floor(to.x / tileMap.gridSize) * tileMap.gridSize - offset.x,
+      Math.floor(to.y / tileMap.gridSize) * tileMap.gridSize - offset.y
+    )
+    this.buildSprite.visible = true
   }
 }

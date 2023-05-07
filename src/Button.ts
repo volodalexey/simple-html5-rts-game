@@ -1,11 +1,11 @@
-import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js'
+import { Container, type FederatedPointerEvent, Graphics, Sprite, Text, type Texture } from 'pixi.js'
 
 export interface IButtonOptions {
   text: string
   buttonWidth?: number
   buttonHeight?: number
   buttonRadius?: number
-  onClick?: (attackBtn: Button) => void
+  onClick?: (e: FederatedPointerEvent) => void
   iconPaddingTop?: number
   iconPaddingLeft?: number
   iconIdleAlpha?: number
@@ -125,11 +125,11 @@ export class Button extends Container {
     this.buttonHoverColor = options.buttonHoverColor ?? options.buttonIdleColor ?? 0x000000
     this.buttonHoverAlpha = options.buttonHoverAlpha ?? 1
     this.buttonBorderWidth = options.buttonBorderWidth ?? 0
-    this.buttonBorderColor = options.buttonBorderColor ?? options.buttonIdleColor ?? 0x000000
+    this.buttonBorderColor = options.buttonBorderColor ?? this.buttonIdleColor ?? 0x000000
     this.buttonBorderHoverColor = options.buttonBorderHoverColor ?? options.buttonIdleColor ?? 0x000000
     this.buttonBorderAlpha = options.buttonBorderAlpha ?? 1
     this.buttonBorderHoverAlpha = options.buttonBorderHoverAlpha ?? 1
-    this.buttonSelectedColor = options.buttonSelectedColor ?? options.buttonIdleColor ?? 0x000000
+    this.buttonSelectedColor = options.buttonSelectedColor ?? this.buttonIdleColor ?? 0x000000
     this.buttonDisabledColor = options.buttonDisabledColor ?? 0x000000
     this.buttonSelectedAlpha = options.buttonSelectedAlpha ?? 1
     this.buttonDisabledAlpha = options.buttonDisabledAlpha ?? 1
@@ -215,11 +215,11 @@ export class Button extends Container {
   }
 
   initEventLesteners (): void {
-    this.on('pointertap', (e) => {
+    this.on('pointertap', (e: FederatedPointerEvent) => {
       this.selected = !this.selected
       this.updateState()
       if (typeof this.onClick === 'function') {
-        this.onClick(this)
+        this.onClick(e)
       }
     })
     this.on('pointerdown', (e) => {

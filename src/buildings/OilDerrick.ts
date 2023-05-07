@@ -7,7 +7,7 @@ export type IOilDerrickOptions = Pick<
 IBuildingOptions,
 Exclude<keyof IBuildingOptions, 'textures'>
 > & {
-  initialAnimation?: OilDerrickAnimation
+  deploy?: boolean
 }
 
 export interface IOilDerrickTextures extends IBuildingTextures {
@@ -112,8 +112,8 @@ export class OilDerrick extends Building {
     this.updateLife()
 
     this.deployAnimation.animationSpeed = this.deployAnimationSpeed
-    if (options.initialAnimation) {
-      this.switchAnimation(options.initialAnimation)
+    if (options.deploy === true) {
+      this.switchAnimation(OilDerrickAnimation.deploy)
     } else {
       this.updateAnimation()
     }

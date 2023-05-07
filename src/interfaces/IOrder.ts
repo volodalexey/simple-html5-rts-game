@@ -1,5 +1,5 @@
 import { type BaseActiveItem } from '../common'
-import { type UnitName, type EItemType } from './IItem'
+import { type UnitName, type EItemType, type BuildName } from './IItem'
 
 export enum EOrderType {
   move = 'move',
@@ -13,6 +13,7 @@ export enum EOrderType {
   guard = 'guard',
   follow = 'follow',
   deploy = 'deploy',
+  build = 'build',
   constructUnit = 'construct-unit',
   moveAndAttack = 'move-and-attack',
 }
@@ -22,7 +23,9 @@ export type OrderTypes = `${EOrderType}`
 export type IOrder = IMoveOrder | IMoveAndAttack
 | IFireOrder | IAttackOrder | IPatrolOrder
 | IStandOrder | IFloatOrder
-| ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder | IDeployOrder | IConstructUnitOrder
+| ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder
+| IDeployOrder | IBuildOrder
+| IConstructUnitOrder
 
 interface IMoveOrder {
   type: 'move'
@@ -83,6 +86,12 @@ interface IHuntOrder {
 interface IDeployOrder {
   type: 'deploy'
   toPoint: IPointGridData
+}
+
+interface IBuildOrder {
+  type: 'build'
+  toPoint: IPointGridData
+  name: BuildName
 }
 
 interface IConstructUnitOrder {

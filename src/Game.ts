@@ -125,7 +125,7 @@ export class Game extends Container {
     this.addChild(this.topBar)
 
     this.sideBar = new SideBar({
-      game: this, initY: TopBar.options.initHeight
+      game: this, viewWidth, initY: TopBar.options.initHeight
     })
     this.addChild(this.sideBar)
 
@@ -255,6 +255,12 @@ export class Game extends Container {
           break
         case ECommandName.attackGuard:
           order = { type: 'move-and-attack', toPoint: { gridX, gridY } }
+          break
+        case ECommandName.buildTurret:
+          order = { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX, gridY } }
+          break
+        case ECommandName.buildStarport:
+          order = { type: 'build', name: EItemName.Starport, toPoint: { gridX, gridY } }
           break
       }
       // identify selected items from players team that can process command
@@ -494,6 +500,7 @@ export class Game extends Container {
     const { x: pX, y: pY } = this.tileMap.pivot
     this.tileMap.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight })
     this.topBar.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight, camX: pX, camY: pY })
+    this.sideBar.handleResize({ viewWidth: maxWidth, initY: this.topBar.height })
 
     const availableWidth = viewWidth
     const availableHeight = viewHeight
@@ -537,7 +544,7 @@ export class Game extends Container {
         order = new Order({ item: selectedItem })
         this.tileMap.orders.addChild(order)
       }
-      order.drawOrderLine({
+      order.drawOrder({
         selectedItem,
         tileMap: this.tileMap
       })
@@ -905,6 +912,8 @@ export class Game extends Container {
         iconAttackGuardTexture: textures['icon-command-attack-guard.png'],
         iconPatrolTexture: textures['icon-command-patrol.png'],
         iconDeselectTexture: textures['icon-deselect.png'],
+        iconBuildTurretTexture: textures['ground-turret-blue-healthy-down-right.png'],
+        iconBuildStarportTexture: textures['starport-blue-healthy-0.png'],
         iconConstructSCVTexture: textures['scv-blue-down-right.png'],
         iconConstructHarvesterTexture: textures['harvester-blue-down-right.png']
       }
@@ -934,7 +943,9 @@ export class Game extends Container {
       if (item != null && ((order != null) || (unitOrder != null))) {
         item.order = (order ?? unitOrder) as IOrder
         if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
-          if (item.itemName === EItemName.ScoutTank) {
+          if (item.itemName === EItemName.SCV) {
+            AUDIO.play('scv-yes')
+          } else if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-yes')
           } else if (item.itemName === EItemName.HeavyTank) {
             AUDIO.play('heavy-tank-yes')
@@ -957,6 +968,8 @@ export class Game extends Container {
           } else {
             AUDIO.play('acknowledge-attacking')
           }
+        } else if (item.order.type === 'build') {
+          AUDIO.play('scv-yes')
         }
         if (toObject != null && (item.order.type === 'attack' || item.order.type === 'guard')) {
           item.order.to = toObject
@@ -1004,6 +1017,15 @@ export class Game extends Container {
         return Rocket.reloadTime
       case EItemName.Laser:
         return Laser.reloadTime
+    }
+  }
+
+  getBuildableGrid (name: EItemName): number[][] | undefined {
+    switch (name) {
+      case EItemName.GroundTurret:
+        return GroundTurret.buildableGrid
+      case EItemName.Starport:
+        return Starport.buildableGrid
     }
   }
 
