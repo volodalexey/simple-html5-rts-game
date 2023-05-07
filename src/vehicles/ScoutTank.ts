@@ -82,6 +82,7 @@ export class ScoutTank extends AttackableVehicle {
   static cost = 500
   public hitPoints = 50
   public turnSpeed = 4
+  public turnFactor = 10
   public projectile: ProjectileName = EItemName.Bullet
   public canAttack = true
   public canAttackLand = true

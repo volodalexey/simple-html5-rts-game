@@ -96,6 +96,7 @@ export class Wraith extends AttackableAirVehicle {
   static cost = 600
   public hitPoints = 50
   public turnSpeed = 4
+  public turnFactor = 10
   public projectile: ProjectileName = EItemName.Laser
   public canAttack = true
   public canAttackLand = false

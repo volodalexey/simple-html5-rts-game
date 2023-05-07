@@ -95,7 +95,8 @@ export class Chopper extends AttackableAirVehicle {
   public sight = 6
   static cost = 900
   public hitPoints = 50
-  public turnSpeed = 4
+  public turnSpeed = 8
+  public turnFactor = 10
   public projectile: ProjectileName = EItemName.Rocket
   public canAttack = true
   public canAttackLand = true

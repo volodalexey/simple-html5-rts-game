@@ -20,6 +20,8 @@ export interface ITileMapOptions {
 
 type GridArray = Array<Array<1 | 0>>
 
+class ActiveItems extends Container<BaseActiveItem> {}
+
 export class TileMap extends Container {
   public game !: Game
   public gridSize !: number
@@ -31,7 +33,7 @@ export class TileMap extends Container {
   private _currentMapBuildableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Container<Hitbox>()
-  public activeItems = new Container<BaseActiveItem>()
+  public activeItems = new ActiveItems()
   public orders = new Container<Order>()
   public projectiles = new Container<Projectile>()
   public background = new Sprite()

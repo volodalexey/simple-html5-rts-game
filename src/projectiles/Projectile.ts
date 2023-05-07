@@ -36,6 +36,7 @@ export class Projectile extends Item implements IMoveable {
   public radius = 0
   public followRadius = 0
   public turnSpeed = 0
+  public turnFactor = 0
   public moveTurning = false
   public hardCollision = false
   public collisionCount = 0

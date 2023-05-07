@@ -70,6 +70,7 @@ export class Transport extends Vehicle {
   static cost = 400
   public hitPoints = 100
   public turnSpeed = 2
+  public turnFactor = 20
 
   constructor (options: ITransportOptions) {
     super({

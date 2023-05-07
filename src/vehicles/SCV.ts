@@ -69,7 +69,8 @@ export class SCV extends Vehicle {
   public sight = 3
   static cost = 400
   public hitPoints = 100
-  public turnSpeed = 2
+  public turnSpeed = 4
+  public turnFactor = 10
 
   constructor (options: ISCVOptions) {
     super({

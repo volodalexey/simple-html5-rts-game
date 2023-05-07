@@ -5,4 +5,5 @@ export interface IMoveable {
   collisionCount: number
   colliding: boolean
   followRadius: number
+  turnFactor: number
 }

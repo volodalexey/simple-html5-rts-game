@@ -76,6 +76,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
   public speed = 0
   public moveTurning = false
   public turnSpeed = 0
+  public turnFactor = 0
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
@@ -422,7 +423,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     const difference = angleDiff({ angle1: this.vector.direction, angle2: newDirection, directions: this.vector.directions })
     const turnAmount = this.turnSpeed * turnSpeedAdjustmentFactor
 
-    if (Math.abs(difference) > turnAmount * 10) {
+    if (Math.abs(difference) > turnAmount * this.turnFactor) {
       this.vector.setDirection({
         direction: wrapDirection({
           direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,

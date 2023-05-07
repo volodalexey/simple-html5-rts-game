@@ -82,6 +82,7 @@ export class HeavyTank extends AttackableVehicle {
   static cost = 1200
   public hitPoints = 50
   public turnSpeed = 4
+  public turnFactor = 10
   public projectile: ProjectileName = EItemName.CannonBall
   public canAttack = true
   public canAttackLand = true

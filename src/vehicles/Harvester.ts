@@ -72,6 +72,7 @@ export class Harvester extends Vehicle {
   static cost = 1600
   public hitPoints = 50
   public turnSpeed = 2
+  public turnFactor = 20
 
   constructor (options: IHarvesterOptions) {
     super({
