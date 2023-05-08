@@ -225,7 +225,7 @@ export class StatusBar extends Container {
     this.messageList.mask = this.messageListMask
   }
 
-  appendMessage ({ character, message, time }: { character: EMessageCharacter, message: string, time: number }): void {
+  appendMessage ({ character, message, time, selfRemove, height }: { character: EMessageCharacter, message: string, time: number, selfRemove: boolean, height: number }): void {
     let texture: Texture
     switch (character) {
       case EMessageCharacter.system:
@@ -251,6 +251,12 @@ export class StatusBar extends Container {
       })
       statusMessage.position.set(padding, this.messageList.height === 0 ? padding : this.messageList.height + padding * 2)
       this.messageList.addChild(statusMessage)
+      if (selfRemove) {
+        setTimeout(() => {
+          statusMessage.removeFromParent()
+          this.reAppendMessages({ width: this.width, height })
+        }, 3000)
+      }
       const { maxPivot } = this
       if (this.messageList.height > maxPivot) {
         this.scrollToLastMessage = true
@@ -341,10 +347,7 @@ export class StatusBar extends Container {
     return (this.messageList.mask as Graphics).width - StatusBar.options.padding * 2
   }
 
-  setLimit ({ width, height }: { width: number, height: number }): void {
-    if (this.width === width) {
-      return
-    }
+  reAppendMessages ({ width, height }: { width: number, height: number }): void {
     const { padding } = StatusBar.options
     const messages: StatusMessage[] = []
     for (let i = 0; i < this.messageList.children.length; i++) {
@@ -361,5 +364,12 @@ export class StatusBar extends Container {
     })
     this.messageList.pivot.y = 0
     this.scrollToLastMessage = true
+  }
+
+  setLimit ({ width, height }: { width: number, height: number }): void {
+    if (this.width === width) {
+      return
+    }
+    this.reAppendMessages({ width, height })
   }
 }

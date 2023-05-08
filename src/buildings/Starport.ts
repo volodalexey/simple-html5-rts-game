@@ -265,14 +265,16 @@ export class Starport extends Building {
             if (this.team === gameTeam) {
               this.game.showMessage({
                 character: EMessageCharacter.system,
-                message: 'Warning! Cannot teleport unit while landing bay is occupied.'
+                message: 'Warning! Cannot teleport unit while landing bay is occupied.',
+                selfRemove: true
               })
             }
           } else if (cash[this.team] < cost) {
             if (this.team === gameTeam) {
               this.game.showMessage({
                 character: EMessageCharacter.system,
-                message: `Warning! Insufficient Funds. Need ${cost} credits.`
+                message: `Warning! Insufficient Funds. Need ${cost} credits.`,
+                selfRemove: true
               })
             }
           } else {

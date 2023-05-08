@@ -985,11 +985,11 @@ export class Game extends Container {
     return true
   }
 
-  showMessage ({ character, message, playSound = true }: { character: EMessageCharacter, message: string, playSound?: boolean }): void {
+  showMessage ({ character, message, playSound = true, selfRemove = false }: { character: EMessageCharacter, message: string, playSound?: boolean, selfRemove?: boolean }): void {
     if (playSound) {
       AUDIO.play('message-received')
     }
-    this.topBar.statusBar.appendMessage({ character, message, time: this.time })
+    this.topBar.statusBar.appendMessage({ character, message, time: this.time, selfRemove, height: TopBar.options.initHeight })
   }
 
   getItemCost (name: EItemName): number | undefined {

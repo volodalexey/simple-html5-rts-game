@@ -113,7 +113,8 @@ export class SCV extends Vehicle {
         if (cash[this.team] < cost && this.team === gameTeam) {
           this.game.showMessage({
             character: EMessageCharacter.system,
-            message: `Warning! Insufficient Funds. Need ${cost} credits.`
+            message: `Warning! Insufficient Funds. Need ${cost} credits.`,
+            selfRemove: true
           })
           this.order = { type: 'stand' }
           return true

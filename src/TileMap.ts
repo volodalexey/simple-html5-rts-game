@@ -12,6 +12,8 @@ import { EItemType } from './interfaces/IItem'
 import { logGrid, logHitboxes } from './logger'
 import { type AirVehicle } from './air-vehicles/AirVehicle'
 import { ECommandName } from './Command'
+import { GroundTurret } from './buildings/GroundTurret'
+import { Starport } from './buildings/Starport'
 
 export interface ITileMapOptions {
   game: Game
@@ -219,9 +221,11 @@ export class TileMap extends Container {
     for (const item of items) {
       item.handleUpdate(deltaMS)
     }
-    this.game.tileMap.activeItems.sortChildren()
     const selectedCommandName = this.game.sideBar.commandsBar.getSelectedCommandName()
-    if (selectedCommandName === ECommandName.buildTurret || selectedCommandName === ECommandName.buildStarport || logHitboxes.enabled) {
+    const cash = this.game.cash[this.game.team]
+    if ((selectedCommandName === ECommandName.buildTurret && cash >= GroundTurret.cost) ||
+      (selectedCommandName === ECommandName.buildStarport && cash >= Starport.cost) ||
+      logHitboxes.enabled) {
       this.rebuildBuildableGrid()
       this.hitboxes.draw({
         currentMapBuildableGrid: this.currentMapBuildableGrid,
@@ -233,6 +237,7 @@ export class TileMap extends Container {
     } else {
       this.hitboxes.visible = false
     }
+    this.game.tileMap.activeItems.sortChildren()
   }
 
   addItem (item: BaseItem): void {
