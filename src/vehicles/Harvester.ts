@@ -114,7 +114,9 @@ export class Harvester extends Vehicle {
           for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
             if (currentMapDeployableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
               // If oilfield has been used already, then cancel order
-              AUDIO.play('harvester-error')
+              if (this.team === this.game.team) {
+                AUDIO.play('harvester-error')
+              }
               this.order = { type: 'stand' }
               return true
             }
@@ -150,12 +152,15 @@ export class Harvester extends Vehicle {
             }))
           }
         } else {
-          const distanceFromDestinationSquared = (Math.pow(toPoint.gridX - thisGrid.gridX, 2) + Math.pow(toPoint.gridY - thisGrid.gridY, 2))
+          const distanceFromDestinationSquared = (Math.pow(Math.floor(toPoint.gridX) - thisGrid.gridX, 2) + Math.pow(Math.floor(toPoint.gridY) - thisGrid.gridY, 2))
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
           const moving = this._moveTo({ type: EItemType.terrain, ...this.order.toPoint }, distanceFromDestination)
 
           // Pathfinding couldn't find a path so stop
           if (!moving) {
+            if (this.team === this.game.team) {
+              AUDIO.play('harvester-error')
+            }
             this.order = { type: 'stand' }
           }
         }

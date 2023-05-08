@@ -98,12 +98,14 @@ export class CampaignScene extends Container implements IScene {
 
     for (let i = 0; i < this.triggers.length; i++) {
       const trigger = this.triggers[i]
+      let triggered = false
       switch (trigger.type) {
         case ETriggerType.timed: {
           if (this.game.time >= (trigger as TimedTrigger).time) {
             trigger.action()
             this.triggers.splice(i, 1)
             i--
+            triggered = true
           }
           break
         }
@@ -112,15 +114,21 @@ export class CampaignScene extends Container implements IScene {
             trigger.action()
             this.triggers.splice(i, 1)
             i--
+            triggered = true
           }
           break
         }
         case ETriggerType.interval: {
           if ((trigger as IntervalTrigger).isElapsed(deltaMS)) {
             trigger.action()
+            triggered = true
           }
           break
         }
+      }
+      if (triggered && trigger.insertTrigger != null) {
+        const newTrigger = createTrigger(trigger.insertTrigger)
+        this.triggers.push(newTrigger)
       }
     }
   }
@@ -687,14 +695,14 @@ export class CampaignScene extends Container implements IScene {
         ]
       },
       {
-        name: 'Entitties',
-        briefing: 'In this level, you will start to learn how to build oil derrick to increase our income.',
+        name: 'Development',
+        briefing: 'We need to build a base from scratch!',
         mapImageSrc: 'level2Background',
         mapSettingsSrc: 'level2Settings',
         startGridX: 0,
         startGridY: 30,
         cash: {
-          blue: 16000,
+          blue: 1600,
           green: 0
         },
         items: [
@@ -716,6 +724,327 @@ export class CampaignScene extends Container implements IScene {
           {
             type: ETriggerType.conditional,
             condition: () => {
+              return Boolean(this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.Harvester))
+            },
+            action: () => {
+              const base = this.game.tileMap.getItemByUid(-1)
+              if (base != null) {
+                this.game.clearSelection(true)
+                base.commands = []
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return Boolean(this.game.tileMap.staticItems.find(item => item.itemName === EItemName.OilDerrick))
+            },
+            action: () => {
+              // now base can construct scv
+              const base = this.game.tileMap.getItemByUid(-1)
+              if (base != null) {
+                this.game.clearSelection(true)
+                base.commands = [ECommandName.constructSCV]
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'We need to build fortifications to resist enemy attacks, please choose the main base to build scv.'
+                })
+                this.game.cash[Team.blue] += 400
+                this.game.cash[Team.green] += 1600
+                this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 2 } } } })
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              const scv = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.SCV)
+              if (scv != null) {
+                scv.commands = [ECommandName.moveFollow, ECommandName.patrol, ECommandName.buildTurret]
+              }
+              return Boolean(scv)
+            },
+            action: () => {
+              // now base can not construct any more scv
+              const base = this.game.tileMap.getItemByUid(-1)
+              if (base != null) {
+                this.game.clearSelection(true)
+                base.commands = []
+                this.game.cash[Team.blue] += 1500
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: "SCV can build a turret to resist the enemy's attack.\nSelect SCV and build a turret on the right side of the main base"
+                })
+                this.game.cash[Team.green] += 2400
+                this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.SCV, unitOrder: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } } })
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return Boolean(this.game.tileMap.staticItems.find(item => item.itemName === EItemName.GroundTurret))
+            },
+            action: () => {
+              this.game.clearSelection(true)
+              const scv = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.SCV && item.team === this.game.team)
+              if (scv != null) {
+                scv.commands = [ECommandName.moveFollow, ECommandName.patrol]
+              }
+              const turret = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.GroundTurret && item.team === this.game.team)
+              const enemyStarport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === Team.green)
+              if (enemyStarport != null && turret != null) {
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'The enemy is attacking!'
+                })
+                this.game.cash[Team.green] += 500
+                this.game.processOrder({ uids: [enemyStarport.uid], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'attack', to: turret }, unitUid: -3 } })
+              } else {
+                this.endMission({ success: false })
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              // find constructed scout tank by enemy
+              return Boolean(this.game.tileMap.getItemByUid(-3))
+            },
+            action: () => {},
+            insertTrigger: {
+              type: ETriggerType.conditional,
+              condition: () => {
+                return this.game.tileMap.isItemsDead([-3])
+              },
+              action: () => {
+                const scv = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.SCV && item.team === this.game.team)
+                if (scv != null) {
+                  this.game.clearSelection(true)
+                  scv.commands = [ECommandName.moveFollow, ECommandName.patrol, ECommandName.buildStarport]
+                  this.game.cash[Team.blue] += 2000
+                  this.game.showMessage({
+                    character: EMessageCharacter.op,
+                    message: 'SCV can build a Starport to produce military units.\nSelect SCV and build a Starport on the right side of the main base'
+                  })
+                }
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return Boolean(this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === this.game.team))
+            },
+            action: () => {
+              this.game.clearSelection(true)
+              const starport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === this.game.team)
+              if (starport != null) {
+                const scv = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.SCV && item.team === this.game.team)
+                if (scv != null) {
+                  scv.commands = [ECommandName.moveFollow, ECommandName.patrol]
+                }
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'Starport has been built, please select the star port and build a Scout Tank and a Chopper.'
+                })
+                starport.commands = [ECommandName.constructScoutTank, ECommandName.constructChopper]
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              const scoutTank = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.ScoutTank && item.team === this.game.team)
+              return Boolean(scoutTank)
+            },
+            action: () => {
+              this.game.clearSelection(true)
+              const starport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === this.game.team)
+              if (starport != null) {
+                const chopper = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.Chopper && item.team === this.game.team)
+                if (chopper == null) {
+                  starport.commands = [ECommandName.constructChopper]
+                } else {
+                  starport.commands = []
+                }
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              const chopper = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.Chopper && item.team === this.game.team)
+              return Boolean(chopper)
+            },
+            action: () => {
+              this.game.clearSelection(true)
+              const starport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === this.game.team)
+              if (starport != null) {
+                const scoutTank = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.ScoutTank && item.team === this.game.team)
+                if (scoutTank == null) {
+                  starport.commands = [ECommandName.constructScoutTank]
+                } else {
+                  starport.commands = []
+                }
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              const scoutTank = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.ScoutTank && item.team === this.game.team)
+              const chopper = this.game.tileMap.moveableItems.find(item => item.itemName === EItemName.Chopper && item.team === this.game.team)
+              return Boolean(scoutTank) && Boolean(chopper)
+            },
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'There is an enemy on the right side of the map, destroy the enemy unit!'
+              })
+              const enemyStarport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === Team.green)
+              if (enemyStarport != null) {
+                this.game.cash[Team.green] += 500
+                this.game.processOrder({ uids: [enemyStarport.uid], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 58, gridY: 10 }, toPoint: { gridX: 51, gridY: 10 } }, unitUid: -4 } })
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              // find constructed scout tank by enemy
+              return Boolean(this.game.tileMap.getItemByUid(-4))
+            },
+            action: () => {},
+            insertTrigger: { // insert new AI trigger
+              type: ETriggerType.conditional,
+              condition: () => {
+                return this.game.tileMap.isItemsDead([-4])
+              },
+              action: () => {
+                this.game.clearSelection(true)
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'Well done! Destroy enemy base!'
+                })
+                this.game.cash[Team.green] += 5000
+                this.game.tileMap.activeItems.children.forEach(item => {
+                  if (item.team === this.game.team) {
+                    switch (item.itemName) {
+                      case EItemName.Base:
+                        item.commands = [ECommandName.constructSCV, ECommandName.constructHarvester]
+                        break
+                      case EItemName.SCV:
+                        item.commands = [ECommandName.moveFollow, ECommandName.patrol, ECommandName.buildTurret, ECommandName.buildStarport]
+                        break
+                      case EItemName.Starport:
+                        item.commands = [ECommandName.constructScoutTank, ECommandName.constructHeavyTank, ECommandName.constructChopper, ECommandName.constructWraith]
+                        break
+                    }
+                  }
+                })
+              },
+              insertTrigger: {
+                // Start simple AI
+                type: ETriggerType.interval,
+                interval: 5000,
+                action: () => {
+                  let oilDerricks = 0
+                  let harvester = 0
+                  const scvIds = []
+                  let scoutTankCount = 0
+                  let heavyTankCount = 0
+                  let chopperCount = 0
+                  let wraithCount = 0
+                  let turretCount = 0
+                  const starportIds = []
+                  const { activeItems } = this.game.tileMap
+                  for (let i = 0; i < activeItems.children.length; i++) {
+                    const item = activeItems.children[i]
+                    if (item.team === Team.green) {
+                      switch (item.itemName) {
+                        case 'oil-derrick':
+                          oilDerricks++
+                          break
+                        case 'ground-turret':
+                          turretCount++
+                          break
+                        case 'starport':
+                          starportIds.push(item.uid)
+                          break
+                        case 'harvester':
+                          harvester++
+                          break
+                        case 'scv':
+                          scvIds.push(item.uid)
+                          break
+                        case 'scout-tank':
+                          scoutTankCount++
+                          break
+                        case 'heavy-tank':
+                          heavyTankCount++
+                          break
+                        case 'chopper':
+                          chopperCount++
+                          break
+                        case 'wraith':
+                          wraithCount++
+                          break
+                      }
+                    }
+                  }
+                  const attackableUnitCount = scoutTankCount + heavyTankCount + chopperCount + wraithCount
+
+                  if (oilDerricks === 0 && harvester === 0) {
+                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 2 } } } })
+                  } else if (oilDerricks === 1 && harvester === 0 && attackableUnitCount > 10) {
+                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 29 } } } })
+                  } else if (oilDerricks === 2 && harvester === 0 && attackableUnitCount > 10) {
+                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 31, gridY: 38 } } } })
+                  } else if (oilDerricks === 3 && harvester === 0 && attackableUnitCount > 10) {
+                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 30, gridY: 17 } } } })
+                  }
+
+                  if (scvIds.length === 0) {
+                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.SCV } })
+                  } else if (starportIds.length === 0) {
+                    this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } })
+                  } else if (starportIds.length === 1 && attackableUnitCount > 4) {
+                    this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 58, gridY: 6 } } })
+                  }
+
+                  if (chopperCount === 0) {
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'patrol', fromPoint: { gridX: 57, gridY: 9 }, toPoint: { gridX: 52, gridY: 12 } } } })
+                  } else if (wraithCount === 0) {
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'patrol', fromPoint: { gridX: 58, gridY: 10 }, toPoint: { gridX: 51, gridY: 10 } } } })
+                  } else if (chopperCount === 1 && wraithCount === 1) {
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
+                  } else if (heavyTankCount === 0) {
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 55, gridY: 8 }, toPoint: { gridX: 55, gridY: 5 } } } })
+                  } else if (heavyTankCount === 1) {
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                  }
+
+                  if (scvIds.length === 1 && this.game.cash.green > 2500) {
+                    if (turretCount === 0) {
+                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 50, gridY: 9 } } })
+                    } else if (turretCount === 1) {
+                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 52, gridY: 11 } } })
+                    } else if (turretCount === 2) {
+                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 55, gridY: 11 } } })
+                    } else if (turretCount === 3) {
+                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 55, gridY: 11 } } })
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
               return this.game.tileMap.isItemsDead([-1])
             },
             action: () => {
@@ -729,20 +1058,6 @@ export class CampaignScene extends Container implements IScene {
             },
             action: () => {
               this.endMission({ success: true })
-            }
-          },
-          {
-            type: ETriggerType.conditional,
-            condition: () => {
-              return Boolean(this.game.tileMap.staticItems.find(item => item.itemName === EItemName.OilDerrick))
-            },
-            action: () => {
-              // now base can construct scv
-              const base = this.game.tileMap.getItemByUid(-1)
-              if (base != null) {
-                this.game.clearSelection()
-                base.commands = [ECommandName.constructSCV]
-              }
             }
           }
         ]

@@ -101,6 +101,7 @@ export class Starport extends Building {
     order?: IOrder
     teleport?: boolean
     cost: number
+    uid?: number
   }
 
   static buildableGrid = [
@@ -289,7 +290,8 @@ export class Starport extends Building {
               name: this.order.name,
               order: this.order.unitOrder,
               teleport: true,
-              cost
+              cost,
+              uid: this.order.unitUid
             }
             this.switchAnimation(StarportAnimation.open)
           }

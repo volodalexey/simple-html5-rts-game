@@ -53,8 +53,6 @@ export class Game extends Container {
   public turnSpeedAdjustmentFactor = 1 / 64
   public speedAdjustmentWhileTurningFactor = 0.4
   public reloadAdjustmentFactor = 1 / 8
-  public deployBuilding = false
-  public canDeployBuilding = false
 
   public viewWidth: number
   public viewHeight: number
@@ -258,13 +256,16 @@ export class Game extends Container {
           break
         case ECommandName.buildTurret:
           order = { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX, gridY } }
+          this.sideBar.commandsBar.deselectTiles()
           break
         case ECommandName.buildStarport:
           order = { type: 'build', name: EItemName.Starport, toPoint: { gridX, gridY } }
+          this.sideBar.commandsBar.deselectTiles()
           break
         case ECommandName.deploy: {
           const minGridX = initialMapDeployableGrid[Math.floor(gridY)][Math.floor(gridX) - 1] === 0 ? Math.floor(gridX) - 1 + 0.5 : gridX
           order = { type: 'deploy', toPoint: { gridX: minGridX, gridY } }
+          this.sideBar.commandsBar.deselectTiles()
           break
         }
       }
@@ -479,7 +480,7 @@ export class Game extends Container {
   }): void => {
     this.gameEnded = false
     this.time = 0
-    this.clearSelection()
+    this.clearSelection(true)
     this.dragSelect.clear()
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
@@ -945,38 +946,40 @@ export class Game extends Container {
       // if uid is a valid item, set the order for the item
       if (item != null && ((order != null) || (unitOrder != null))) {
         item.order = (order ?? unitOrder) as IOrder
-        if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
-          if (item.itemName === EItemName.SCV) {
+        if (item.team === this.team) {
+          if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
+            if (item.itemName === EItemName.SCV) {
+              AUDIO.play('scv-yes')
+            } else if (item.itemName === EItemName.Harvester) {
+              AUDIO.play('harvester-yes')
+            } else if (item.itemName === EItemName.ScoutTank) {
+              AUDIO.play('scout-tank-yes')
+            } else if (item.itemName === EItemName.HeavyTank) {
+              AUDIO.play('heavy-tank-yes')
+            } else if (item.itemName === EItemName.Chopper) {
+              AUDIO.play('chopper-yes')
+            } else if (item.itemName === EItemName.Wraith) {
+              AUDIO.play('wraith-yes')
+            } else {
+              AUDIO.play('acknowledge-moving')
+            }
+          } else if (['attack', 'move-and-attack'].includes(item.order.type)) {
+            if (item.itemName === EItemName.ScoutTank) {
+              AUDIO.play('scout-tank-attack')
+            } else if (item.itemName === EItemName.HeavyTank) {
+              AUDIO.play('heavy-tank-attack')
+            } else if (item.itemName === EItemName.Chopper) {
+              AUDIO.play('chopper-attack')
+            } else if (item.itemName === EItemName.Wraith) {
+              AUDIO.play('wraith-attack')
+            } else {
+              AUDIO.play('acknowledge-attacking')
+            }
+          } else if (item.order.type === 'build') {
             AUDIO.play('scv-yes')
-          } else if (item.itemName === EItemName.Harvester) {
+          } else if (item.order.type === 'deploy') {
             AUDIO.play('harvester-yes')
-          } else if (item.itemName === EItemName.ScoutTank) {
-            AUDIO.play('scout-tank-yes')
-          } else if (item.itemName === EItemName.HeavyTank) {
-            AUDIO.play('heavy-tank-yes')
-          } else if (item.itemName === EItemName.Chopper) {
-            AUDIO.play('chopper-yes')
-          } else if (item.itemName === EItemName.Wraith) {
-            AUDIO.play('wraith-yes')
-          } else {
-            AUDIO.play('acknowledge-moving')
           }
-        } else if (['attack', 'move-and-attack'].includes(item.order.type)) {
-          if (item.itemName === EItemName.ScoutTank) {
-            AUDIO.play('scout-tank-attack')
-          } else if (item.itemName === EItemName.HeavyTank) {
-            AUDIO.play('heavy-tank-attack')
-          } else if (item.itemName === EItemName.Chopper) {
-            AUDIO.play('chopper-attack')
-          } else if (item.itemName === EItemName.Wraith) {
-            AUDIO.play('wraith-attack')
-          } else {
-            AUDIO.play('acknowledge-attacking')
-          }
-        } else if (item.order.type === 'build') {
-          AUDIO.play('scv-yes')
-        } else if (item.order.type === 'deploy') {
-          AUDIO.play('harvester-yes')
         }
         if (toObject != null && (item.order.type === 'attack' || item.order.type === 'guard')) {
           item.order.to = toObject

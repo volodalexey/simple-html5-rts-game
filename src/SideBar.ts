@@ -211,9 +211,7 @@ export class SideBar extends Container {
       if (!this.closed || (this.opened && !this.toClose) || (!this.opened && this.toOpen)) {
         this.close()
       }
-      if (this.closed) {
-        this.commandsBar.deselectTiles()
-      }
+      this.commandsBar.deselectTiles()
     }
   }
 

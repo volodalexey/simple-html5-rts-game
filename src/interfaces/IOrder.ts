@@ -98,6 +98,7 @@ interface IConstructUnitOrder {
   type: 'construct-unit'
   name: UnitName
   unitOrder?: IOrder
+  unitUid?: number
 }
 
 interface IMoveAndAttack {

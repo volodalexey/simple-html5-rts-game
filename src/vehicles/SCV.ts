@@ -131,7 +131,9 @@ export class SCV extends Vehicle {
         for (let y = buildableGrid.length - 1; y >= 0; y--) {
           for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
             if (currentMapBuildableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
-              AUDIO.play('scv-error')
+              if (this.team === this.game.team) {
+                AUDIO.play('scv-error')
+              }
               this.order = { type: 'stand' }
               return true
             }
@@ -179,7 +181,9 @@ export class SCV extends Vehicle {
           const moving = this._moveTo({ type: EItemType.terrain, ...this.order.toPoint }, distanceFromDestination)
 
           if (!moving) {
-            AUDIO.play('scv-error')
+            if (this.team === this.game.team) {
+              AUDIO.play('scv-error')
+            }
             this.order = { type: 'stand' }
           }
         }
