@@ -347,17 +347,17 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     // List of objects that will collide after next movement step
     const collisionObjects = []
 
-    const { airItems } = tileMap
+    const { airMoveableItems: airItems } = tileMap
     for (let i = airItems.length - 1; i >= 0; i--) {
       const vehicle = airItems[i]
       const vehicleGrid = vehicle.getGridXY({ center: true })
       // Test vehicles that are less than 3 squares away for collisions
       if (vehicle !== this && Math.abs(vehicleGrid.gridX - thisGrid.gridX) < 3 && Math.abs(vehicleGrid.gridY - thisGrid.gridY) < 3) {
         const distanceSq = Math.pow(vehicleGrid.gridX - newX, 2) + Math.pow(vehicleGrid.gridY - newY, 2)
-        if (distanceSq < Math.pow((this.radius + vehicle.radius) / tileMap.gridSize, 2)) {
+        if (distanceSq < Math.pow((this.radius + vehicle.radius) * 0.2 / tileMap.gridSize, 2)) {
           // Distance between vehicles is less than hard collision threshold (sum of vehicle radii)
           collisionObjects.push({ collisionType: ECollisionType.hard, with: { type: vehicle.type, x: vehicleGrid.gridX, y: vehicleGrid.gridY } })
-        } else if (distanceSq < Math.pow((this.radius * 1.1 + vehicle.radius) / tileMap.gridSize, 2)) {
+        } else if (distanceSq < Math.pow((this.radius + vehicle.radius) * 0.5 / tileMap.gridSize, 2)) {
           // Distance between vehicles is less than soft collision threshold (1.5 times vehicle radius + colliding vehicle radius)
           collisionObjects.push({ collisionType: ECollisionType.soft, with: { type: vehicle.type, x: vehicleGrid.gridX, y: vehicleGrid.gridY } })
         }
@@ -371,10 +371,6 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     const { turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
     // First find path to destination
-    const destX = Math.round(destination.gridX)
-    const destY = Math.round(destination.gridY)
-    const end = { gridX: destX, gridY: destY }
-
     let newDirection = findAngleGrid({
       from: destination,
       to: thisGrid,
@@ -384,18 +380,12 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     // check if moving along current direction might cause collision..
     // If so, change newDirection
     const collisionObjects = this.checkCollisionObjects(distanceFromDestination)
-    this.colliding = false
     this.hardCollision = false
     if (collisionObjects.length > 0) {
       this.colliding = true
 
       // Create a force vector object that adds up repulsion from all colliding objects
       const forceVector = { x: 0, y: 0 }
-      // By default, the next step has a mild attraction force
-      collisionObjects.push({
-        collisionType: ECollisionType.attraction,
-        with: { x: end.gridX, y: end.gridY }
-      })
       for (let i = collisionObjects.length - 1; i >= 0; i--) {
         const collObject = collisionObjects[i]
         const objectAngle = findAngle({
@@ -404,7 +394,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
           directions: this.vector.directions
         })
         const objectAngleRadians = -(objectAngle / this.vector.directions) * 2 * Math.PI
-        let forceMagnitude
+        let forceMagnitude = 0
         switch (collObject.collisionType) {
           case ECollisionType.hard:
             forceMagnitude = 2
@@ -412,9 +402,6 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
             break
           case ECollisionType.soft:
             forceMagnitude = 1
-            break
-          case ECollisionType.attraction:
-            forceMagnitude = -0.5
             break
         }
 
@@ -445,13 +432,8 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     }
 
     const maximumMovement = this.speed * speedAdjustmentFactor * (this.moveTurning ? speedAdjustmentWhileTurningFactor : 1)
-    let movement = Math.min(maximumMovement, distanceFromDestination)
-
-    if (this.hardCollision) {
-      movement = 0
-    }
-
-    const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
+    const movement = Math.min(maximumMovement, distanceFromDestination)
+    const angleRadians = -(this.vector.direction / this.vector.directions) * 2 * Math.PI
     const lastMovementGridX = -(movement * Math.sin(angleRadians))
     const lastMovementGridY = -(movement * Math.cos(angleRadians))
     const newGridX = thisGrid.gridX + lastMovementGridX

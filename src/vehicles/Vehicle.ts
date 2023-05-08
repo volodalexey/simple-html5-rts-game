@@ -271,17 +271,17 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
     const thisGrid = this.getGridXY({ center: true })
     const maximumMovement = this.speed * speedAdjustmentFactor * (this.moveTurning ? speedAdjustmentWhileTurningFactor : 1)
     const movement = Math.min(maximumMovement, distanceFromDestination)
-    const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
+    const angleRadians = -(this.vector.direction / this.vector.directions) * 2 * Math.PI
     const newX = thisGrid.gridX - (movement * Math.sin(angleRadians))
     const newY = thisGrid.gridY - (movement * Math.cos(angleRadians))
 
     // List of objects that will collide after next movement step
     const collisionObjects = []
 
-    const x1 = Math.max(0, Math.round(newX) - 3)
-    const x2 = Math.min(tileMap.mapGridWidth - 1, Math.round(newX) + 3)
-    const y1 = Math.max(0, Math.round(newY) - 3)
-    const y2 = Math.min(tileMap.mapGridHeight - 1, Math.round(newY) + 3)
+    const x1 = Math.max(0, Math.floor(newX) - 3)
+    const x2 = Math.min(tileMap.mapGridWidth - 1, Math.floor(newX) + 3)
+    const y1 = Math.max(0, Math.floor(newY) - 3)
+    const y2 = Math.min(tileMap.mapGridHeight - 1, Math.floor(newY) + 3)
     // Test grid upto 3 squares away
     for (let j = x1; j <= x2; j++) {
       for (let i = y1; i <= y2; i++) {
@@ -300,7 +300,7 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
       }
     }
 
-    const { groundItems } = tileMap
+    const { groundMoveableItems: groundItems } = tileMap
     for (let i = groundItems.length - 1; i >= 0; i--) {
       const vehicle = groundItems[i]
       const vehicleGrid = vehicle.getGridXY({ center: true })
@@ -325,9 +325,9 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
     const thisGrid = this.getGridXY({ center: true })
 
     // First find path to destination
-    const destX = Math.round(destination.gridX)
-    const destY = Math.round(destination.gridY)
-    const start = { gridX: Math.round(thisGrid.gridX), gridY: Math.round(thisGrid.gridY) }
+    const destX = Math.floor(destination.gridX)
+    const destY = Math.floor(destination.gridY)
+    const start = { gridX: Math.floor(thisGrid.gridX), gridY: Math.floor(thisGrid.gridY) }
     const end = { gridX: destX, gridY: destY }
 
     const grid = tileMap.currentCopyMapPassableGrid
@@ -351,9 +351,8 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
       // Use A* algorithm to try and find a path to the destination
       path = AStar.calc({ grid, start, end, f: 'Euclidean' })
       if (path.length > 1) {
-        const nextStep = { x: path[1].x, y: path[1].y }
         newDirection = findAngle({
-          from: nextStep,
+          from: { x: path[1].x + 0.5, y: path[1].y + 0.5 },
           to: { x: thisGrid.gridX, y: thisGrid.gridY },
           directions: this.vector.directions
         })
@@ -366,7 +365,6 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
     // check if moving along current direction might cause collision..
     // If so, change newDirection
     const collisionObjects = this.checkCollisionObjects(grid, distanceFromDestination)
-    this.colliding = false
     this.hardCollision = false
     if (collisionObjects.length > 0) {
       this.colliding = true
