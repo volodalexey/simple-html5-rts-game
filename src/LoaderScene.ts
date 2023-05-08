@@ -12,6 +12,13 @@ export const manifest: ResolverManifest = {
         level1Background: 'assets/levels/level-1.png',
         level1Settings: 'assets/levels/level-1.json'
       }
+    },
+    {
+      name: 'level-2-bundle',
+      assets: {
+        level2Background: 'assets/levels/level-2.png',
+        level2Settings: 'assets/levels/level-2.json'
+      }
     }
   ]
 }
@@ -38,6 +45,7 @@ export class LoaderScene extends Container implements IScene {
 
     this.setup()
     this.draw()
+    this.loaderBarFill.width = 10
   }
 
   setup (): void {
@@ -58,9 +66,10 @@ export class LoaderScene extends Container implements IScene {
     loaderBarBorder.endFill()
 
     loaderBarFill.beginFill(barOptions.fillColor)
+    loaderBarFill.position.set(barOptions.borderThick, barOptions.borderThick)
     loaderBarFill.drawRoundedRect(
-      barOptions.borderThick,
-      barOptions.borderThick,
+      0,
+      0,
       barOptions.width - barOptions.borderThick * 2,
       barOptions.height - barOptions.borderThick * 2,
       barOptions.borderRadius)

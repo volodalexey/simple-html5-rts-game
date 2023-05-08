@@ -13,6 +13,7 @@ import { Chopper } from './air-vehicles/Chopper'
 import { ECommandName } from './Command'
 import { Transport } from './vehicles/Transport'
 import { Wraith } from './air-vehicles/Wraith'
+import { Harvester } from './vehicles/Harvester'
 
 interface IMissionItem {
   name: EItemNames
@@ -679,6 +680,43 @@ export class CampaignScene extends Container implements IScene {
             type: ETriggerType.conditional,
             condition: () => {
               return this.game.tileMap.getTeamStaticItems(Team.green).length <= 0
+            },
+            action: () => {
+              this.endMission({ success: true })
+            }
+          }
+        ]
+      },
+      {
+        name: 'Entitties',
+        briefing: 'In this level, you will start to learn how to build oil derrick to increase our income.',
+        mapImageSrc: 'level2Background',
+        mapSettingsSrc: 'level2Settings',
+        startGridX: 0,
+        startGridY: 30,
+        cash: {
+          blue: Harvester.cost,
+          green: 0
+        },
+        items: [
+          /* The Rebel Base now in our hands */
+          { name: 'base', initGridX: 2, initGridY: 36, team: Team.blue, commands: [ECommandName.constructHarvester], uid: -1 },
+          { name: 'base', initGridX: 56, initGridY: 2, team: Team.green, uid: -2 }
+        ],
+        triggers: [
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return this.game.tileMap.isItemsDead([-1])
+            },
+            action: () => {
+              this.endMission({ success: false })
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return this.game.tileMap.isItemsDead([-2])
             },
             action: () => {
               this.endMission({ success: true })
