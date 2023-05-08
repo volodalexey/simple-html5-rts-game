@@ -4,6 +4,7 @@ import { logLayout } from './logger'
 import { Button, type IButtonOptions } from './Button'
 import { TileMap } from './TileMap'
 import { CampaignScene } from './CampaignScene'
+import { StatusBar } from './StatusBar'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -40,7 +41,16 @@ export class MenuScene extends Container implements IScene {
     this.drawMainOptions()
 
     setTimeout(() => {
-      void TileMap.idleLoad().catch(console.error)
+      TileMap.idleLoad().then(() => {
+        StatusBar.prepareTextures({
+          textures: {
+            girl1Texture: Assets.get('characterGirl1'),
+            girl2Texture: Assets.get('characterGirl2'),
+            man1Texture: Assets.get('characterMan1'),
+            systemTexture: Assets.get('characterSystem')
+          }
+        })
+      }).catch(console.error)
     }, 1000)
   }
 

@@ -201,7 +201,7 @@ export class SideBar extends Container {
     logSideBar(`handleSelectedItems (${selectedItems.length}) opened=${this.opened} toOpen=${this.toOpen} toClose=${this.toClose}`)
     if (selectedItems.length > 0) {
       const commandsChanged = this.commandsBar.prepareCommands(selectedItems)
-      if (commandsChanged) {
+      if (commandsChanged || this.commandsBar.commandTiles.children.length === 0) {
         this.drawMask({ height: this.commandsBar.height })
       }
       if ((!this.opened && !this.toOpen) || commandsChanged) {
@@ -210,6 +210,9 @@ export class SideBar extends Container {
     } else {
       if (!this.closed || (this.opened && !this.toClose) || (!this.opened && this.toOpen)) {
         this.close()
+      }
+      if (this.closed) {
+        this.commandsBar.deselectTiles()
       }
     }
   }

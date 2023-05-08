@@ -255,6 +255,7 @@ export class StatusBar extends Container {
         setTimeout(() => {
           statusMessage.removeFromParent()
           this.reAppendMessages({ width: this.width, height })
+          this.messageList.pivot.y = this.maxPivot
         }, 3000)
       }
       const { maxPivot } = this

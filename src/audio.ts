@@ -19,7 +19,9 @@ import rocketHit0Audio from './assets/audio/rocket-hit-0.mp3'
 import laser1Audio from './assets/audio/laser1.mp3'
 import laser2Audio from './assets/audio/laser2.mp3'
 import laserHit0Audio from './assets/audio/laser-hit-0.mp3'
-import messageAudio from './assets/audio/message.mp3'
+import message0Audio from './assets/audio/message-0.mp3'
+import message1Audio from './assets/audio/message-1.mp3'
+import messageError0Audio from './assets/audio/message-error-0.mp3'
 import roger1Audio from './assets/audio/roger1.mp3'
 import roger2Audio from './assets/audio/roger2.mp3'
 import yupAudio from './assets/audio/yup.mp3'
@@ -60,6 +62,15 @@ import scvYes4Audio from './assets/audio/scv-yes-4.mp3'
 import scvYes5Audio from './assets/audio/scv-yes-5.mp3'
 import scvYes6Audio from './assets/audio/scv-yes-6.mp3'
 import scvError0Audio from './assets/audio/scv-error-0.mp3'
+import harvesterYes0Audio from './assets/audio/harvester-yes-0.mp3'
+import harvesterYes1Audio from './assets/audio/harvester-yes-1.mp3'
+import harvesterYes2Audio from './assets/audio/harvester-yes-2.mp3'
+import harvesterYes3Audio from './assets/audio/harvester-yes-3.mp3'
+import harvesterYes4Audio from './assets/audio/harvester-yes-4.mp3'
+import harvesterYes5Audio from './assets/audio/harvester-yes-5.mp3'
+import harvesterYes6Audio from './assets/audio/harvester-yes-6.mp3'
+import harvesterYes7Audio from './assets/audio/harvester-yes-7.mp3'
+import harvesterError0Audio from './assets/audio/harvester-error-0.mp3'
 
 export const AUDIO = {
   bullet1: new Howl({
@@ -122,8 +133,14 @@ export const AUDIO = {
   laserHit0: new Howl({
     src: laserHit0Audio
   }),
-  message: new Howl({
-    src: messageAudio
+  message0: new Howl({
+    src: message0Audio
+  }),
+  message1: new Howl({
+    src: message1Audio
+  }),
+  messageError0: new Howl({
+    src: messageError0Audio
   }),
   roger1: new Howl({
     src: roger1Audio
@@ -245,13 +262,41 @@ export const AUDIO = {
   scvError0: new Howl({
     src: scvError0Audio
   }),
+  harvesterYes0: new Howl({
+    src: harvesterYes0Audio
+  }),
+  harvesterYes1: new Howl({
+    src: harvesterYes1Audio
+  }),
+  harvesterYes2: new Howl({
+    src: harvesterYes2Audio
+  }),
+  harvesterYes3: new Howl({
+    src: harvesterYes3Audio
+  }),
+  harvesterYes4: new Howl({
+    src: harvesterYes4Audio
+  }),
+  harvesterYes5: new Howl({
+    src: harvesterYes5Audio
+  }),
+  harvesterYes6: new Howl({
+    src: harvesterYes6Audio
+  }),
+  harvesterYes7: new Howl({
+    src: harvesterYes7Audio
+  }),
+  harvesterError0: new Howl({
+    src: harvesterError0Audio
+  }),
   play (name: '' | 'acknowledge-attacking' | 'acknowledge-moving'
   | 'bullet' | 'bullet-hit'
   | 'rocket' | 'rocket-hit'
   | 'laser' | 'laser-hit'
   | 'cannon-ball' | 'cannon-hit'
-  | 'message-received'
+  | 'message-received' | 'message-error'
   | 'scv-yes' | 'scv-error'
+  | 'harvester-yes' | 'harvester-error'
   | 'scout-tank-attack' | 'scout-tank-yes'
   | 'heavy-tank-attack' | 'heavy-tank-yes'
   | 'chopper-attack' | 'chopper-yes'
@@ -281,7 +326,9 @@ export const AUDIO = {
     } else if (name === 'cannon-hit') {
       sounds = [this.cannonHit]
     } else if (name === 'message-received') {
-      sounds = [this.message]
+      sounds = [this.message0, this.message1]
+    } else if (name === 'message-error') {
+      sounds = [this.messageError0]
     } else if (name === 'scout-tank-attack') {
       stopPrevious = true
       sounds = [this.vultureAttack0]
@@ -313,6 +360,13 @@ export const AUDIO = {
       stopPrevious = true;
       [this.scvYes0, this.scvYes1, this.scvYes2, this.scvYes3, this.scvYes4, this.scvYes5, this.scvYes6].forEach(s => s.stop())
       sounds = [this.scvError0]
+    } else if (name === 'harvester-yes') {
+      stopPrevious = true
+      sounds = [this.harvesterYes0, this.harvesterYes1, this.harvesterYes2, this.harvesterYes3, this.harvesterYes4, this.harvesterYes5, this.harvesterYes6, this.harvesterYes7]
+    } else if (name === 'harvester-error') {
+      stopPrevious = true;
+      [this.harvesterYes0, this.harvesterYes1, this.harvesterYes2, this.harvesterYes3, this.harvesterYes4, this.harvesterYes5, this.harvesterYes6, this.harvesterYes7].forEach(s => s.stop())
+      sounds = [this.harvesterError0]
     }
     if (sounds.length > 0) {
       if (stopPrevious) {

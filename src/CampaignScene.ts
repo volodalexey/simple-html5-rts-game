@@ -13,7 +13,6 @@ import { Chopper } from './air-vehicles/Chopper'
 import { ECommandName } from './Command'
 import { Transport } from './vehicles/Transport'
 import { Wraith } from './air-vehicles/Wraith'
-import { Harvester } from './vehicles/Harvester'
 
 interface IMissionItem {
   name: EItemNames
@@ -258,7 +257,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.driver,
                   message: 'Thank you. We thought we would never get out of here alive.'
                 })
-                this.game.processCommand({ uids: [-3, -4], order: { type: 'follow', to: hero } })
+                this.game.processOrder({ uids: [-3, -4], order: { type: 'follow', to: hero } })
               }
             }
           },
@@ -353,8 +352,8 @@ export class CampaignScene extends Container implements IScene {
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
               if (this.game.cash[Team.green] > 1000 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
-                this.game.processCommand({ uids: [-12], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
-                this.game.processCommand({ uids: [-13], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-12], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-13], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               }
             }
           },
@@ -486,7 +485,7 @@ export class CampaignScene extends Container implements IScene {
               tileMap.addItem(new Transport({
                 game: this.game, initX: tileMap.gridSize * 57, initY: tileMap.gridSize * 3, commands: [], team: Team.blue, uid: -6
               }))
-              this.game.processCommand({ uids: [-5], orderType: 'guard', toUid: -6 })
+              this.game.processOrder({ uids: [-5], orderType: 'guard', toUid: -6 })
               this.game.showMessage({
                 character: EMessageCharacter.driver,
                 message: 'Commander!! The colony has sent some extra supplies. We are coming in from the North East sector through rebel territory. We could use a little protection.'
@@ -522,7 +521,7 @@ export class CampaignScene extends Container implements IScene {
             time: 48000,
             action: () => {
               // Start moving the transport
-              this.game.processCommand({ uids: [-6], order: { type: 'move', toPoint: { gridX: 1.5, gridY: 38.5 } } })
+              this.game.processOrder({ uids: [-6], order: { type: 'move', toPoint: { gridX: 1.5, gridY: 38.5 } } })
               this.game.showMessage({
                 character: EMessageCharacter.driver,
                 message: 'Thanks! Appreciate the backup. All right. Off we go.'
@@ -591,26 +590,26 @@ export class CampaignScene extends Container implements IScene {
               // Make sure enemy has atleast two wraiths and two heavy tanks, and use the remaining starports to build choppers and scouts
               if (wraithCount === 0) {
                 // No wraiths alive. Ask both starports to make wraiths
-                this.game.processCommand({ uids: [-23, -24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-23, -24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
               } else if (wraithCount === 1) {
                 // One wraith alive. Ask starports to make one wraith and one chopper
-                this.game.processCommand({ uids: [-23], order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
-                this.game.processCommand({ uids: [-24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-23], order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
               } else {
                 // Two wraiths alive. Ask both starports to make choppers
-                this.game.processCommand({ uids: [-23, -24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-23, -24], order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
               }
 
               if (heavyTankCount === 0) {
                 // No heavy-tanks alive. Ask both starports to make heavy-tanks
-                this.game.processCommand({ uids: [-21, -22], order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-21, -22], order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
               } else if (heavyTankCount === 1) {
                 // One heavy-tank alive. Ask starports to make one heavy-tank and one scout-tank
-                this.game.processCommand({ uids: [-21], order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
-                this.game.processCommand({ uids: [-22], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-21], order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-22], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               } else {
                 // Two heavy-tanks alive. Ask both starports to make scout-tanks
-                this.game.processCommand({ uids: [-21, -22], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrder({ uids: [-21, -22], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               }
               // Ask any units on the field to attack
               const uids = []
@@ -620,7 +619,7 @@ export class CampaignScene extends Container implements IScene {
                   uids.push(item.uid)
                 }
               };
-              this.game.processCommand({ uids, order: { type: 'hunt' } })
+              this.game.processOrder({ uids, order: { type: 'hunt' } })
             }
           },
           {
@@ -695,7 +694,7 @@ export class CampaignScene extends Container implements IScene {
         startGridX: 0,
         startGridY: 30,
         cash: {
-          blue: Harvester.cost,
+          blue: 16000,
           green: 0
         },
         items: [
@@ -704,6 +703,16 @@ export class CampaignScene extends Container implements IScene {
           { name: 'base', initGridX: 56, initGridY: 2, team: Team.green, uid: -2 }
         ],
         triggers: [
+          {
+            type: ETriggerType.timed,
+            time: 2000,
+            action: () => {
+              this.game.showMessage({
+                character: EMessageCharacter.op,
+                message: 'Commander! Please build harvester truck and deplot it on some oil field to become oil derrick.'
+              })
+            }
+          },
           {
             type: ETriggerType.conditional,
             condition: () => {
@@ -720,6 +729,20 @@ export class CampaignScene extends Container implements IScene {
             },
             action: () => {
               this.endMission({ success: true })
+            }
+          },
+          {
+            type: ETriggerType.conditional,
+            condition: () => {
+              return Boolean(this.game.tileMap.staticItems.find(item => item.itemName === EItemName.OilDerrick))
+            },
+            action: () => {
+              // now base can construct scv
+              const base = this.game.tileMap.getItemByUid(-1)
+              if (base != null) {
+                this.game.clearSelection()
+                base.commands = [ECommandName.constructSCV]
+              }
             }
           }
         ]

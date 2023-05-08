@@ -215,26 +215,6 @@
       "folder": ""
     },
     {
-      "name": "character-girl1.png",
-      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/character-girl1.png",
-      "folder": ""
-    },
-    {
-      "name": "character-girl2.png",
-      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/character-girl2.png",
-      "folder": ""
-    },
-    {
-      "name": "character-man1.png",
-      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/character-man1.png",
-      "folder": ""
-    },
-    {
-      "name": "character-system.png",
-      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/character-system.png",
-      "folder": ""
-    },
-    {
       "name": "chopper-blue-down-0.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/chopper-blue-down-0.png",
       "folder": ""

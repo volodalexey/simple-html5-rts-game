@@ -1,4 +1,6 @@
+import { AUDIO } from '../audio'
 import { OilDerrick } from '../buildings/OilDerrick'
+import { ECommandName } from '../Command'
 import { wrapDirection, Team, angleDiff } from '../common'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { EVectorDirection } from '../Vector'
@@ -13,6 +15,7 @@ Exclude<keyof IVehicleOptions, 'textures'>
 
 export class Harvester extends Vehicle {
   public itemName = EItemName.Harvester
+  public commands = [ECommandName.moveFollow, ECommandName.patrol, ECommandName.deploy]
   static blueTextures: IVehicleTextures
   static greenTextures: IVehicleTextures
   static textures (team: Team): IVehicleTextures {
@@ -103,21 +106,22 @@ export class Harvester extends Vehicle {
       case 'deploy': {
         const { tileMap, turnSpeedAdjustmentFactor } = this.game
         tileMap.rebuildBuildableGrid(this)
-        const { currentMapBuildableGrid } = tileMap
+        tileMap.mergeBuildableGridIntoDeployable()
+        const { currentMapDeployableGrid } = tileMap
         const { buildableGrid } = OilDerrick
         const { toPoint } = this.order
         for (let y = buildableGrid.length - 1; y >= 0; y--) {
           for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
-            if (currentMapBuildableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
+            if (currentMapDeployableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
               // If oilfield has been used already, then cancel order
+              AUDIO.play('harvester-error')
               this.order = { type: 'stand' }
               return true
             }
           }
         }
-        const thisGrid = this.getGridXY({ center: true })
-        const distanceFromDestinationSquared = (Math.pow(toPoint.gridX - thisGrid.gridX, 2) + Math.pow(toPoint.gridY - thisGrid.gridY, 2))
-        if (distanceFromDestinationSquared < Math.pow(this.radius * 2 / tileMap.gridSize, 2)) {
+        const thisGrid = this.getGridXY({ center: true, floor: true })
+        if (thisGrid.gridX === Math.floor(toPoint.gridX) && thisGrid.gridY === Math.floor(toPoint.gridY)) {
           // After reaching oil field, turn harvester to point towards left (direction 6)
           const difference = angleDiff({ angle1: this.vector.direction, angle2: EVectorDirection.left, directions: this.vector.directions })
           const turnAmount = this.turnSpeed * turnSpeedAdjustmentFactor
@@ -139,13 +143,14 @@ export class Harvester extends Vehicle {
 
             tileMap.addItem(new OilDerrick({
               game: this.game,
-              initX: Math.floor(thisGrid.gridX) * tileMap.gridSize,
-              initY: Math.floor(thisGrid.gridY) * tileMap.gridSize,
+              initX: Math.floor(toPoint.gridX) * tileMap.gridSize,
+              initY: Math.floor(toPoint.gridY) * tileMap.gridSize,
               team: this.team,
               deploy: true
             }))
           }
         } else {
+          const distanceFromDestinationSquared = (Math.pow(toPoint.gridX - thisGrid.gridX, 2) + Math.pow(toPoint.gridY - thisGrid.gridY, 2))
           const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
           const moving = this._moveTo({ type: EItemType.terrain, ...this.order.toPoint }, distanceFromDestination)
 

@@ -25,6 +25,7 @@ export interface ICommandsBarTextures {
   iconDeselectTexture: Texture
   iconBuildTurretTexture: Texture
   iconBuildStarportTexture: Texture
+  iconDeployTexture: Texture
   iconConstructSCVTexture: Texture
   iconConstructHarvesterTexture: Texture
   iconConstructScoutTankTexture: Texture
@@ -105,6 +106,14 @@ export class CommandsBar extends Container {
         iconHeight: 40,
         iconPaddingTop: 8,
         iconPaddingLeft: 10
+      },
+      [ECommandName.deploy]: {
+        iconTexture: textures.iconDeployTexture,
+        text: 'deploy',
+        iconWidth: 40,
+        iconHeight: 40,
+        iconPaddingTop: 8,
+        iconPaddingLeft: 8
       },
       [ECommandName.constructSCV]: {
         iconTexture: textures.iconConstructSCVTexture,
@@ -248,6 +257,10 @@ export class CommandsBar extends Container {
       case ECommandName.buildStarport:
         return (e: FederatedPointerEvent) => {
           this.deselectTiles(ECommandName.buildStarport)
+        }
+      case ECommandName.deploy:
+        return (e: FederatedPointerEvent) => {
+          this.deselectTiles(ECommandName.deploy)
         }
       case ECommandName.constructSCV:
         return () => {

@@ -1,5 +1,5 @@
 import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphics, type IPointData, type FederatedWheelEvent } from 'pixi.js'
-import { type EMessageCharacter, StatusBar } from './StatusBar'
+import { type EMessageCharacter } from './StatusBar'
 import { TileMap } from './TileMap'
 import { Camera } from './Camera'
 import { logDoubleTapEvent, logLayout, logPointerEvent } from './logger'
@@ -212,7 +212,7 @@ export class Game extends Container {
             }
           }
           if (uids.length > 0) {
-            this.processCommand({ uids, order })
+            this.processOrder({ uids, order })
           }
         } else {
           this.clearSelection()
@@ -234,7 +234,7 @@ export class Game extends Container {
             }
           }
           if (uids.length > 0) {
-            this.processCommand({ uids, order })
+            this.processOrder({ uids, order })
           }
         } else {
           this.clearSelection()
@@ -246,7 +246,7 @@ export class Game extends Container {
       if (selectedCommandName == null) {
         selectedCommandName = ECommandName.moveFollow
       }
-      const { gridSize } = this.tileMap
+      const { gridSize, initialMapDeployableGrid } = this.tileMap
       const gridX = point.x / gridSize
       const gridY = point.y / gridSize
       switch (selectedCommandName) {
@@ -262,6 +262,11 @@ export class Game extends Container {
         case ECommandName.buildStarport:
           order = { type: 'build', name: EItemName.Starport, toPoint: { gridX, gridY } }
           break
+        case ECommandName.deploy: {
+          const minGridX = initialMapDeployableGrid[Math.floor(gridY)][Math.floor(gridX) - 1] === 0 ? Math.floor(gridX) - 1 + 0.5 : gridX
+          order = { type: 'deploy', toPoint: { gridX: minGridX, gridY } }
+          break
+        }
       }
       // identify selected items from players team that can process command
       for (let i = this.selectedItems.length - 1; i >= 0; i--) {
@@ -272,7 +277,7 @@ export class Game extends Container {
           if (selectedCommandName === ECommandName.patrol) {
             // process patrol order individually
             const thisGrid = item.getGridXY({ center: true })
-            this.processCommand({ uids: [item.uid], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
+            this.processOrder({ uids: [item.uid], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
           } else {
             uids.push(item.uid)
           }
@@ -280,7 +285,7 @@ export class Game extends Container {
       }
       // then command them to move to the clicked location
       if (uids.length > 0) {
-        this.processCommand({ uids, order })
+        this.processOrder({ uids, order })
       }
     }
 
@@ -818,15 +823,6 @@ export class Game extends Container {
       }
     })
 
-    StatusBar.prepareTextures({
-      textures: {
-        girl1Texture: textures['character-girl1.png'],
-        girl2Texture: textures['character-girl2.png'],
-        man1Texture: textures['character-man1.png'],
-        systemTexture: textures['character-system.png']
-      }
-    })
-
     StartModal.prepareTextures({
       textures: {
         iconHomeTexture: textures['icon-home.png'],
@@ -916,6 +912,7 @@ export class Game extends Container {
         iconDeselectTexture: textures['icon-deselect.png'],
         iconBuildTurretTexture: textures['ground-turret-blue-healthy-down-right.png'],
         iconBuildStarportTexture: textures['starport-blue-healthy-0.png'],
+        iconDeployTexture: textures['oil-derrick-blue-healthy-0.png'],
         iconConstructSCVTexture: textures['scv-blue-down-right.png'],
         iconConstructHarvesterTexture: textures['harvester-blue-down-right.png'],
         iconConstructScoutTankTexture: textures['scout-tank-blue-down-right.png'],
@@ -927,7 +924,7 @@ export class Game extends Container {
   }
 
   // Receive command from singleplayer or multiplayer object and send it to units
-  processCommand ({ uids, order, toUid, orderType }: { uids: number[], order?: IOrder, orderType?: OrderTypes, toUid?: number }): boolean {
+  processOrder ({ uids, order, toUid, orderType }: { uids: number[], order?: IOrder, orderType?: OrderTypes, toUid?: number }): boolean {
     // In case the target "to" object is in terms of uid, fetch the target object
     let toObject
     let unitOrder: IOrder | undefined
@@ -951,6 +948,8 @@ export class Game extends Container {
         if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
           if (item.itemName === EItemName.SCV) {
             AUDIO.play('scv-yes')
+          } else if (item.itemName === EItemName.Harvester) {
+            AUDIO.play('harvester-yes')
           } else if (item.itemName === EItemName.ScoutTank) {
             AUDIO.play('scout-tank-yes')
           } else if (item.itemName === EItemName.HeavyTank) {
@@ -976,6 +975,8 @@ export class Game extends Container {
           }
         } else if (item.order.type === 'build') {
           AUDIO.play('scv-yes')
+        } else if (item.order.type === 'deploy') {
+          AUDIO.play('harvester-yes')
         }
         if (toObject != null && (item.order.type === 'attack' || item.order.type === 'guard')) {
           item.order.to = toObject
@@ -987,7 +988,11 @@ export class Game extends Container {
 
   showMessage ({ character, message, playSound = true, selfRemove = false }: { character: EMessageCharacter, message: string, playSound?: boolean, selfRemove?: boolean }): void {
     if (playSound) {
-      AUDIO.play('message-received')
+      if (selfRemove) {
+        AUDIO.play('message-error')
+      } else {
+        AUDIO.play('message-received')
+      }
     }
     this.topBar.statusBar.appendMessage({ character, message, time: this.time, selfRemove, height: TopBar.options.initHeight })
   }

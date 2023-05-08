@@ -4,7 +4,7 @@ export enum ECommandName {
   attack = 'attack',
   attackGuard = 'attackGuard',
   patrol = 'patrol',
-  // deploy = 'deploy',
+  deploy = 'deploy',
   buildTurret = 'buildTurret',
   buildStarport = 'buildStarport',
   constructSCV = 'constructSCV',

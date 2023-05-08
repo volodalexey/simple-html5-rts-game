@@ -14,6 +14,7 @@ import { type AirVehicle } from './air-vehicles/AirVehicle'
 import { ECommandName } from './Command'
 import { GroundTurret } from './buildings/GroundTurret'
 import { Starport } from './buildings/Starport'
+import { OilDerrick } from './buildings/OilDerrick'
 
 export interface ITileMapOptions {
   game: Game
@@ -30,10 +31,12 @@ export class TileMap extends Container {
   public gridSize !: number
   public mapGridWidth !: number
   public mapGridHeight !: number
-  public currentMapTerrainGrid: GridArray = []
   public rebuildPassableRequired = false
+  private _initialMapTerrainGrid: GridArray = []
   private _currentMapPassableGrid: GridArray = []
   private _currentMapBuildableGrid: GridArray = []
+  private _initialMapDeployableGrid: GridArray = []
+  private _currentMapDeployableGrid: GridArray = []
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Hitboxes()
   public activeItems = new ActiveItems()
@@ -102,16 +105,16 @@ export class TileMap extends Container {
     this.mapGridWidth = settings.width
     this.mapGridHeight = settings.height
 
-    this.currentMapTerrainGrid = []
+    this._initialMapTerrainGrid = []
 
     for (let y = 0; y < this.mapGridHeight; y++) {
-      this.currentMapTerrainGrid[y] = []
+      this._initialMapTerrainGrid[y] = []
       for (let x = 0; x < this.mapGridWidth; x++) {
         const initX = x * settings.tilewidth
         const initY = y * settings.tileheight
         const foundInPoints = hitboxesPoints.some(hp => hp.x === initX && hp.y === initY)
         // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
-        this.currentMapTerrainGrid[y][x] = foundInPoints ? 1 : 0
+        this._initialMapTerrainGrid[y][x] = foundInPoints ? 1 : 0
       }
     }
     this.hitboxes.alpha = 0.3
@@ -141,6 +144,26 @@ export class TileMap extends Container {
         }
       }
     }
+
+    this._initialMapDeployableGrid = []
+    const oilFieldsPoints = MapSettings.mapObjectToPositions({
+      mapSettings: settings,
+      layerName: 'Oilfields'
+    })
+    for (let y = 0; y < this.mapGridHeight; y++) {
+      this._initialMapDeployableGrid[y] = []
+      for (let x = 0; x < this.mapGridWidth; x++) {
+        this._initialMapDeployableGrid[y][x] = 1 // init all grid as not possible to deploy
+      }
+    }
+    const { buildableGrid } = OilDerrick
+    oilFieldsPoints.forEach(oilFieldsPoint => {
+      for (let y = buildableGrid.length - 1; y >= 0; y--) {
+        for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
+          this._initialMapDeployableGrid[oilFieldsPoint.y / this.gridSize + y][oilFieldsPoint.x / this.gridSize + x] = 0
+        }
+      }
+    })
 
     this._currentMapPassableGrid = []
     this._currentMapBuildableGrid = []
@@ -228,7 +251,17 @@ export class TileMap extends Container {
       logHitboxes.enabled) {
       this.rebuildBuildableGrid()
       this.hitboxes.draw({
-        currentMapBuildableGrid: this.currentMapBuildableGrid,
+        currentMapGrid: this.currentMapBuildableGrid,
+        tileWidth: this.gridSize,
+        tileHeight: this.gridSize,
+        borderWidth: 2
+      })
+      this.hitboxes.visible = true
+    } else if (selectedCommandName === ECommandName.deploy || logHitboxes.enabled) {
+      this.rebuildBuildableGrid()
+      this.mergeBuildableGridIntoDeployable()
+      this.hitboxes.draw({
+        currentMapGrid: this._currentMapDeployableGrid,
         tileWidth: this.gridSize,
         tileHeight: this.gridSize,
         borderWidth: 2
@@ -314,6 +347,14 @@ export class TileMap extends Container {
     return this._currentMapBuildableGrid
   }
 
+  get initialMapDeployableGrid (): GridArray {
+    return this._initialMapDeployableGrid
+  }
+
+  get currentMapDeployableGrid (): GridArray {
+    return this._currentMapDeployableGrid
+  }
+
   get currentCopyMapPassableGrid (): GridArray {
     const { currentMapPassableGrid } = this
     this._currentCopyMapPassableGrid.length = currentMapPassableGrid.length
@@ -331,7 +372,9 @@ export class TileMap extends Container {
   }
 
   rebuildPassableGrid (): void {
-    this._currentMapPassableGrid = this.currentMapTerrainGrid.map(g => g.slice())
+    if (this._currentMapPassableGrid.length !== this._initialMapTerrainGrid.length) {
+      this._currentMapPassableGrid = this._initialMapTerrainGrid.map(g => g.slice())
+    }
     const { staticItems } = this
     for (let i = staticItems.length - 1; i >= 0; i--) {
       const item = staticItems[i]
@@ -339,6 +382,7 @@ export class TileMap extends Container {
       const itemGrid = item.getGridXY({ floor: true })
       for (let y = passableGrid.length - 1; y >= 0; y--) {
         for (let x = passableGrid[y].length - 1; x >= 0; x--) {
+          this._currentMapPassableGrid[y][x] = this._initialMapTerrainGrid[y][x]
           if (passableGrid[y][x] !== 0) {
             this._currentMapPassableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
           }
@@ -348,7 +392,7 @@ export class TileMap extends Container {
   }
 
   rebuildBuildableGrid (exceptItem?: Vehicle): void {
-    this._currentMapBuildableGrid = this.currentMapTerrainGrid.map(g => g.slice())
+    this._currentMapBuildableGrid = this._initialMapTerrainGrid.map(g => g.slice())
     const { activeItems } = this
     const { tileMap: { mapGridWidth, mapGridHeight } } = this.game
     for (let i = activeItems.children.length - 1; i >= 0; i--) {
@@ -378,6 +422,20 @@ export class TileMap extends Container {
               this._currentMapBuildableGrid[y][x] = 1
             }
           }
+        }
+      }
+    }
+  }
+
+  mergeBuildableGridIntoDeployable (): void {
+    if (this._currentMapDeployableGrid.length !== this._initialMapDeployableGrid.length) {
+      this._currentMapDeployableGrid = this._initialMapDeployableGrid.map(g => g.slice())
+    }
+    for (let y = this._currentMapDeployableGrid.length - 1; y >= 0; y--) {
+      for (let x = this._currentMapDeployableGrid[y].length - 1; x >= 0; x--) {
+        this._currentMapDeployableGrid[y][x] = this._initialMapDeployableGrid[y][x]
+        if (this._currentMapDeployableGrid[y][x] === 0) {
+          this._currentMapDeployableGrid[y][x] = this._currentMapBuildableGrid[y][x]
         }
       }
     }

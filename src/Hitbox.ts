@@ -2,9 +2,9 @@ import { Graphics } from 'pixi.js'
 
 export class Hitboxes extends Graphics {
   draw ({
-    currentMapBuildableGrid, tileWidth, tileHeight, borderWidth
+    currentMapGrid: currentMapBuildableGrid, tileWidth, tileHeight, borderWidth
   }: {
-    currentMapBuildableGrid: Array<Array<1 | 0>>
+    currentMapGrid: Array<Array<1 | 0>>
     tileWidth: number
     tileHeight: number
     borderWidth: number
@@ -39,7 +39,7 @@ export class Hitboxes extends Graphics {
   }): void {
     if (toggle) {
       this.draw({
-        currentMapBuildableGrid,
+        currentMapGrid: currentMapBuildableGrid,
         tileWidth,
         tileHeight,
         borderWidth

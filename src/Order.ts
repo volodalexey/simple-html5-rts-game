@@ -5,6 +5,7 @@ import { type TileMap } from './TileMap'
 import { EItemName } from './interfaces/IItem'
 import { GroundTurret } from './buildings/GroundTurret'
 import { Starport } from './buildings/Starport'
+import { OilDerrick } from './buildings/OilDerrick'
 
 export class Order extends Graphics {
   public item!: SelectableItem
@@ -157,6 +158,11 @@ export class Order extends Graphics {
           : Starport.greenTextures.healthyTextures[0]
         offset = Starport.collisionOptions.offset
       }
+    } else if (selectedItem.order.type === 'deploy') {
+      texture = selectedItem.team === Team.blue
+        ? OilDerrick.blueTextures.healthyTextures[0]
+        : OilDerrick.greenTextures.healthyTextures[0]
+      offset = OilDerrick.collisionOptions.offset
     }
     if (texture == null) {
       return

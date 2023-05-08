@@ -39,7 +39,7 @@ export class OilDerrick extends Building {
     OilDerrick.greenTextures = greenTextures
   }
 
-  public collisionOptions = {
+  static collisionOptions = {
     width: 35,
     height: 19,
     offset: {
@@ -98,6 +98,7 @@ export class OilDerrick extends Building {
       ...options,
       textures: OilDerrick.textures(options.team)
     })
+    this.collisionOptions = OilDerrick.collisionOptions
     if (Array.isArray(options.commands)) {
       this.commands = options.commands
     }

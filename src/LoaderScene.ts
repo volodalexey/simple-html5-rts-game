@@ -14,6 +14,15 @@ export const manifest: ResolverManifest = {
       }
     },
     {
+      name: 'characters-bundle',
+      assets: {
+        characterGirl1: 'assets/images/character-girl-1.png',
+        characterGirl2: 'assets/images/character-girl-2.png',
+        characterMan1: 'assets/images/character-man-1.png',
+        characterSystem: 'assets/images/character-system.png'
+      }
+    },
+    {
       name: 'level-2-bundle',
       assets: {
         level2Background: 'assets/levels/level-2.png',
