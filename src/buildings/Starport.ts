@@ -84,7 +84,7 @@ export class Starport extends Building {
   }
 
   public sight = 3
-  static cost = 2000
+  static cost = 200
   public hitPoints = 300
   public life = this.hitPoints
   public teleportAnimationSpeed = 0.1
@@ -182,6 +182,10 @@ export class Starport extends Building {
 
   isClosing (): boolean {
     return this.currentAnimation === this.closingAnimation
+  }
+
+  isIdle (): boolean {
+    return this.currentAnimation === this.healthyAnimation
   }
 
   override updateAnimation (): void {

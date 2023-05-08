@@ -76,14 +76,13 @@ export class OilDerrick extends Building {
   }
 
   public sight = 3
-  static cost = 5000
   public hitPoints = 300
   public life = this.hitPoints
   public deployAnimationSpeed = 0.1
   public deployAnimation!: AnimatedSprite
   public elapsedTime = 0
   public harvestInterval = 1000
-  public harvestAmount = 10
+  public harvestAmount = 5
 
   static buildableGrid = [
     [1, 1]

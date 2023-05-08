@@ -31,6 +31,7 @@ import { SideBar } from './SideBar'
 import { CommandsBar } from './CommandsBar'
 import { ECommandName } from './Command'
 import { SCV } from './vehicles/SCV'
+import { type AI } from './AI'
 
 export interface IGameOptions {
   viewWidth: number
@@ -49,6 +50,7 @@ export class Game extends Container {
     [Team.green]: 0
   }
 
+  public ai?: AI
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
   public speedAdjustmentWhileTurningFactor = 0.4
@@ -478,6 +480,7 @@ export class Game extends Container {
     startGridX?: number
     startGridY?: number
   }): void => {
+    this.ai = undefined
     this.gameEnded = false
     this.time = 0
     this.clearSelection(true)
@@ -543,6 +546,9 @@ export class Game extends Container {
     this.camera.handleUpdate(deltaMS)
 
     this.drawOrders()
+    if (this.ai != null) {
+      this.ai.handleUpdate(deltaMS)
+    }
   }
 
   drawOrders (): void {
@@ -925,7 +931,7 @@ export class Game extends Container {
   }
 
   // Receive command from singleplayer or multiplayer object and send it to units
-  processOrder ({ uids, order, toUid, orderType }: { uids: number[], order?: IOrder, orderType?: OrderTypes, toUid?: number }): boolean {
+  processOrder ({ uids, items, order, toUid, orderType }: { uids?: number[], items?: BaseActiveItem[], order?: IOrder, orderType?: OrderTypes, toUid?: number }): boolean {
     // In case the target "to" object is in terms of uid, fetch the target object
     let toObject
     let unitOrder: IOrder | undefined
@@ -941,10 +947,14 @@ export class Game extends Container {
       }
     }
 
-    for (const uid of uids) {
-      const item = this.tileMap.getItemByUid(uid)
-      // if uid is a valid item, set the order for the item
-      if (item != null && ((order != null) || (unitOrder != null))) {
+    // if uid is a valid item, set the order for the item
+    items = (Array.isArray(uids) ? uids : [])
+      .map(uid => this.tileMap.getItemByUid(uid))
+      .filter((item): item is BaseActiveItem => Boolean(item))
+      .concat(Array.isArray(items) ? items : [])
+      .filter((item): item is BaseActiveItem => Boolean(item))
+    for (const item of items) {
+      if (order != null || unitOrder != null) {
         item.order = (order ?? unitOrder) as IOrder
         if (item.team === this.team) {
           if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
@@ -1002,8 +1012,6 @@ export class Game extends Container {
 
   getItemCost (name: EItemName): number | undefined {
     switch (name) {
-      case EItemName.OilDerrick:
-        return OilDerrick.cost
       case EItemName.Starport:
         return Starport.cost
       case EItemName.GroundTurret:

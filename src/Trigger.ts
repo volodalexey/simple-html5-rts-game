@@ -1,18 +1,18 @@
-interface ITimedTrigger {
+export interface ITimedTrigger {
   type: ETriggerType.timed
   time: number
   action: () => void
   insertTrigger?: ITrigger
 }
 
-interface IIntervalTrigger {
+export interface IIntervalTrigger {
   type: ETriggerType.interval
   interval: number
   action: () => void
   insertTrigger?: ITrigger
 }
 
-interface IConditionalTrigger {
+export interface IConditionalTrigger {
   type: ETriggerType.conditional
   action: () => void
   condition: () => boolean

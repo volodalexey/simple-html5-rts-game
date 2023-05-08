@@ -79,7 +79,7 @@ export class ScoutTank extends AttackableVehicle {
   public radius = 11
   public speed = 20
   public sight = 4
-  static cost = 500
+  static cost = 50
   public hitPoints = 50
   public turnSpeed = 4
   public turnFactor = 10

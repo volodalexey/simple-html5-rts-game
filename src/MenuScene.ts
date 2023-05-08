@@ -5,6 +5,7 @@ import { Button, type IButtonOptions } from './Button'
 import { TileMap } from './TileMap'
 import { CampaignScene } from './CampaignScene'
 import { StatusBar } from './StatusBar'
+import { VersusCPUScene } from './VersusCPUScene'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -40,7 +41,7 @@ export class MenuScene extends Container implements IScene {
 
     this.drawMainOptions()
 
-    setTimeout(() => {
+    window.requestIdleCallback(() => {
       TileMap.idleLoad().then(() => {
         StatusBar.prepareTextures({
           textures: {
@@ -51,7 +52,7 @@ export class MenuScene extends Container implements IScene {
           }
         })
       }).catch(console.error)
-    }, 1000)
+    })
   }
 
   setup ({ menuTexture }: IMenuSceneSceneOptions): void {
@@ -92,7 +93,7 @@ export class MenuScene extends Container implements IScene {
     this.choices.addChild(campaignButton)
 
     const vsCPUButton = new Button({
-      onClick: this.goToMultiplayerScene,
+      onClick: this.goToVersusCPUScene,
       ...style,
       text: 'Versus CPU'
     })
@@ -199,7 +200,15 @@ export class MenuScene extends Container implements IScene {
     }).catch(console.error)
   }
 
-  goToMultiplayerScene = (): void => {
-
+  goToVersusCPUScene = (): void => {
+    SceneManager.changeScene({
+      name: 'versusCPU',
+      newScene: new VersusCPUScene({
+        app: SceneManager.app,
+        viewWidth: SceneManager.width,
+        viewHeight: SceneManager.height
+      }),
+      initialResize: false
+    }).catch(console.error)
   }
 }

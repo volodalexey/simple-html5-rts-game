@@ -89,7 +89,7 @@ export class GroundTurret extends AttackableBuilding {
   }
 
   public sight = 10
-  static cost = 1500
+  static cost = 150
   public hitPoints = 200
   public life = this.hitPoints
   public teleportAnimationSpeed = 0.1

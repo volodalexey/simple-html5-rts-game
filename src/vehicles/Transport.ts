@@ -67,7 +67,7 @@ export class Transport extends Vehicle {
   public radius = 15
   public speed = 15
   public sight = 3
-  static cost = 400
+  static cost = 40
   public hitPoints = 100
   public turnSpeed = 2
   public turnFactor = 20

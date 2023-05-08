@@ -13,6 +13,7 @@ import { Chopper } from './air-vehicles/Chopper'
 import { ECommandName } from './Command'
 import { Transport } from './vehicles/Transport'
 import { Wraith } from './air-vehicles/Wraith'
+import { AI } from './AI'
 
 interface IMissionItem {
   name: EItemNames
@@ -51,8 +52,6 @@ interface ICampaignSceneOptions {
 }
 
 export class CampaignScene extends Container implements IScene {
-  public missionStarted = false
-
   public game!: Game
   public missions: IMission[] = []
   static options = {
@@ -134,7 +133,6 @@ export class CampaignScene extends Container implements IScene {
   }
 
   startCurrentLevel (): void {
-    this.missionStarted = true
     const mission = this.missions[this.currentMissionIdx]
     this.triggers = mission.triggers.map(triggerDescription => createTrigger(triggerDescription))
 
@@ -351,7 +349,7 @@ export class CampaignScene extends Container implements IScene {
                 character: EMessageCharacter.op,
                 message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
               })
-              this.game.cash[Team.blue] += 1900
+              this.game.cash[Team.blue] += 190
             }
           },
           {
@@ -359,7 +357,7 @@ export class CampaignScene extends Container implements IScene {
             interval: 1000,
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
-              if (this.game.cash[Team.green] > 1000 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
+              if (this.game.cash[Team.green] > 100 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
                 this.game.processOrder({ uids: [-12], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
                 this.game.processOrder({ uids: [-13], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               }
@@ -565,7 +563,7 @@ export class CampaignScene extends Container implements IScene {
               return false
             },
             action: () => {
-              this.game.cash[Team.blue] += 2000
+              this.game.cash[Team.blue] += 200
               this.game.showMessage({
                 character: EMessageCharacter.driver,
                 message: 'The rebels came out of nowhere. There was nothing we could do. She saved our lives. Hope these supplies were worth it.'
@@ -702,7 +700,7 @@ export class CampaignScene extends Container implements IScene {
         startGridX: 0,
         startGridY: 30,
         cash: {
-          blue: 1600,
+          blue: 160,
           green: 0
         },
         items: [
@@ -749,8 +747,8 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.op,
                   message: 'We need to build fortifications to resist enemy attacks, please choose the main base to build scv.'
                 })
-                this.game.cash[Team.blue] += 400
-                this.game.cash[Team.green] += 1600
+                this.game.cash[Team.blue] += 40
+                this.game.cash[Team.green] += 160
                 this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 2 } } } })
               }
             }
@@ -770,12 +768,12 @@ export class CampaignScene extends Container implements IScene {
               if (base != null) {
                 this.game.clearSelection(true)
                 base.commands = []
-                this.game.cash[Team.blue] += 1500
+                this.game.cash[Team.blue] += 150
                 this.game.showMessage({
                   character: EMessageCharacter.op,
                   message: "SCV can build a turret to resist the enemy's attack.\nSelect SCV and build a turret on the right side of the main base"
                 })
-                this.game.cash[Team.green] += 2400
+                this.game.cash[Team.green] += 240
                 this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.SCV, unitOrder: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } } })
               }
             }
@@ -798,7 +796,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.op,
                   message: 'The enemy is attacking!'
                 })
-                this.game.cash[Team.green] += 500
+                this.game.cash[Team.green] += 50
                 this.game.processOrder({ uids: [enemyStarport.uid], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'attack', to: turret }, unitUid: -3 } })
               } else {
                 this.endMission({ success: false })
@@ -822,7 +820,7 @@ export class CampaignScene extends Container implements IScene {
                 if (scv != null) {
                   this.game.clearSelection(true)
                   scv.commands = [ECommandName.moveFollow, ECommandName.patrol, ECommandName.buildStarport]
-                  this.game.cash[Team.blue] += 2000
+                  this.game.cash[Team.blue] += 200
                   this.game.showMessage({
                     character: EMessageCharacter.op,
                     message: 'SCV can build a Starport to produce military units.\nSelect SCV and build a Starport on the right side of the main base'
@@ -904,7 +902,7 @@ export class CampaignScene extends Container implements IScene {
               })
               const enemyStarport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === Team.green)
               if (enemyStarport != null) {
-                this.game.cash[Team.green] += 500
+                this.game.cash[Team.green] += 50
                 this.game.processOrder({ uids: [enemyStarport.uid], order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 58, gridY: 10 }, toPoint: { gridX: 51, gridY: 10 } }, unitUid: -4 } })
               }
             }
@@ -927,7 +925,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.op,
                   message: 'Well done! Destroy enemy base!'
                 })
-                this.game.cash[Team.green] += 5000
+                this.game.cash[Team.green] += 500
                 this.game.tileMap.activeItems.children.forEach(item => {
                   if (item.team === this.game.team) {
                     switch (item.itemName) {
@@ -943,102 +941,8 @@ export class CampaignScene extends Container implements IScene {
                     }
                   }
                 })
-              },
-              insertTrigger: {
-                // Start simple AI
-                type: ETriggerType.interval,
-                interval: 5000,
-                action: () => {
-                  let oilDerricks = 0
-                  let harvester = 0
-                  const scvIds = []
-                  let scoutTankCount = 0
-                  let heavyTankCount = 0
-                  let chopperCount = 0
-                  let wraithCount = 0
-                  let turretCount = 0
-                  const starportIds = []
-                  const { activeItems } = this.game.tileMap
-                  for (let i = 0; i < activeItems.children.length; i++) {
-                    const item = activeItems.children[i]
-                    if (item.team === Team.green) {
-                      switch (item.itemName) {
-                        case 'oil-derrick':
-                          oilDerricks++
-                          break
-                        case 'ground-turret':
-                          turretCount++
-                          break
-                        case 'starport':
-                          starportIds.push(item.uid)
-                          break
-                        case 'harvester':
-                          harvester++
-                          break
-                        case 'scv':
-                          scvIds.push(item.uid)
-                          break
-                        case 'scout-tank':
-                          scoutTankCount++
-                          break
-                        case 'heavy-tank':
-                          heavyTankCount++
-                          break
-                        case 'chopper':
-                          chopperCount++
-                          break
-                        case 'wraith':
-                          wraithCount++
-                          break
-                      }
-                    }
-                  }
-                  const attackableUnitCount = scoutTankCount + heavyTankCount + chopperCount + wraithCount
-
-                  if (oilDerricks === 0 && harvester === 0) {
-                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 2 } } } })
-                  } else if (oilDerricks === 1 && harvester === 0 && attackableUnitCount > 10) {
-                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 29 } } } })
-                  } else if (oilDerricks === 2 && harvester === 0 && attackableUnitCount > 10) {
-                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 31, gridY: 38 } } } })
-                  } else if (oilDerricks === 3 && harvester === 0 && attackableUnitCount > 10) {
-                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 30, gridY: 17 } } } })
-                  }
-
-                  if (scvIds.length === 0) {
-                    this.game.processOrder({ uids: [-2], order: { type: 'construct-unit', name: EItemName.SCV } })
-                  } else if (starportIds.length === 0) {
-                    this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } })
-                  } else if (starportIds.length === 1 && attackableUnitCount > 4) {
-                    this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 58, gridY: 6 } } })
-                  }
-
-                  if (chopperCount === 0) {
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'patrol', fromPoint: { gridX: 57, gridY: 9 }, toPoint: { gridX: 52, gridY: 12 } } } })
-                  } else if (wraithCount === 0) {
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'patrol', fromPoint: { gridX: 58, gridY: 10 }, toPoint: { gridX: 51, gridY: 10 } } } })
-                  } else if (chopperCount === 1 && wraithCount === 1) {
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
-                  } else if (heavyTankCount === 0) {
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 55, gridY: 8 }, toPoint: { gridX: 55, gridY: 5 } } } })
-                  } else if (heavyTankCount === 1) {
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
-                    this.game.processOrder({ uids: starportIds, order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
-                  }
-
-                  if (scvIds.length === 1 && this.game.cash.green > 2500) {
-                    if (turretCount === 0) {
-                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 50, gridY: 9 } } })
-                    } else if (turretCount === 1) {
-                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 52, gridY: 11 } } })
-                    } else if (turretCount === 2) {
-                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 55, gridY: 11 } } })
-                    } else if (turretCount === 3) {
-                      this.game.processOrder({ uids: scvIds, order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 55, gridY: 11 } } })
-                    }
-                  }
-                }
+                // start AI
+                this.game.ai = new AI({ game: this.game, team: Team.green })
               }
             }
           },

@@ -93,7 +93,7 @@ export class Wraith extends AttackableAirVehicle {
   public radius = 15
   public speed = 40
   public sight = 8
-  static cost = 600
+  static cost = 60
   public hitPoints = 50
   public turnSpeed = 4
   public turnFactor = 10
