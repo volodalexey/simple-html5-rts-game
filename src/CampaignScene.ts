@@ -433,7 +433,7 @@ export class CampaignScene extends Container implements IScene {
           { name: 'base', initGridX: 5, initGridY: 36, team: Team.blue, uid: -11 },
           { name: 'starport', initGridX: 1, initGridY: 28, team: Team.blue, uid: -12 },
           { name: 'starport', initGridX: 4, initGridY: 32, team: Team.blue, uid: -13 },
-          { name: 'harvester', initGridX: 1.5, initGridY: 38.5, initCenter: true, team: Team.blue, order: { type: 'deploy', toPoint: { gridX: 1.5, gridY: 38.5 } } },
+          { name: 'harvester', initGridX: 1.5, initGridY: 38.5, initCenter: true, team: Team.blue, order: { type: 'deploy', toPoint: { gridX: 1, gridY: 38 } } },
           { name: 'ground-turret', initGridX: 7, initGridY: 28, team: Team.blue },
           { name: 'ground-turret', initGridX: 8, initGridY: 32, team: Team.blue },
           { name: 'ground-turret', initGridX: 11, initGridY: 37, team: Team.blue },

@@ -392,7 +392,14 @@ export class TileMap extends Container {
   }
 
   rebuildBuildableGrid (exceptItem?: Vehicle): void {
-    this._currentMapBuildableGrid = this._initialMapTerrainGrid.map(g => g.slice())
+    if (this._currentMapBuildableGrid.length !== this._initialMapTerrainGrid.length) {
+      this._currentMapBuildableGrid = this._initialMapTerrainGrid.map(g => g.slice())
+    }
+    for (let x = 0; x < this.mapGridWidth; x++) {
+      for (let y = 0; y < this.mapGridHeight; y++) {
+        this._currentMapBuildableGrid[y][x] = this._initialMapTerrainGrid[y][x]
+      }
+    }
     const { activeItems } = this
     const { tileMap: { mapGridWidth, mapGridHeight } } = this.game
     for (let i = activeItems.children.length - 1; i >= 0; i--) {
