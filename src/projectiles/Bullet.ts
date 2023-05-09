@@ -14,7 +14,7 @@ export class Bullet extends Projectile {
   static shootAudio = ''
 
   public speed = 50
-  public range = 5
+  public distanceTolive = 10
   public damage = 1
 
   public collisionOptions = {

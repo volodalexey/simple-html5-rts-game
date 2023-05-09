@@ -87,6 +87,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
 
   constructor (options: IAirVehicleOptions) {
     super(options)
+    this.order = options.order ?? { type: 'float' }
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
     }

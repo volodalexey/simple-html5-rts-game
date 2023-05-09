@@ -13,8 +13,9 @@ export class Laser extends Projectile {
   static reloadTime = 30
 
   public speed = 60
-  public range = 8
-  public damage = 10
+  public distanceTolive = 20
+  public damage = 15
+  public turnSpeed = 1
 
   public collisionOptions = {
     width: 4,

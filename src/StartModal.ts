@@ -13,6 +13,10 @@ interface IStartModalOptions {
   viewHeight: number
 }
 
+class ModalBox extends Graphics {}
+class ReasonText extends Text {}
+class DynamicContent extends Container {}
+
 export class StartModal extends Container {
   static textures: IStartModalTextures
 
@@ -27,9 +31,10 @@ export class StartModal extends Container {
   public sucess = false
   public elapsedSpawnFrames = 0
   public spawnFrame = Math.floor(Math.random() * 20 + 60)
-  public modalBox!: Graphics
+  public modalBox!: ModalBox
   public particles = new ParticleContainer(300, { position: true, scale: true, tint: true })
-  public reasonText!: Text
+  public reasonText!: ReasonText
+  public dynamicContent!: DynamicContent
   public boxOptions = {
     backgroundColor: 0x454545,
     outerBorderColor: 0x485b6c,
@@ -80,12 +85,12 @@ export class StartModal extends Container {
   }
 
   setup (_: IStartModalOptions): void {
-    this.modalBox = new Graphics()
+    this.modalBox = new ModalBox()
     this.addChild(this.modalBox)
 
     const { boxOptions, reasonTextOptions } = this
 
-    this.reasonText = new Text('-', {
+    this.reasonText = new ReasonText('-', {
       fontSize: reasonTextOptions.textSize,
       fill: reasonTextOptions.textColor,
       fontWeight: reasonTextOptions.fontWeight as TextStyleFontWeight,
@@ -100,6 +105,9 @@ export class StartModal extends Container {
     this.reasonText.anchor.set(0.5, 0.5)
     this.reasonText.position.set(boxOptions.width / 2, boxOptions.height / 2 + reasonTextOptions.top)
     this.addChild(this.reasonText)
+
+    this.dynamicContent = new DynamicContent()
+    this.addChild(this.dynamicContent)
   }
 
   draw (_: IStartModalOptions): void {
@@ -135,6 +143,7 @@ export class StartModal extends Container {
     onLeftClick?: () => void
     onRightClick?: () => void
   }): void {
+    this.cleanFromAll()
     const { iconHomeTexture, iconNextTexture, iconRepeatTexture } = StartModal.textures
     const {
       leftOne, leftTwo, top, fillRegular, fillSuccess, fillError,
@@ -204,7 +213,7 @@ export class StartModal extends Container {
         buttonRightStyle.text = 'Next'
         buttonRightStyle.iconTexture = iconNextTexture
         const buttonRight = new Button(buttonRightStyle)
-        this.addChild(buttonRight)
+        this.dynamicContent.addChild(buttonRight)
         break
       }
 
@@ -217,15 +226,15 @@ export class StartModal extends Container {
         buttonRightStyle.text = 'Repeat'
         buttonRightStyle.iconTexture = iconRepeatTexture
         const buttonRight = new Button(buttonRightStyle)
-        this.addChild(buttonRight)
+        this.dynamicContent.addChild(buttonRight)
         break
       }
     }
 
     const buttonLeft = new Button(buttonLeftStyle)
-    this.addChild(buttonLeft)
+    this.dynamicContent.addChild(buttonLeft)
 
-    this.addChild(this.particles)
+    this.dynamicContent.addChild(this.particles)
   }
 
   hideModal (): void {
@@ -236,6 +245,9 @@ export class StartModal extends Container {
     this.hideModal()
     while (this.particles.children[0] != null) {
       this.particles.children[0].removeFromParent()
+    }
+    while (this.dynamicContent.children[0] != null) {
+      this.dynamicContent.children[0].removeFromParent()
     }
   }
 

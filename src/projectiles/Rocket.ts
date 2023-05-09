@@ -13,7 +13,7 @@ export class Rocket extends Projectile {
   static reloadTime = 40
 
   public speed = 25
-  public range = 9
+  public distanceTolive = 25
   public damage = 20
   public turnSpeed = 2
 

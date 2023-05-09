@@ -28,7 +28,7 @@ export class Projectile extends Item implements IMoveable {
   static reloadTime = 0
 
   public type = EItemType.projectiles
-  public range = 0
+  public distanceTolive = 0
   public damage = 0
   public distanceTravelled = 0
   public vector = new Vector({ direction: EVectorDirection.down })
@@ -186,7 +186,7 @@ export class Projectile extends Item implements IMoveable {
       case 'fire': {
         // Move towards destination and stop when close by or if travelled past range
         const reachedTarget = this.reachedTarget()
-        if (this.distanceTravelled > this.range || reachedTarget) {
+        if (this.distanceTravelled > this.distanceTolive || reachedTarget) {
           if (reachedTarget) {
             this.playHitSound()
 

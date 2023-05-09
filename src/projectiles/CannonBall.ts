@@ -13,7 +13,7 @@ export class CannonBall extends Projectile {
   static reloadTime = 40
 
   public speed = 60
-  public range = 15
+  public distanceTolive = 20
   public damage = 20
 
   public collisionOptions = {
