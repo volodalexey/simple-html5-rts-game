@@ -364,7 +364,6 @@ export class StatusBar extends Container {
       this.messageList.addChild(msg)
     })
     this.messageList.pivot.y = 0
-    this.scrollToLastMessage = true
   }
 
   setLimit ({ width, height }: { width: number, height: number }): void {
@@ -372,5 +371,6 @@ export class StatusBar extends Container {
       return
     }
     this.reAppendMessages({ width, height })
+    this.messageList.pivot.y = this.maxPivot
   }
 }

@@ -40,11 +40,9 @@ export class TopBar extends Container {
     this.miniMap.position.set(this.statusBar.width, 0)
   }
 
-  handleResize ({ viewWidth, viewHeight, camX, camY }: {
+  handleResize ({ viewWidth, viewHeight }: {
     viewWidth: number
     viewHeight: number
-    camX: number
-    camY: number
   }): void {
     const { statusBarWidth, miniMapWidth, initHeight } = TopBar.options
     const statusBarLeftWidth = viewWidth - miniMapWidth
@@ -53,15 +51,11 @@ export class TopBar extends Container {
     const limitWidth = statusBarLeftWidth > statusBarWidth ? statusBarWidth : statusBarLeftWidth
     this.statusBar.setLimit({ width: limitWidth, height: initHeight })
     this.miniMap.x = viewWidth - this.miniMap.width
-    this.miniMap.handleResize({ viewWidth, viewHeight, camX, camY })
+    this.miniMap.handleResize({ viewWidth, viewHeight })
   }
 
-  handleUpdate (options: {
-    deltaMS: number
-    camX?: number
-    camY?: number
-  }): void {
-    this.statusBar.handleUpdate(options.deltaMS)
-    this.miniMap.handleUpdate(options)
+  handleUpdate (deltaMS: number): void {
+    this.statusBar.handleUpdate(deltaMS)
+    this.miniMap.handleUpdate(deltaMS)
   }
 }

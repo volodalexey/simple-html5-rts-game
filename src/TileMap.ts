@@ -195,15 +195,15 @@ export class TileMap extends Container {
       this.maxXPivot = (maxBgWidth - viewWidth) / scale.x
       this.minXPivot = -gridSize * scale.x
     } else {
-      this.maxXPivot = 0
-      this.minXPivot = 0
+      this.maxXPivot = -gridSize * scale.x
+      this.minXPivot = -gridSize * scale.x
     }
     if (maxBgHeight > viewHeight) {
       this.maxYPivot = (maxBgHeight - viewHeight) / scale.y
       this.minYPivot = -gridSize * scale.y
     } else {
-      this.maxYPivot = 0
-      this.minYPivot = 0
+      this.maxYPivot = -gridSize * scale.y
+      this.minYPivot = -gridSize * scale.y
     }
   }
 

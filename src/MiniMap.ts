@@ -10,6 +10,11 @@ export interface IMiniMapOptions {
   initHeight: number
 }
 
+class BorderRect extends Graphics {}
+class CameraRect extends Graphics {}
+class BackgroundContainer extends Container {}
+class Background extends Sprite {}
+
 export class MiniMap extends Container {
   static options = {
     borderColor: 0x454545,
@@ -27,10 +32,10 @@ export class MiniMap extends Container {
   public rebuildRequired = true
   public pointerDownX = -1
   public pointerDownY = -1
-  public border = new Graphics()
-  public backgroundContainer = new Container()
-  public background = new Sprite()
-  public cameraRect = new Graphics()
+  public border = new BorderRect()
+  public backgroundContainer = new BackgroundContainer()
+  public background = new Background()
+  public cameraRect = new CameraRect()
   public activeItems = new Container<Graphics>()
   public initWidth!: number
   public initHeight!: number
@@ -126,33 +131,25 @@ export class MiniMap extends Container {
     logPointerEvent(`Game pdX=${this.pointerDownX} pdX=${this.pointerDownY} up`)
   }
 
-  assignBackgroundTexture ({ texture, camX, camY }: { texture: Texture, camX?: number, camY?: number }): void {
+  assignBackgroundTexture ({ texture }: { texture: Texture }): void {
     this.background.texture = texture
     this.fit({ texture })
     this.drawCameraRect()
-    this.updateCameraRect({ camX, camY })
+    this.updateCameraRect()
   }
 
-  handleUpdate ({ camX, camY }: {
-    deltaMS: number
-    camX?: number
-    camY?: number
-  }): void {
-    this.updateCameraRect({ camX, camY })
+  handleUpdate (deltaMS: number): void {
+    this.updateCameraRect()
     this.updateItems()
   }
 
-  handleResize ({ viewWidth, viewHeight, camX, camY }: {
-    viewWidth: number
-    viewHeight: number
-    camX: number
-    camY: number
-  }): void {
+  handleResize (_: { viewWidth: number, viewHeight: number }): void {
     this.drawCameraRect()
-    this.updateCameraRect({ camX, camY })
+    this.updateCameraRect()
   }
 
   fit ({ texture }: { texture: Texture }): void {
+    const { gridSize } = this.game.tileMap
     const { initWidth, initHeight } = this
     const { borderWidth } = MiniMap.options
     const { width, height } = texture
@@ -160,18 +157,22 @@ export class MiniMap extends Container {
     const innerWidth = initWidth - borderWidth * 2
     const innerHeight = initHeight - borderWidth * 2
     let scale = 1
-    if (width >= height) {
-      scale = innerWidth / width
+    const padTextureWidth = width + gridSize * 2
+    const padTextureHeight = height + gridSize * 2
+    if (padTextureWidth >= padTextureHeight) {
+      scale = innerWidth / padTextureWidth
     } else {
-      scale = innerHeight / height
+      scale = innerHeight / padTextureHeight
     }
 
-    this.background.scale.set(scale)
+    this.backgroundContainer.scale.set(scale)
 
     const { width: bgWidth, height: bgHeight } = this.background
+    const innerWidthScaled = innerWidth / this.backgroundContainer.scale.x
+    const innerHeightScaled = innerHeight / this.backgroundContainer.scale.y
 
-    const x = innerWidth > bgWidth ? (innerWidth - bgWidth) / 2 : 0
-    const y = innerHeight > bgHeight ? (innerHeight - bgHeight) / 2 : 0
+    const x = innerWidthScaled > bgWidth ? (innerWidthScaled - bgWidth) / 2 : 0
+    const y = innerHeightScaled > bgHeight ? (innerHeightScaled - bgHeight) / 2 : 0
     this.background.x = x
     this.background.y = y
   }
@@ -184,7 +185,7 @@ export class MiniMap extends Container {
     const { scale: { x: tmSX, y: tmSY } } = this.game.tileMap
     const cameraWidth = width / tmSX
     const cameraHeight = height / tmSY
-    const { scale: { x: bgSX, y: bgSY } } = this.background
+    const { scale: { x: bgSX, y: bgSY } } = this.backgroundContainer
     const scaledBorderWidthX = cameraRectThickness / bgSX
     const scaledBorderWidthY = cameraRectThickness / bgSY
     this.cameraRect.drawRect(0, 0, cameraWidth, cameraHeight)
@@ -194,7 +195,8 @@ export class MiniMap extends Container {
     this.cameraRect.endHole()
   }
 
-  updateCameraRect ({ camX = 0, camY = 0 }: { camX?: number, camY?: number }): void {
+  updateCameraRect (): void {
+    const { x: camX, y: camY } = this.game.tileMap.pivot
     this.cameraRect.position.set(camX, camY)
   }
 

@@ -40,6 +40,8 @@ export interface IGameOptions {
   team: Team
 }
 
+class DragSelect extends Graphics {}
+
 export class Game extends Container {
   public gameEnded = false
   public time = 0
@@ -65,7 +67,7 @@ export class Game extends Container {
   public camera!: Camera
   public selectedItems: SelectableItem[] = []
   public dragSelectThreshold = 5
-  public dragSelect = new Graphics()
+  public dragSelect = new DragSelect()
   static options = {
     doubleTapMaxTime: 300,
     doubleTapThreasholdX: 10,
@@ -511,9 +513,8 @@ export class Game extends Container {
       viewWidth,
       viewHeight: leftHeight
     })
-    const { x: pX, y: pY } = this.tileMap.pivot
     this.tileMap.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight })
-    this.topBar.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight, camX: pX, camY: pY })
+    this.topBar.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight })
     this.sideBar.handleResize({ viewWidth: maxWidth, initY: this.topBar.height })
 
     const availableWidth = viewWidth
@@ -542,8 +543,7 @@ export class Game extends Container {
       return
     }
     this.time += deltaMS
-    const { x: pX, y: pY } = this.tileMap.pivot
-    this.topBar.handleUpdate({ deltaMS, camX: pX, camY: pY })
+    this.topBar.handleUpdate(deltaMS)
     this.sideBar.handleUpdate(deltaMS)
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
