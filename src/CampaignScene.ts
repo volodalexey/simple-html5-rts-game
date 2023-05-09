@@ -168,8 +168,8 @@ export class CampaignScene extends Container implements IScene {
         briefing: 'In the months since the great war, mankind has fallen into chaos. Billions are dead with cities in ruins.\nSmall groups of survivors band together to try and survive as best as they can.\nWe are trying to reach out to all the survivors in this sector before we join back with the main colony.',
         mapImageSrc: 'level1Background',
         mapSettingsSrc: 'level1Settings',
-        startGridX: 36,
-        startGridY: 0,
+        startGridX: 57,
+        startGridY: 12,
         cash: {
           blue: 0,
           green: 0
@@ -290,8 +290,8 @@ export class CampaignScene extends Container implements IScene {
         briefing: 'Thanks to the supplies from the convoy, we now have the base up and running.\nThe rebels nearby are proving to be a problem. We need to take them out. \nFirst set up the base defences. Then find and destroy all rebels in the area.\nThe colony will be sending us reinforcements to help us out.',
         mapImageSrc: 'level1Background',
         mapSettingsSrc: 'level1Settings',
-        startGridX: 36,
-        startGridY: 0,
+        startGridX: 55,
+        startGridY: 18,
         cash: {
           blue: 0,
           green: 0
@@ -428,8 +428,8 @@ export class CampaignScene extends Container implements IScene {
         briefing: 'Thanks to the attack led by you, we now have control of the rebel base. We can expect the rebels to try to retaliate.\n The colony is sending in aircraft to help us evacuate back to the main camp. All we need to do is hang tight until the choppers get here. \n Luckily, we have some supplies and ammunition to defend ourselves with until they get here. \nProtect the transports at all costs.',
         mapImageSrc: 'level1Background',
         mapSettingsSrc: 'level1Settings',
-        startGridX: 0,
-        startGridY: 20,
+        startGridX: 7,
+        startGridY: 29,
         cash: {
           blue: 0,
           green: 0
@@ -697,8 +697,8 @@ export class CampaignScene extends Container implements IScene {
         briefing: 'We need to build a base from scratch!',
         mapImageSrc: 'level2Background',
         mapSettingsSrc: 'level2Settings',
-        startGridX: 0,
-        startGridY: 30,
+        startGridX: 2,
+        startGridY: 37,
         cash: {
           blue: 160,
           green: 0
@@ -925,7 +925,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.op,
                   message: 'Well done! Destroy enemy base!'
                 })
-                this.game.cash[Team.green] += 500
+                this.game.cash[Team.green] += 200
                 this.game.tileMap.activeItems.children.forEach(item => {
                   if (item.team === this.game.team) {
                     switch (item.itemName) {

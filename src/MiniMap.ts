@@ -92,9 +92,7 @@ export class MiniMap extends Container {
         // do nothing
       } else {
         // only if click outside of camera rectangular
-        const goX = localPosition.x - this.cameraRect.width * 0.5
-        const goY = localPosition.y - this.cameraRect.height * 0.5
-        this.game.tileMap.goTo({ x: goX, y: goY })
+        this.game.tileMap.goTo(localPosition)
       }
     }
   }

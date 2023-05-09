@@ -108,7 +108,10 @@ export class Game extends Container {
   }: IGameOptions): void {
     const leftHeight = viewHeight - TopBar.options.initHeight
     this.camera = new Camera({
-      viewWidth, viewHeight: leftHeight, initY: TopBar.options.initHeight
+      game: this,
+      viewWidth,
+      viewHeight: leftHeight,
+      initY: TopBar.options.initHeight
     })
     this.addChild(this.camera)
 
@@ -488,8 +491,8 @@ export class Game extends Container {
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
     this.topBar.miniMap.assignBackgroundTexture({ texture: this.tileMap.background.texture })
-    this.tileMap.goTo({ x: startGridX * gridSize, y: startGridY * gridSize })
     this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
+    this.tileMap.goTo({ x: startGridX * gridSize, y: startGridY * gridSize })
   }
 
   endGame (options: Parameters<StartModal['showModal']>[0]): void {
@@ -505,8 +508,8 @@ export class Game extends Container {
     const maxWidth = viewWidth > bgWidth ? bgWidth : viewWidth
     const leftHeight = viewHeight - this.topBar.height
     this.camera.handleResize({
-      viewWidth: maxWidth,
-      viewHeight: leftHeight > bgHeight ? bgHeight : leftHeight
+      viewWidth,
+      viewHeight: leftHeight
     })
     const { x: pX, y: pY } = this.tileMap.pivot
     this.tileMap.handleResize({ viewWidth: maxWidth, viewHeight: leftHeight })

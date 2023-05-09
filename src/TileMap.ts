@@ -184,23 +184,27 @@ export class TileMap extends Container {
   }
 
   calcPivotLimits (): void {
-    const { width: viewWidth, height: viewHeight } = this.game.camera
-    const { scale } = this
+    const { width: camWidth, height: camHeight } = this.game.camera
+    const { scale, gridSize } = this
     const { width: bgWidth, height: bgHeight } = this.background
-    const width = bgWidth * scale.x
-    const height = bgHeight * scale.y
-    if (width > viewWidth) {
-      this.maxXPivot = (width - viewWidth) / scale.x
+    const maxBgWidth = (bgWidth + gridSize) * scale.x
+    const maxBgHeight = (bgHeight + gridSize) * scale.y
+    const viewWidth = camWidth
+    const viewHeight = camHeight
+    if (maxBgWidth > viewWidth) {
+      this.maxXPivot = (maxBgWidth - viewWidth) / scale.x
+      this.minXPivot = -gridSize * scale.x
     } else {
       this.maxXPivot = 0
+      this.minXPivot = 0
     }
-    this.minXPivot = 0
-    if (height > viewHeight) {
-      this.maxYPivot = (height - viewHeight) / scale.y
+    if (maxBgHeight > viewHeight) {
+      this.maxYPivot = (maxBgHeight - viewHeight) / scale.y
+      this.minYPivot = -gridSize * scale.y
     } else {
       this.maxYPivot = 0
+      this.minYPivot = 0
     }
-    this.minYPivot = 0
   }
 
   calcScaleLimits (): void {
@@ -463,10 +467,13 @@ export class TileMap extends Container {
     })
   }
 
-  goTo ({ x, y }: { x: number, y: number }): void {
+  goTo ({ x, y, center = true }: { x: number, y: number, center?: boolean }): void {
+    const { cameraRect } = this.game.topBar.miniMap
     const { pivot } = this
-    pivot.x = x
-    pivot.y = y
+    const goX = center ? x - cameraRect.width * 0.5 : x
+    const goY = center ? y - cameraRect.height * 0.5 : y
+    pivot.x = goX
+    pivot.y = goY
     this.checkPivotLimits()
   }
 

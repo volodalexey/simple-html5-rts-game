@@ -41,7 +41,7 @@ export class MenuScene extends Container implements IScene {
 
     this.drawMainOptions()
 
-    window.requestIdleCallback(() => {
+    setTimeout(() => {
       TileMap.idleLoad().then(() => {
         StatusBar.prepareTextures({
           textures: {

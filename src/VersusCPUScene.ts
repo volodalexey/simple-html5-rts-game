@@ -109,8 +109,8 @@ export class VersusCPUScene extends Container implements IScene {
     this.game.startGame({
       mapImageSrc: 'level2Background',
       mapSettingsSrc: 'level2Settings',
-      startGridX: 0,
-      startGridY: 30
+      startGridX: 2,
+      startGridY: 37
     });
 
     [
