@@ -122,9 +122,12 @@ export class StatusBar extends Container {
   }
 
   static getTimeText (time: number): string {
-    const hours = Math.trunc(time / (1000 * 60 * 60))
-    const minutes = Math.trunc((time - hours) / (1000 * 60))
-    const seconds = Math.trunc((time - hours - minutes) / 1000)
+    let timeDiff = time / 1000
+    const seconds = Math.round(timeDiff % 60)
+    timeDiff = Math.floor(timeDiff / 60) // remove seconds from the time
+    const minutes = Math.round(timeDiff % 60)
+    timeDiff = Math.floor(timeDiff / 60) // remove minutes from the time
+    const hours = Math.round(timeDiff % 24)
     const addZero = (num: number): string => String(num).padStart(2, '0')
     return `Time:\n${addZero(hours)}:${addZero(minutes)}:${addZero(seconds)}`
   }
