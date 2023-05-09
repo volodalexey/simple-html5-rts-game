@@ -3,8 +3,10 @@ import { Chopper } from './air-vehicles/Chopper'
 import { Wraith } from './air-vehicles/Wraith'
 import { type Base } from './buildings/Base'
 import { GroundTurret } from './buildings/GroundTurret'
+import { OilDerrick } from './buildings/OilDerrick'
 import { Starport } from './buildings/Starport'
 import { type BaseActiveItem, type Team } from './common'
+import { calcBuildablePoints } from './interfaces/IBuildable'
 import { EItemName } from './interfaces/IItem'
 import { logAI } from './logger'
 import { Harvester } from './vehicles/Harvester'
@@ -224,26 +226,37 @@ export class AI {
       attackableUnitCount,
       cash
     } = this
-    const maxAU1 = 10
-    const factor1 = 1.2
-    const factor2 = 1.4
-    const factor3 = 2
-    if (oilDerrick.count === 0 && harvester.count === 0 && cash >= Harvester.cost) {
-      this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 2 } } } })
-      logAI(`calcMainOrders(${cash}) 1`)
-      return true
-    } else if (oilDerrick.count === 1 && harvester.count === 0 && cash >= Harvester.cost * factor1 && attackableUnitCount > maxAU1) {
-      this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 51, gridY: 29 } } } })
-      logAI(`calcMainOrders(${cash}) 2`)
-      return true
-    } else if (oilDerrick.count === 2 && harvester.count === 0 && cash >= Harvester.cost * factor2 && attackableUnitCount > maxAU1) {
-      this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 31, gridY: 38 } } } })
-      logAI(`calcMainOrders(${cash}) 3`)
-      return true
-    } else if (oilDerrick.count === 3 && harvester.count === 0 && cash >= Harvester.cost * factor3 && attackableUnitCount > maxAU1) {
-      this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: { gridX: 30, gridY: 17 } } } })
-      logAI(`calcMainOrders(${cash}) 4`)
-      return true
+    const { currentMapBuildableGrid } = this.game.tileMap
+    const possiblePoints = [
+      { gridX: 51, gridY: 2 },
+      { gridX: 51, gridY: 29 },
+      { gridX: 31, gridY: 38 },
+      { gridX: 30, gridY: 17 }
+    ]
+      .map(pp => calcBuildablePoints({ buildableGrid: OilDerrick.buildableGrid, ...pp }))
+      .filter(points => points.every(({ gridX, gridY }) => currentMapBuildableGrid[gridY][gridX] === 0))
+      .map(points => points[0])
+    if (possiblePoints.length > 0) {
+      if (oilDerrick.count === 0 && harvester.count === 0 && cash >= Harvester.cost) {
+        this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: possiblePoints[0] } } })
+        logAI(`calcMainOrders(${cash}) 1`)
+        return true
+      } else if (oilDerrick.count === 1 && harvester.count === 0 && cash >= Harvester.cost * 1.2 && attackableUnitCount > 8) {
+        this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: possiblePoints[0] } } })
+        logAI(`calcMainOrders(${cash}) 2`)
+        return true
+      } else if (oilDerrick.count === 2 && harvester.count === 0 && cash >= Harvester.cost * 1.4 && attackableUnitCount > 12) {
+        this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: possiblePoints[0] } } })
+        logAI(`calcMainOrders(${cash}) 3`)
+        return true
+      } else if (oilDerrick.count === 3 && harvester.count === 0 && cash >= Harvester.cost * 2 && attackableUnitCount > 14) {
+        this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.Harvester, unitOrder: { type: 'deploy', toPoint: possiblePoints[0] } } })
+        logAI(`calcMainOrders(${cash}) 4`)
+        return true
+      } else if (harvester.count > 0) {
+        this.game.processOrder({ items: harvester.one(), order: { type: 'deploy', toPoint: possiblePoints[0] } })
+        logAI(`calcMainOrders(${cash}) 5`)
+      }
     }
     return false
   }
@@ -260,20 +273,28 @@ export class AI {
       attackableUnitCount,
       cash
     } = this
-    const maxAU2 = 8
-    const factor1 = 1.5
+    const { currentMapBuildableGrid } = this.game.tileMap
+    const possiblePoints = [
+      { gridX: 53, gridY: 6 },
+      { gridX: 58, gridY: 6 }
+    ]
+      .map(pp => calcBuildablePoints({ buildableGrid: Starport.buildableGrid, ...pp }))
+      .filter(points => points.every(({ gridX, gridY }) => currentMapBuildableGrid[gridY][gridX] === 0))
+      .map(points => points[0])
     if (scv.count === 0 && cash >= SCV.cost) {
       this.game.processOrder({ items: base.one(), order: { type: 'construct-unit', name: EItemName.SCV, unitOrder: { type: 'move', toPoint: { gridX: 59, gridY: 4 } } } })
       logAI(`calcSecondaryOrders(${cash}) 1`)
       return true
-    } else if (scv.count === 1 && starport.count === 0 && cash >= Starport.cost) {
-      this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } })
-      logAI(`calcSecondaryOrders(${cash}) 2`)
-      return true
-    } else if (scv.count === 1 && starport.count === 1 && cash >= Starport.cost * factor1 && attackableUnitCount > maxAU2) {
-      this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.Starport, toPoint: { gridX: 58, gridY: 6 } } })
-      logAI(`calcSecondaryOrders(${cash}) 3`)
-      return true
+    } else if (possiblePoints.length > 0) {
+      if (scv.count === 1 && starport.count === 0 && cash >= Starport.cost) {
+        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.Starport, toPoint: possiblePoints[0] } })
+        logAI(`calcSecondaryOrders(${cash}) 2`)
+        return true
+      } else if (scv.count === 1 && starport.count === 1 && cash >= Starport.cost * 1.5 && attackableUnitCount > 8) {
+        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.Starport, toPoint: possiblePoints[0] } })
+        logAI(`calcSecondaryOrders(${cash}) 3`)
+        return true
+      }
     }
     return false
   }
@@ -291,7 +312,6 @@ export class AI {
       },
       cash
     } = this
-    const maxST1 = 3
     if (chopper.count === 0) {
       this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'patrol', fromPoint: { gridX: 57, gridY: 9 }, toPoint: { gridX: 52, gridY: 12 } } } })
       logAI(`calcAttackableOrders(${cash}) 1`)
@@ -301,19 +321,19 @@ export class AI {
       logAI(`calcAttackableOrders(${cash}) 2`)
       return true
     } else if (chopper.count === 1 && wraith.count === 1) {
-      this.game.processOrder({ items: starport.other(), order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 51, gridY: 3 } } } })
-      this.game.processOrder({ items: starport.other(), order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 50, gridY: 4 } } } })
+      this.game.processOrder({ items: starport.other(), order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'patrol', fromPoint: { gridX: 51, gridY: 3 }, toPoint: { gridX: 58, gridY: 3 } } } })
+      this.game.processOrder({ items: starport.other(), order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'patrol', fromPoint: { gridX: 51, gridY: 3 }, toPoint: { gridX: 58, gridY: 3 } } } })
       logAI(`calcAttackableOrders(${cash}) 3`)
       return true
     } else if (heavyTank.count === 0) {
-      this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 54, gridY: 12 }, toPoint: { gridX: 54, gridY: 14 } } } })
+      this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.HeavyTank, unitUid: -324, unitOrder: { type: 'patrol', fromPoint: { gridX: 54, gridY: 12 }, toPoint: { gridX: 54, gridY: 14 } } } })
       logAI(`calcAttackableOrders(${cash}) 4`)
       return true
     } else if (heavyTank.count === 1) {
       this.game.processOrder({ items: starport.other(), order: { type: 'construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 50, gridY: 14 } } } })
       logAI(`calcAttackableOrders(${cash}) 5`)
       return true
-    } else if (scoutTank.count < maxST1 && cash >= ScoutTank.cost) {
+    } else if (scoutTank.count < 3 && cash >= ScoutTank.cost) {
       this.game.processOrder({ items: starport.other(true), order: { type: 'construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 51, gridY: 15 } } } })
       logAI(`calcAttackableOrders(${cash}) 6`)
       return true
@@ -333,25 +353,31 @@ export class AI {
       cash
     } = this
 
-    const maxC1 = 250
-    const factor1 = 1.2
-    const factor2 = 1.4
-    const factor3 = 2
-    if (scv.count === 1 && cash > maxC1) {
+    const { currentMapBuildableGrid } = this.game.tileMap
+    const possiblePoints = [
+      { gridX: 50, gridY: 9 },
+      { gridX: 52, gridY: 11 },
+      { gridX: 55, gridY: 11 },
+      { gridX: 58, gridY: 11 }
+    ]
+      .map(pp => calcBuildablePoints({ buildableGrid: GroundTurret.buildableGrid, ...pp }))
+      .filter(points => points.every(({ gridX, gridY }) => currentMapBuildableGrid[gridY][gridX] === 0))
+      .map(points => points[0])
+    if (scv.count === 1 && cash >= GroundTurret.cost && possiblePoints.length > 0) {
       if (groundTurret.count === 0) {
-        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 50, gridY: 9 } } })
+        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: possiblePoints[0] } })
         logAI(`calcFortificationOrders(${cash}) 1`)
         return true
-      } else if (groundTurret.count === 1 && cash >= GroundTurret.cost * factor1) {
-        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 52, gridY: 11 } } })
+      } else if (groundTurret.count === 1 && cash >= GroundTurret.cost * 1.2) {
+        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: possiblePoints[0] } })
         logAI(`calcFortificationOrders(${cash}) 2`)
         return true
-      } else if (groundTurret.count === 2 && cash >= GroundTurret.cost * factor2) {
-        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 55, gridY: 11 } } })
+      } else if (groundTurret.count === 2 && cash >= GroundTurret.cost * 1.4) {
+        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: possiblePoints[0] } })
         logAI(`calcFortificationOrders(${cash}) 3`)
         return true
-      } else if (groundTurret.count === 3 && cash >= GroundTurret.cost * factor3) {
-        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX: 58, gridY: 11 } } })
+      } else if (groundTurret.count === 3 && cash >= GroundTurret.cost * 2) {
+        this.game.processOrder({ items: scv.one(), order: { type: 'build', name: EItemName.GroundTurret, toPoint: possiblePoints[0] } })
         logAI(`calcFortificationOrders(${cash}) 4`)
         return true
       }
@@ -374,16 +400,13 @@ export class AI {
       },
       cash
     } = this
-    const fST1 = 4
-    const fHT1 = 3
-    const fC1 = 100
-    const fGT1 = 4
-    if (scoutTank.count >= fST1 && heavyTank.count >= fHT1 && cash > fC1 && groundTurret.count >= fGT1) {
+    const seed1 = Math.random()
+    if (scoutTank.count >= 3 && heavyTank.count >= 3 && cash > 50 && seed1 >= 0.6) {
       this.game.processOrder({ items: scoutTank.items, order: { type: 'move-and-attack', toPoint: { gridX: 0, gridY: 39 } } })
       this.game.processOrder({ items: heavyTank.items, order: { type: 'move-and-attack', toPoint: { gridX: 0, gridY: 39 } } })
       logAI(`calcWaveOrders(${cash}) 1`)
       return true
-    } else if (chopper.count >= 5 && wraith.count >= 5) {
+    } else if (chopper.count >= 3 && wraith.count >= 5 && cash > 100 && groundTurret.count >= 2 && seed1 >= 0.9) {
       this.game.processOrder({ items: chopper.items, order: { type: 'move-and-attack', toPoint: { gridX: 0, gridY: 39 } } })
       this.game.processOrder({ items: wraith.items, order: { type: 'move-and-attack', toPoint: { gridX: 0, gridY: 39 } } })
       logAI(`calcWaveOrders(${cash}) 2`)
@@ -405,13 +428,13 @@ export class AI {
     const seed2 = 1 + Math.random() * 3
     if (seed1 < 0.1) {
       if (cash >= Chopper.cost * seed2) {
-        this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 51, gridY: 3 } } } })
+        this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.Chopper, unitOrder: { type: 'patrol', fromPoint: { gridX: 50, gridY: 2 }, toPoint: { gridX: 58, gridY: 15 } } } })
         logAI(`calcRandomOrders(${cash}) 1`)
         return true
       }
     } else if (seed1 < 0.3) {
       if (cash >= Wraith.cost * seed2) {
-        this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 51, gridY: 3 } } } })
+        this.game.processOrder({ items: starport.one(), order: { type: 'construct-unit', name: EItemName.Wraith, unitOrder: { type: 'patrol', fromPoint: { gridX: 51, gridY: 3 }, toPoint: { gridX: 57, gridY: 15 } } } })
         logAI(`calcRandomOrders(${cash}) 2`)
         return true
       }

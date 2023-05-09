@@ -146,6 +146,7 @@ export class Starport extends Building {
   }
 
   calcZIndex (): void {
+    // allow ground items to be visible on top of starport when constructing
     this.zIndex = this.y + this.height * this.passableGrid.filter(row => row.some(i => i === 1)).length / this.passableGrid.length
   }
 

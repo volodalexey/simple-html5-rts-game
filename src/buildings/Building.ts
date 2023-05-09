@@ -3,6 +3,8 @@ import { EItemType } from '../interfaces/IItem'
 import { LifeBar } from '../LifeBar'
 import { type ECommandName } from '../Command'
 import { type ISelectableLifeableItemOptions, SelectableLifeableSquareItem } from '../SelectableLifeableItem'
+import { calcBuildablePoints, calcPassablePoints, type IBuildable } from '../interfaces/IBuildable'
+import { type IGridPoint } from '../interfaces/IGridPoint'
 
 export interface IBuildingTextures {
   healthyTextures: Texture[]
@@ -13,7 +15,7 @@ export interface IBuildingOptions extends ISelectableLifeableItemOptions {
   textures: IBuildingTextures
 }
 
-export class Building extends SelectableLifeableSquareItem {
+export class Building extends SelectableLifeableSquareItem implements IBuildable {
   public commands: ECommandName[] = []
   public spritesContainer = new Container<AnimatedSprite>()
   public buildableGrid: number[][] = []
@@ -101,6 +103,14 @@ export class Building extends SelectableLifeableSquareItem {
 
   calcZIndex (): void {
     this.zIndex = this.y + this.height
+  }
+
+  calcPassablePoints ({ gridX, gridY }: IGridPoint): IGridPoint[] {
+    return calcPassablePoints({ gridX, gridY, passableGrid: this.passableGrid })
+  }
+
+  calcBuildablePoints ({ gridX, gridY }: IGridPoint): IGridPoint[] {
+    return calcBuildablePoints({ gridX, gridY, buildableGrid: this.buildableGrid })
   }
 }
 

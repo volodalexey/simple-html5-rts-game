@@ -5,6 +5,7 @@ import { generateUid } from './common'
 import { type ECommandName } from './Command'
 import { type IOrder } from './interfaces/IOrder'
 import { logItemBounds } from './logger'
+import { type IGridPoint } from './interfaces/IGridPoint'
 
 export interface IItemOptions {
   game: Game
@@ -44,7 +45,7 @@ export class Item extends Container implements IItem {
     this.addChild(this.collisionGraphics)
   }
 
-  getGridXY ({ floor = false, center = false } = {}): { gridX: number, gridY: number } {
+  getGridXY ({ floor = false, center = false } = {}): IGridPoint {
     const { gridSize } = this.game.tileMap
     const collisionPosition = this.getCollisionPosition({ center })
     const ret = { gridX: collisionPosition.x / gridSize, gridY: collisionPosition.y / gridSize }
@@ -62,7 +63,7 @@ export class Item extends Container implements IItem {
     this.position.set(x + diffX, y + diffY)
   }
 
-  setPositionByGridXY ({ gridX, gridY, center }: { gridX: number, gridY: number, center?: boolean }): void {
+  setPositionByGridXY ({ gridX, gridY, center }: IGridPoint & { center?: boolean }): void {
     const { gridSize } = this.game.tileMap
     this.setPositionByXY({ x: gridX * gridSize, y: gridY * gridSize, center })
   }

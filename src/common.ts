@@ -5,6 +5,7 @@ import { type ISelectable } from './interfaces/ISelectable'
 import { type Projectile } from './projectiles/Projectile'
 import { type Vehicle } from './vehicles/Vehicle'
 import { type AirVehicle } from './air-vehicles/AirVehicle'
+import { type IGridPoint } from './interfaces/IGridPoint'
 
 export enum Team {
   blue = 'blue',
@@ -52,8 +53,8 @@ export function findAngle ({
 export function findAngleGrid ({
   from, to, directions
 }: {
-  from: { gridX: number, gridY: number }
-  to: { gridX: number, gridY: number }
+  from: IGridPoint
+  to: IGridPoint
   directions: EVectorDirection
 }): EVectorDirection {
   const dy = from.gridY - to.gridY

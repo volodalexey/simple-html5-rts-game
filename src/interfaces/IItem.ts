@@ -1,6 +1,7 @@
 import { type Graphics } from 'pixi.js'
 import { type IOrder } from './IOrder'
 import { type ECommandName } from '../Command'
+import { type IGridPoint } from './IGridPoint'
 
 export enum EItemType {
   none = 'none',
@@ -54,9 +55,9 @@ export interface IItem {
       y: number
     }
   }
-  getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => { gridX: number, gridY: number }
+  getGridXY: (options: { floor?: boolean, center?: boolean, air?: boolean }) => IGridPoint
   setPositionByXY: (options: { x: number, y: number, center?: boolean }) => void
-  setPositionByGridXY: (options: { gridX: number, gridY: number, center?: boolean }) => void
+  setPositionByGridXY: (options: IGridPoint & { center?: boolean }) => void
   handleUpdate: (deltaMS: number) => void
   drawCollision: () => void
   getCollisionPosition: (options: { center?: boolean, air?: boolean }) => { x: number, y: number }

@@ -123,7 +123,7 @@ export class VersusCPUScene extends Container implements IScene {
       }
     })
     this.game.tileMap.rebuildBuildableGrid()
-    this.game.cash[Team.blue] = 160
+    this.game.cash[Team.blue] = 1600
     this.game.cash[Team.green] = 1600
 
     this.game.showMessage({

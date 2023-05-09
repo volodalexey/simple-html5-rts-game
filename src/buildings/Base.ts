@@ -5,6 +5,7 @@ import { EItemName, type UnitName } from '../interfaces/IItem'
 import { ECommandName } from '../Command'
 import { type IOrder } from '../interfaces/IOrder'
 import { EMessageCharacter } from '../StatusBar'
+import { type IGridPoint } from '../interfaces/IGridPoint'
 
 export type IBaseOptions = Pick<
 IBuildingOptions,
@@ -193,7 +194,7 @@ export class Base extends Building {
         tileMap.rebuildBuildableGrid()
         const { currentMapBuildableGrid, mapGridWidth, mapGridHeight } = tileMap
         const { buildableGrid } = this
-        const availablePlaces: Array<{ gridX: number, gridY: number }> = []
+        const availablePlaces: IGridPoint[] = []
         const thisGrid = this.getGridXY()
         // check only diagonal spaces outside of main buildable grid
         for (const gridY of [thisGrid.gridY - 1, thisGrid.gridY + buildableGrid.length]) {

@@ -1,11 +1,6 @@
-/* Pathfinding related functions */
+import { type IGridPoint } from './interfaces/IGridPoint'
 
 type IGrid = Array<Array<0 | 1>>
-
-interface IGridPoint {
-  gridX: number
-  gridY: number
-}
 
 interface IResult {
   x: number

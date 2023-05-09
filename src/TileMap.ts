@@ -193,17 +193,17 @@ export class TileMap extends Container {
     const viewHeight = camHeight
     if (maxBgWidth > viewWidth) {
       this.maxXPivot = (maxBgWidth - viewWidth) / scale.x
-      this.minXPivot = -gridSize * scale.x
+      this.minXPivot = -gridSize
     } else {
-      this.maxXPivot = -gridSize * scale.x
-      this.minXPivot = -gridSize * scale.x
+      this.maxXPivot = -gridSize
+      this.minXPivot = -gridSize
     }
     if (maxBgHeight > viewHeight) {
       this.maxYPivot = (maxBgHeight - viewHeight) / scale.y
-      this.minYPivot = -gridSize * scale.y
+      this.minYPivot = -gridSize
     } else {
-      this.maxYPivot = -gridSize * scale.y
-      this.minYPivot = -gridSize * scale.y
+      this.maxYPivot = -gridSize
+      this.minYPivot = -gridSize
     }
   }
 
@@ -382,16 +382,11 @@ export class TileMap extends Container {
     const { staticItems } = this
     for (let i = staticItems.length - 1; i >= 0; i--) {
       const item = staticItems[i]
-      const { passableGrid } = item
       const itemGrid = item.getGridXY({ floor: true })
-      for (let y = passableGrid.length - 1; y >= 0; y--) {
-        for (let x = passableGrid[y].length - 1; x >= 0; x--) {
-          this._currentMapPassableGrid[y][x] = this._initialMapTerrainGrid[y][x]
-          if (passableGrid[y][x] !== 0) {
-            this._currentMapPassableGrid[itemGrid.gridY + y][itemGrid.gridX + x] = 1
-          }
-        }
-      }
+      const passablePoints = item.calcPassablePoints(itemGrid)
+      passablePoints.forEach(({ gridX, gridY }) => {
+        this._currentMapPassableGrid[gridY][gridX] = 1
+      })
     }
   }
 

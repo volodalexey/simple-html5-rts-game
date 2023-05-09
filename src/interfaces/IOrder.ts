@@ -1,4 +1,5 @@
 import { type BaseActiveItem } from '../common'
+import { type IGridPoint } from './IGridPoint'
 import { type UnitName, type EItemType, type BuildName } from './IItem'
 
 export enum EOrderType {
@@ -55,9 +56,7 @@ interface IFollowOrder {
   nextOrder?: IOrder
 }
 
-export interface IPointGridData {
-  gridX: number
-  gridY: number
+export interface IPointGridData extends IGridPoint {
   type?: EItemType
 }
 

@@ -197,7 +197,8 @@ export class CommandsBar extends Container {
       if (selectedItem.team !== this.game.team) {
         return
       }
-      if (hasMoveable && (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles)) {
+      if (hasMoveable && (selectedItem.type === EItemType.vehicles || selectedItem.type === EItemType.airVehicles) &&
+        commandNames.size < 5) {
         selectedItem.commands.forEach(commandName => commandNames.add(commandName))
       } else if (selectedItem.type === EItemType.buildings) {
         selectedItem.commands.forEach(commandName => commandNames.add(commandName))
