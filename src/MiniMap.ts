@@ -245,7 +245,7 @@ export class MiniMap extends Container {
       } else if (activeItem.type === EItemType.vehicles || activeItem.type === EItemType.airVehicles) {
         activeItemsMini.drawCircle(itemCenter.x, itemCenter.y, Math.max(activeItem.collisionGraphics.width, activeItem.collisionGraphics.height) / 2)
       }
-      if (activeItem.team === this.game.team) {
+      if (!logNoFog.enabled && activeItem.team === this.game.team) {
         sightMini.beginFill(0xffffff)
         sightMini.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize)
         sightMini.endFill()

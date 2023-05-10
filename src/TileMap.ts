@@ -557,7 +557,7 @@ export class TileMap extends Container {
     }
     sight.clear()
     sightBlurred.clear()
-    const processedUids: number[] = []
+    const processedVisibleUids: number[] = []
     const blurFactor = 1.3
     for (let i = 0; i < activeItems.children.length; i++) {
       const activeItem = activeItems.children[i]
@@ -587,14 +587,14 @@ export class TileMap extends Container {
         }
         for (let j = 0; j < activeItems.children.length; j++) {
           const activeItemJ = activeItems.children[j]
-          if (activeItemJ.team !== this.game.team && !processedUids.includes(activeItemJ.uid)) {
+          if (activeItemJ.team !== this.game.team && !processedVisibleUids.includes(activeItemJ.uid)) {
             const itemCenterJ = activeItemJ.getCollisionPosition({ center: true })
             if (Math.hypot(itemCenter.y - itemCenterJ.y, itemCenter.x - itemCenterJ.x) < activeItem.sight * gridSize * blurFactor) {
               activeItemJ.renderable = true
+              processedVisibleUids.push(activeItemJ.uid)
             } else {
               activeItemJ.renderable = false
             }
-            processedUids.push(activeItem.uid)
           }
         }
       }
