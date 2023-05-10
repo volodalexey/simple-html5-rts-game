@@ -83,7 +83,7 @@ export class Starport extends Building {
     }
   }
 
-  public sight = 3
+  public sightRadius = 6
   static cost = 200
   public hitPoints = 300
   public life = this.hitPoints

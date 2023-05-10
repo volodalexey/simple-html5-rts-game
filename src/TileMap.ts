@@ -576,10 +576,10 @@ export class TileMap extends Container {
         const itemCenter = activeItem.getCollisionPosition({ center: true })
         if (!logNoFog.enabled) {
           sight.beginFill(0xffffff)
-          sight.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize)
+          sight.drawCircle(itemCenter.x, itemCenter.y, activeItem.sightRadius * gridSize)
           sight.endFill()
           sightBlurred.beginFill(0xffffff)
-          sightBlurred.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize * blurFactor)
+          sightBlurred.drawCircle(itemCenter.x, itemCenter.y, activeItem.sightRadius * gridSize * blurFactor)
           sightBlurred.endFill()
         }
         if (logNoSightHide.enabled) {
@@ -589,7 +589,7 @@ export class TileMap extends Container {
           const activeItemJ = activeItems.children[j]
           if (activeItemJ.team !== this.game.team && !processedVisibleUids.includes(activeItemJ.uid)) {
             const itemCenterJ = activeItemJ.getCollisionPosition({ center: true })
-            if (Math.hypot(itemCenter.y - itemCenterJ.y, itemCenter.x - itemCenterJ.x) < activeItem.sight * gridSize * blurFactor) {
+            if (Math.hypot(itemCenter.y - itemCenterJ.y, itemCenter.x - itemCenterJ.x) < activeItem.sightRadius * gridSize * blurFactor) {
               activeItemJ.renderable = true
               processedVisibleUids.push(activeItemJ.uid)
             } else {

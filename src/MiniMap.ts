@@ -247,7 +247,7 @@ export class MiniMap extends Container {
       }
       if (!logNoFog.enabled && activeItem.team === this.game.team) {
         sightMini.beginFill(0xffffff)
-        sightMini.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize)
+        sightMini.drawCircle(itemCenter.x, itemCenter.y, activeItem.sightRadius * gridSize)
         sightMini.endFill()
       }
       activeItemsMini.endFill()

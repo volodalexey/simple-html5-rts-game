@@ -49,6 +49,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
   public leftAnimation!: AnimatedSprite
   public upLeftAnimation!: AnimatedSprite
 
+  public attackRadius = 0
   public canAttack = false
   public canAttackLand = false
   public canAttackAir = false
@@ -172,7 +173,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
       if (this.isValidTarget(item)) {
         const itemGrid = item.getGridXY({ center: true })
         const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sight + addSight, 2)) {
+        if (distance < Math.pow(this.sightRadius + addSight, 2)) {
           if (!Array.isArray(targetsByDistance[distance])) {
             targetsByDistance[distance] = []
           }
@@ -207,7 +208,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
       return false
     }
     switch (this.order.type) {
-      case 'sentry': {
+      case 'stand': {
         const target = this.findTargetInSight()
         if (target != null) {
           this.order = { type: 'attack', to: target, nextOrder: this.order }
@@ -222,51 +223,53 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
         const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestination = Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)
         if (this.order.to.isDead() || !this.isValidTarget(this.order.to) ||
-          distanceFromDestination > Math.pow(this.sight, 2)
+          distanceFromDestination > Math.pow(this.sightRadius, 2)
         ) {
           const target = this.findTargetInSight()
           if (target != null) {
             this.order.to = target
           } else {
-            this.order = { type: 'sentry' }
+            this.order = { type: 'stand' }
           }
         }
         if (this.order.type !== 'attack' || this.order.to == null) {
           return true
         }
-        const { turnSpeedAdjustmentFactor, tileMap } = this.game
-        const newDirection = findAngleGrid({
-          from: toGrid, to: thisGrid, directions: this.vector.directions
-        })
-        const difference = angleDiff({ angle1: this.vector.direction, angle2: newDirection, directions: this.vector.directions })
-        const turnAmount = this.turnSpeed * turnSpeedAdjustmentFactor
-        if (Math.abs(difference) > turnAmount) {
-          this.vector.setDirection({
-            direction: wrapDirection({
-              direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,
-              directions: this.vector.directions
-            })
+        if (distanceFromDestination < Math.pow(this.attackRadius, 2)) {
+          const { turnSpeedAdjustmentFactor, tileMap } = this.game
+          const newDirection = findAngleGrid({
+            from: toGrid, to: thisGrid, directions: this.vector.directions
           })
-          this.moveTurning = true
-        } else {
-          this.vector.setDirection({ direction: newDirection })
-          this.moveTurning = false
-          if (this.reloadTimeLeft <= 0) {
-            const reloadTime = this.game.getReloadTime(this.projectile)
-            if (typeof reloadTime === 'number') {
-              this.reloadTimeLeft = reloadTime
-              const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
-              const bulletX = thisGrid.gridX - (this.radius * Math.sin(angleRadians) / tileMap.gridSize)
-              const bulletY = thisGrid.gridY - (this.radius * Math.cos(angleRadians) / tileMap.gridSize)
-              const projectile = this.game.createProjectile({
-                name: this.projectile,
-                initX: bulletX * tileMap.gridSize,
-                initY: bulletY * tileMap.gridSize,
-                direction: newDirection,
-                target: this.order.to
+          const difference = angleDiff({ angle1: this.vector.direction, angle2: newDirection, directions: this.vector.directions })
+          const turnAmount = this.turnSpeed * turnSpeedAdjustmentFactor
+          if (Math.abs(difference) > turnAmount) {
+            this.vector.setDirection({
+              direction: wrapDirection({
+                direction: this.vector.direction + turnAmount * Math.abs(difference) / difference,
+                directions: this.vector.directions
               })
-              if (projectile != null) {
-                tileMap.addItem(projectile)
+            })
+            this.moveTurning = true
+          } else {
+            this.vector.setDirection({ direction: newDirection })
+            this.moveTurning = false
+            if (this.reloadTimeLeft <= 0) {
+              const reloadTime = this.game.getReloadTime(this.projectile)
+              if (typeof reloadTime === 'number') {
+                this.reloadTimeLeft = reloadTime
+                const angleRadians = -(Math.round(this.vector.direction) / this.vector.directions) * 2 * Math.PI
+                const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
+                const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
+                const projectile = this.game.createProjectile({
+                  name: this.projectile,
+                  initX: bulletX * tileMap.gridSize,
+                  initY: bulletY * tileMap.gridSize,
+                  direction: newDirection,
+                  target: this.order.to
+                })
+                if (projectile != null) {
+                  tileMap.addItem(projectile)
+                }
               }
             }
           }

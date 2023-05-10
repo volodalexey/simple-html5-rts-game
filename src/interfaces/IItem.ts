@@ -41,7 +41,8 @@ export type ProjectileName = EItemName.Bullet | EItemName.CannonBall | EItemName
 
 export interface IItem {
   uid: number
-  sight: number
+  sightRadius: number
+  collisionRadius: number
   type: EItemType
   itemName: EItemName
   commands: ECommandName[]

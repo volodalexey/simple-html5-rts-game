@@ -22,7 +22,6 @@ export class Building extends SelectableLifeableSquareItem implements IBuildable
   public passableGrid: number[][] = []
 
   public type = EItemType.buildings
-  public radius = 0
   public cost = 0
   public healthyAnimation!: AnimatedSprite
   public damagedAnimation!: AnimatedSprite

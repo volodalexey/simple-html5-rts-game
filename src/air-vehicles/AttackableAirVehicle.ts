@@ -23,6 +23,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
     }
   }
 
+  public attackRadius = 0
   public canAttack = false
   public canAttackLand = false
   public canAttackAir = false
@@ -55,7 +56,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       if (this.isValidTarget(item)) {
         const itemGrid = item.getGridXY({ center: true })
         const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sight + addSight, 2)) {
+        if (distance < Math.pow(this.sightRadius + addSight, 2)) {
           if (!Array.isArray(targetsByDistance[distance])) {
             targetsByDistance[distance] = []
           }
@@ -77,17 +78,10 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
     const { tileMap, turnSpeedAdjustmentFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
     switch (this.order.type) {
-      case 'float': {
+      case 'stand': {
         const target = this.findTargetInSight()
         if (target != null) {
           this.order = { type: 'attack', to: target }
-        }
-        return true
-      }
-      case 'sentry': {
-        const target = this.findTargetInSight(2)
-        if (target != null) {
-          this.order = { type: 'attack', to: target, nextOrder: this.order }
         }
         return true
       }
@@ -106,13 +100,13 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
           if (this.order.nextOrder != null) {
             this.order = this.order.nextOrder
           } else {
-            this.order = { type: 'float' }
+            this.order = { type: 'stand' }
           }
           return true
         }
         const toGrid = this.order.to.getGridXY({ center: true })
         const distanceFromDestination = Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2)
-        if (distanceFromDestination < Math.pow(this.sight, 2)) {
+        if (distanceFromDestination < Math.pow(this.attackRadius, 2)) {
           // Turn towards target and then start attacking when within range of the target
           const newDirection = findAngleGrid({
             from: toGrid, to: thisGrid, directions: this.vector.directions
@@ -135,8 +129,8 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
               if (typeof reloadTime === 'number') {
                 this.reloadTimeLeft = reloadTime
                 const angleRadians = -(this.vector.direction / this.vector.directions) * 2 * Math.PI
-                const bulletX = thisGrid.gridX - (this.radius * Math.sin(angleRadians) / tileMap.gridSize)
-                const bulletY = thisGrid.gridY - (this.radius * Math.cos(angleRadians) / tileMap.gridSize)
+                const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
+                const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
                 const projectile = this.game.createProjectile({
                   name: this.projectile,
                   initX: bulletX * tileMap.gridSize,
@@ -156,19 +150,19 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
           if (!moving) {
             // Pathfinding couldn't find a path so stop
             // e.g. enemy is in hard collide state
-            this.order = { type: 'float' }
+            this.order = { type: 'stand' }
           }
         }
         return true
       }
       case 'patrol': {
-        const target = this.findTargetInSight(1)
+        const target = this.findTargetInSight()
         if (target != null) {
           this.order = { type: 'attack', to: target, nextOrder: this.order }
           return true
         }
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
-        if (distanceFromDestinationSquared < Math.pow(this.sight / tileMap.gridSize, 2)) {
+        if (distanceFromDestinationSquared < Math.pow(this.sightRadius / tileMap.gridSize, 2)) {
           const to = this.order.toPoint
           this.order.toPoint = this.order.fromPoint
           this.order.fromPoint = to
@@ -182,7 +176,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
           if (this.order.nextOrder != null) {
             this.order = this.order.nextOrder
           } else {
-            this.order = { type: 'float' }
+            this.order = { type: 'stand' }
           }
           return true
         }
@@ -190,7 +184,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
         if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
-          const target = this.findTargetInSight(1)
+          const target = this.findTargetInSight()
           if (target != null) {
             this.order = { type: 'attack', to: target, nextOrder: this.order }
             return true
@@ -203,7 +197,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
             }
           }
         } else {
-          const target = this.findTargetInSight(1)
+          const target = this.findTargetInSight()
           if (target != null) {
             this.order = { type: 'attack', to: target, nextOrder: this.order }
           } else {
@@ -220,16 +214,16 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
           return true
         }
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
-        if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
+        if (distanceFromDestinationSquared < Math.pow(this.collisionRadius / tileMap.gridSize, 2)) {
           // Stop when within one radius of the destination
-          this.order = { type: 'float' }
+          this.order = { type: 'stand' }
           return true
         }
         const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
         const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
         // Pathfinding couldn't find a path so stop
         if (!moving) {
-          this.order = { type: 'float' }
+          this.order = { type: 'stand' }
           return true
         }
         return true

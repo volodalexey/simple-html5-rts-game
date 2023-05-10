@@ -3,6 +3,7 @@ import { type BaseActiveItem } from '../common'
 import { type ProjectileName } from './IItem'
 
 export interface IAttackable {
+  attackRadius: number
   reloadTimeLeft: number
   drawReloadBarOptions: {
     alpha: number
@@ -20,5 +21,5 @@ export interface IAttackable {
   canAttackLand: boolean
   canAttackAir: boolean
   isValidTarget: (item: BaseActiveItem) => boolean
-  findTargetInSight: () => void
+  findTargetInSight: (addSight?: number) => void
 }

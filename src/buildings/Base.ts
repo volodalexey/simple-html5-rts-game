@@ -78,7 +78,7 @@ export class Base extends Building {
     }
   }
 
-  public sight = 4
+  public sightRadius = 8
   public hitPoints = 500
   public life = this.hitPoints
   public constructingAnimationSpeed = 0.1

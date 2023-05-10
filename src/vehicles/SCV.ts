@@ -68,9 +68,9 @@ export class SCV extends Vehicle {
     }
   }
 
-  public radius = 15
+  public collisionRadius = 10
+  public sightRadius = 6
   public speed = 15
-  public sight = 3
   static cost = 40
   public hitPoints = 100
   public turnSpeed = 4

@@ -75,7 +75,7 @@ export class OilDerrick extends Building {
     }
   }
 
-  public sight = 3
+  public sightRadius = 4
   public hitPoints = 300
   public life = this.hitPoints
   public deployAnimationSpeed = 0.1

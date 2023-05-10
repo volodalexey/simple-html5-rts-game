@@ -19,7 +19,8 @@ export interface IItemOptions {
 export class Item extends Container implements IItem {
   public game: Game
   public uid: number
-  public sight = 0
+  public sightRadius = 0
+  public collisionRadius = 0
   public type = EItemType.none
   public itemName = EItemName.None
   public commands: ECommandName[] = []

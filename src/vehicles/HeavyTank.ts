@@ -76,9 +76,10 @@ export class HeavyTank extends AttackableVehicle {
     }
   }
 
-  public radius = 13
+  public collisionRadius = 13
+  public sightRadius = 10
+  public attackRadius = 9
   public speed = 15
-  public sight = 10
   static cost = 120
   public hitPoints = 50
   public turnSpeed = 4

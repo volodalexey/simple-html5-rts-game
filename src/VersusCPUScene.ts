@@ -115,9 +115,7 @@ export class VersusCPUScene extends Container implements IScene {
 
     [
       { name: EItemName.Base, initGridX: 2, initGridY: 36, team: Team.blue },
-      { name: EItemName.Base, initGridX: 56, initGridY: 2, team: Team.green },
-      { name: EItemName.Chopper, initGridX: 56, initGridY: 4, team: Team.green },
-      { name: EItemName.Wraith, initGridX: 56, initGridY: 6, team: Team.blue }
+      { name: EItemName.Base, initGridX: 56, initGridY: 2, team: Team.green }
     ].forEach((itemOptions) => {
       const item = this.game.createItem(itemOptions)
       if (item != null) {

@@ -8,8 +8,6 @@ export enum EOrderType {
   attack = 'attack',
   patrol = 'patrol',
   stand = 'stand',
-  float = 'float',
-  sentry = 'sentry',
   hunt = 'hunt',
   guard = 'guard',
   follow = 'follow',
@@ -23,8 +21,8 @@ export type OrderTypes = `${EOrderType}`
 
 export type IOrder = IMoveOrder | IMoveAndAttack
 | IFireOrder | IAttackOrder | IPatrolOrder
-| IStandOrder | IFloatOrder
-| ISentryOrder | IHuntOrder | IGuardOrder | IFollowOrder
+| IStandOrder
+| IHuntOrder | IGuardOrder | IFollowOrder
 | IDeployOrder | IBuildOrder
 | IConstructUnitOrder
 
@@ -68,14 +66,6 @@ interface IPatrolOrder {
 
 interface IStandOrder {
   type: 'stand'
-}
-
-interface IFloatOrder {
-  type: 'float'
-}
-
-interface ISentryOrder {
-  type: 'sentry'
 }
 
 interface IHuntOrder {

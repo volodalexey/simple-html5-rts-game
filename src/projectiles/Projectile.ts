@@ -33,7 +33,6 @@ export class Projectile extends Item implements IMoveable {
   public distanceTravelled = 0
   public vector = new Vector({ direction: EVectorDirection.down })
   public speed = 0
-  public radius = 0
   public followRadius = 0
   public turnSpeed = 0
   public turnFactor = 0

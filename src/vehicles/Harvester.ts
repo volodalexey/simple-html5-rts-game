@@ -69,9 +69,9 @@ export class Harvester extends Vehicle {
     }
   }
 
-  public radius = 10
+  public collisionRadius = 10
+  public sightRadius = 4
   public speed = 10
-  public sight = 3
   static cost = 160
   public hitPoints = 50
   public turnSpeed = 2

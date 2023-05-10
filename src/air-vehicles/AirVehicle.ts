@@ -80,14 +80,13 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
   public hardCollision = false
   public collisionCount = 0
   public colliding = false
-  public radius = 0
   public followRadius = 4
   public elapsedSwitchFrames = 0
   public switchFrames = 30 // allow to switch animation direction only once per some time to avoid jumping on edges
 
   constructor (options: IAirVehicleOptions) {
     super(options)
-    this.order = options.order ?? { type: 'float' }
+    this.order = options.order ?? { type: 'stand' }
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
     }
@@ -253,11 +252,11 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
         this.collisionCount = 0
         // Move towards destination until distance from destination is less than aircraft radius
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
-        if (distanceFromDestinationSquared < Math.pow(this.radius / tileMap.gridSize, 2)) {
-          this.order = { type: 'float' }
+        if (distanceFromDestinationSquared < Math.pow(this.collisionRadius / tileMap.gridSize, 2)) {
+          this.order = { type: 'stand' }
           return true
         } else {
-          if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.radius * 5 / tileMap.gridSize, 2)) {
+          if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.collisionRadius * 5 / tileMap.gridSize, 2)) {
             // Count collsions within 5 radius distance of goal
             if (this.collisionCount === 0) {
               this.collisionCount = 1
@@ -266,7 +265,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
             }
             // Stop if more than 30 collisions occur
             if (this.collisionCount > 30) {
-              this.order = { type: 'float' }
+              this.order = { type: 'stand' }
               return true
             }
           }
@@ -274,7 +273,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
           const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
           // Pathfinding couldn't find a path so stop
           if (!moving) {
-            this.order = { type: 'float' }
+            this.order = { type: 'stand' }
             return true
           }
         }
@@ -285,7 +284,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
           if (this.order.nextOrder != null) {
             this.order = this.order.nextOrder
           } else {
-            this.order = { type: 'float' }
+            this.order = { type: 'stand' }
           }
           return true
         }
@@ -302,7 +301,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
       }
       case 'patrol': {
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
-        if (distanceFromDestinationSquared < Math.pow(this.sight / tileMap.gridSize, 2)) {
+        if (distanceFromDestinationSquared < Math.pow(this.sightRadius / tileMap.gridSize, 2)) {
           const to = this.order.toPoint
           this.order.toPoint = this.order.fromPoint
           this.order.fromPoint = to
@@ -348,17 +347,17 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     // List of objects that will collide after next movement step
     const collisionObjects = []
 
-    const { airMoveableItems: airItems } = tileMap
-    for (let i = airItems.length - 1; i >= 0; i--) {
-      const vehicle = airItems[i]
+    const { airMoveableItems } = tileMap
+    for (let i = airMoveableItems.length - 1; i >= 0; i--) {
+      const vehicle = airMoveableItems[i]
       const vehicleGrid = vehicle.getGridXY({ center: true })
       // Test vehicles that are less than 3 squares away for collisions
       if (vehicle !== this && Math.abs(vehicleGrid.gridX - thisGrid.gridX) < 3 && Math.abs(vehicleGrid.gridY - thisGrid.gridY) < 3) {
         const distanceSq = Math.pow(vehicleGrid.gridX - newX, 2) + Math.pow(vehicleGrid.gridY - newY, 2)
-        if (distanceSq < Math.pow((this.radius + vehicle.radius) * 0.2 / tileMap.gridSize, 2)) {
+        if (distanceSq < Math.pow((this.collisionRadius + vehicle.collisionRadius) * 0.2 / tileMap.gridSize, 2)) {
           // Distance between vehicles is less than hard collision threshold (sum of vehicle radii)
           collisionObjects.push({ collisionType: ECollisionType.hard, with: { type: vehicle.type, x: vehicleGrid.gridX, y: vehicleGrid.gridY } })
-        } else if (distanceSq < Math.pow((this.radius + vehicle.radius) * 0.5 / tileMap.gridSize, 2)) {
+        } else if (distanceSq < Math.pow((this.collisionRadius + vehicle.collisionRadius) * 0.5 / tileMap.gridSize, 2)) {
           // Distance between vehicles is less than soft collision threshold (1.5 times vehicle radius + colliding vehicle radius)
           collisionObjects.push({ collisionType: ECollisionType.soft, with: { type: vehicle.type, x: vehicleGrid.gridX, y: vehicleGrid.gridY } })
         }

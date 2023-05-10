@@ -299,7 +299,7 @@ export class CampaignScene extends Container implements IScene {
         items: [
           { name: 'base', initGridX: 55, initGridY: 6, team: Team.blue, commands: [ECommandName.constructSCV], uid: -1 },
           { name: 'ground-turret', initGridX: 53, initGridY: 17, direction: EVectorDirection.up, team: Team.blue },
-          { name: 'heavy-tank', initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, order: { type: 'sentry' } },
+          { name: 'heavy-tank', initGridX: 55, initGridY: 16, direction: EVectorDirection.upLeft, team: Team.blue, uid: -2, order: { type: 'stand' } },
           /* The first wave of attacks */
           { name: 'scout-tank', initGridX: 55, initGridY: 36, direction: EVectorDirection.down, team: Team.green, order: { type: 'hunt' } },
           { name: 'scout-tank', initGridX: 53, initGridY: 36, direction: EVectorDirection.down, team: Team.green, order: { type: 'hunt' } },
@@ -508,10 +508,10 @@ export class CampaignScene extends Container implements IScene {
                 game: this.game, initX: tileMap.gridSize * 57, initY: tileMap.gridSize * 28, team: Team.green, order: { type: 'hunt' }
               }))
               tileMap.addItem(new Wraith({
-                game: this.game, initX: tileMap.gridSize * 55, initY: tileMap.gridSize * 33, team: Team.green, order: { type: 'sentry' }
+                game: this.game, initX: tileMap.gridSize * 55, initY: tileMap.gridSize * 33, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 55, gridY: 33 }, toPoint: { gridX: 55, gridY: 30 } }
               }))
               tileMap.addItem(new Wraith({
-                game: this.game, initX: tileMap.gridSize * 53, initY: tileMap.gridSize * 33, team: Team.green, order: { type: 'sentry' }
+                game: this.game, initX: tileMap.gridSize * 53, initY: tileMap.gridSize * 33, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 53, gridY: 33 }, toPoint: { gridX: 53, gridY: 30 } }
               }))
               tileMap.addItem(new ScoutTank({
                 game: this.game, initX: tileMap.gridSize * 35, initY: tileMap.gridSize * 25, team: Team.green, order: { type: 'patrol', fromPoint: { gridX: 35, gridY: 25 }, toPoint: { gridX: 35, gridY: 30 } }
