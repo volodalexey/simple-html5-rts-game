@@ -492,7 +492,7 @@ export class Game extends Container {
     this.dragSelect.clear()
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
-    this.topBar.miniMap.assignBackgroundTexture({ texture: this.tileMap.background.texture })
+    this.topBar.miniMap.assignBackgroundTexture({ texture: Assets.get(mapImageSrc) })
     this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
     this.tileMap.goTo({ x: startGridX * gridSize, y: startGridY * gridSize })
   }

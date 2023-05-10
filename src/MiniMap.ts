@@ -1,5 +1,5 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, type Texture } from 'pixi.js'
-import { logPointerEvent } from './logger'
+import { logNoFog, logPointerEvent } from './logger'
 import { type Game } from './Game'
 import { type BaseActiveItem, Team } from './common'
 import { EItemType } from './interfaces/IItem'
@@ -12,8 +12,11 @@ export interface IMiniMapOptions {
 
 class BorderRect extends Graphics {}
 class CameraRect extends Graphics {}
+class BorderContainer extends Container {}
 class BackgroundContainer extends Container {}
 class Background extends Sprite {}
+class ActiveItems extends Graphics {}
+class SightMini extends Graphics {}
 
 export class MiniMap extends Container {
   static options = {
@@ -33,10 +36,13 @@ export class MiniMap extends Container {
   public pointerDownX = -1
   public pointerDownY = -1
   public border = new BorderRect()
+  public borderContainer = new BorderContainer()
   public backgroundContainer = new BackgroundContainer()
   public background = new Background()
+  public background2 = new Background()
+  public sightMini = new SightMini()
   public cameraRect = new CameraRect()
-  public activeItems = new Container<Graphics>()
+  public activeItemsMini = new ActiveItems()
   public initWidth!: number
   public initHeight!: number
   constructor (options: IMiniMapOptions) {
@@ -54,13 +60,17 @@ export class MiniMap extends Container {
 
   setup (): void {
     this.addChild(this.border)
-
-    this.background.addChild(this.cameraRect)
-    this.background.addChild(this.activeItems)
-    this.backgroundContainer.addChild(this.background)
+    this.addChild(this.borderContainer)
+    this.borderContainer.addChild(this.backgroundContainer)
     const { borderWidth } = MiniMap.options
-    this.backgroundContainer.position.set(borderWidth, borderWidth)
-    this.addChild(this.backgroundContainer)
+    this.borderContainer.position.set(borderWidth, borderWidth)
+
+    this.backgroundContainer.addChild(this.background)
+    this.background.alpha = 0.3
+    this.backgroundContainer.addChild(this.background2)
+    this.backgroundContainer.addChild(this.activeItemsMini)
+    this.backgroundContainer.addChild(this.cameraRect)
+    this.backgroundContainer.addChild(this.sightMini)
   }
 
   draw (): void {
@@ -76,11 +86,12 @@ export class MiniMap extends Container {
   }
 
   addEventLesteners (): void {
-    this.background.eventMode = 'static'
-    this.background.on('pointerdown', this.handlePointerDown)
-    this.background.on('pointerup', this.handlePointerUp)
-    this.background.on('pointermove', this.handlePointerMove)
-    this.background.on('pointerleave', this.handlePointerLeave)
+    this.backgroundContainer.eventMode = 'static'
+    this.backgroundContainer.on('pointerdown', this.handlePointerDown)
+    this.backgroundContainer.on('pointerup', this.handlePointerUp)
+    this.backgroundContainer.on('pointermove', this.handlePointerMove)
+    this.backgroundContainer.on('pointerleave', this.handlePointerLeave)
+    this.activeItemsMini.interactiveChildren = false
   }
 
   handlePointerDown = (e: FederatedPointerEvent): void => {
@@ -133,6 +144,7 @@ export class MiniMap extends Container {
 
   assignBackgroundTexture ({ texture }: { texture: Texture }): void {
     this.background.texture = texture
+    this.background2.texture = texture
     this.fit({ texture })
     this.drawCameraRect()
     this.updateCameraRect()
@@ -165,16 +177,16 @@ export class MiniMap extends Container {
       scale = innerHeight / padTextureHeight
     }
 
-    this.backgroundContainer.scale.set(scale)
+    this.borderContainer.scale.set(scale)
 
-    const { width: bgWidth, height: bgHeight } = this.background
-    const innerWidthScaled = innerWidth / this.backgroundContainer.scale.x
-    const innerHeightScaled = innerHeight / this.backgroundContainer.scale.y
+    // const { width: bgWidth, height: bgHeight } = this.background.texture
+    const innerWidthScaled = innerWidth / this.borderContainer.scale.x
+    const innerHeightScaled = innerHeight / this.borderContainer.scale.y
 
-    const x = innerWidthScaled > bgWidth ? (innerWidthScaled - bgWidth) / 2 : 0
-    const y = innerHeightScaled > bgHeight ? (innerHeightScaled - bgHeight) / 2 : 0
-    this.background.x = x
-    this.background.y = y
+    const x = innerWidthScaled > width ? (innerWidthScaled - width) / 2 : 0
+    const y = innerHeightScaled > height ? (innerHeightScaled - height) / 2 : 0
+    this.backgroundContainer.x = x
+    this.backgroundContainer.y = y
   }
 
   drawCameraRect (): void {
@@ -185,7 +197,7 @@ export class MiniMap extends Container {
     const { scale: { x: tmSX, y: tmSY } } = this.game.tileMap
     const cameraWidth = width / tmSX
     const cameraHeight = height / tmSY
-    const { scale: { x: bgSX, y: bgSY } } = this.backgroundContainer
+    const { scale: { x: bgSX, y: bgSY } } = this.borderContainer
     const scaledBorderWidthX = cameraRectThickness / bgSX
     const scaledBorderWidthY = cameraRectThickness / bgSY
     this.cameraRect.drawRect(0, 0, cameraWidth, cameraHeight)
@@ -216,33 +228,32 @@ export class MiniMap extends Container {
   }
 
   drawItems (): void {
-    while (this.activeItems.children.length > 0) {
-      this.activeItems.children[0].removeFromParent()
-    }
-    const { width, height } = this.background.texture
-    const bgBounds = { top: 0, right: 0 + width, bottom: 0 + height, left: 0 }
-    const { activeItems } = this.game.tileMap
+    const { activeItemsMini, background2, sightMini } = this
+    const { activeItems, gridSize } = this.game.tileMap
+    activeItemsMini.clear()
+    sightMini.clear()
     for (let i = 0; i < activeItems.children.length; i++) {
       const activeItem = activeItems.children[i]
-      const graphics = new Graphics()
-      graphics.beginFill(this.getItemColor(activeItem))
-      const itemBounds = activeItem.getCollisionBounds()
-      if ((itemBounds.left < bgBounds.left && itemBounds.right < bgBounds.left) ||
-        (itemBounds.left > bgBounds.right && itemBounds.right > bgBounds.right) ||
-        (itemBounds.top < bgBounds.top && itemBounds.bottom < bgBounds.top) ||
-        (itemBounds.top > bgBounds.bottom && itemBounds.bottom > bgBounds.bottom)) {
-        // item outside of map bounds
-        // skip draw on mini-map
+      if (!activeItem.renderable) {
         continue
       }
+      activeItemsMini.beginFill(this.getItemColor(activeItem))
+      const itemBounds = activeItem.getCollisionBounds()
+      const itemCenter = activeItem.getCollisionPosition({ center: true })
       if (activeItem.type === EItemType.buildings) {
-        graphics.drawRect(0, 0, itemBounds.right - itemBounds.left, itemBounds.bottom - itemBounds.top)
+        activeItemsMini.drawRect(itemBounds.left, itemBounds.top, itemBounds.right - itemBounds.left, itemBounds.bottom - itemBounds.top)
       } else if (activeItem.type === EItemType.vehicles || activeItem.type === EItemType.airVehicles) {
-        graphics.drawCircle(0, 0, (itemBounds.right - itemBounds.left) / 2)
+        activeItemsMini.drawCircle(itemCenter.x, itemCenter.y, Math.max(activeItem.collisionGraphics.width, activeItem.collisionGraphics.height) / 2)
       }
-      graphics.endFill()
-      graphics.position.set(itemBounds.left, itemBounds.top)
-      this.activeItems.addChild(graphics)
+      if (activeItem.team === this.game.team) {
+        sightMini.beginFill(0xffffff)
+        sightMini.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize)
+        sightMini.endFill()
+      }
+      activeItemsMini.endFill()
+    }
+    if (!logNoFog.enabled) {
+      background2.mask = sightMini
     }
   }
 }

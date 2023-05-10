@@ -1,4 +1,4 @@
-import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics } from 'pixi.js'
+import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics, BlurFilter } from 'pixi.js'
 import { MapSettings, type IMapSettings } from './MapSettings'
 import { Hitboxes } from './Hitbox'
 import { manifest } from './LoaderScene'
@@ -9,7 +9,7 @@ import { type Projectile } from './projectiles/Projectile'
 import { type Order } from './Order'
 import { type Game } from './Game'
 import { EItemType } from './interfaces/IItem'
-import { logGrid, logHitboxes } from './logger'
+import { logGrid, logHitboxes, logNoFog, logNoSightHide } from './logger'
 import { type AirVehicle } from './air-vehicles/AirVehicle'
 import { ECommandName } from './Command'
 import { GroundTurret } from './buildings/GroundTurret'
@@ -25,6 +25,11 @@ export interface ITileMapOptions {
 type GridArray = Array<Array<1 | 0>>
 
 class ActiveItems extends Container<BaseActiveItem> {}
+class Orders extends Container<Order> {}
+class Projectiles extends Container<Projectile> {}
+class SightOuter extends Graphics {}
+class SightInner extends Graphics {}
+class Background extends Sprite {}
 
 export class TileMap extends Container {
   public game !: Game
@@ -40,9 +45,13 @@ export class TileMap extends Container {
   private readonly _currentCopyMapPassableGrid: GridArray = []
   public hitboxes = new Hitboxes()
   public activeItems = new ActiveItems()
-  public orders = new Container<Order>()
-  public projectiles = new Container<Projectile>()
-  public background = new Sprite()
+  public orders = new Orders()
+  public projectiles = new Projectiles()
+  public sightBlurred = new SightOuter()
+  public sight = new SightInner()
+  public background = new Background()
+  public background2 = new Background()
+  public background3 = new Background()
   public minXPivot = 0
   public maxXPivot = 0
   public minYPivot = 0
@@ -69,10 +78,14 @@ export class TileMap extends Container {
 
   setup (): void {
     this.addChild(this.background)
+    this.addChild(this.background2)
+    this.addChild(this.background3)
     this.addChild(this.activeItems)
     this.addChild(this.hitboxes)
     this.addChild(this.orders)
     this.addChild(this.projectiles)
+    this.addChild(this.sightBlurred)
+    this.addChild(this.sight)
   }
 
   static async idleLoad (): Promise<void> {
@@ -93,8 +106,13 @@ export class TileMap extends Container {
     const settings: IMapSettings = Assets.get(mapSettingsSrc)
 
     this.background.texture = background
-    this.background.scale.set(1, 1)
-    this.background.pivot.set(0, 0)
+    if (!logNoFog.enabled) {
+      this.background2.texture = background
+      this.background3.texture = background
+      this.background2.alpha = 0.5
+    }
+    this.scale.set(1, 1)
+    this.pivot.set(0, 0)
 
     const hitboxesPoints = MapSettings.mapTilesToPositions({
       mapSettings: settings,
@@ -275,6 +293,7 @@ export class TileMap extends Container {
       this.hitboxes.visible = false
     }
     this.game.tileMap.activeItems.sortChildren()
+    this.updateFog()
   }
 
   addItem (item: BaseItem): void {
@@ -526,5 +545,66 @@ export class TileMap extends Container {
     this.checkScaleLimits()
     this.calcPivotLimits()
     this.checkPivotLimits()
+  }
+
+  updateFog (): void {
+    const { activeItems, gridSize, sight, sightBlurred, background, background3, projectiles } = this
+    const bgBounds = {
+      top: background.y,
+      right: background.x + background.width,
+      bottom: background.y + background.height,
+      left: background.x
+    }
+    sight.clear()
+    sightBlurred.clear()
+    const processedUids: number[] = []
+    const blurFactor = 1.3
+    for (let i = 0; i < activeItems.children.length; i++) {
+      const activeItem = activeItems.children[i]
+      if (activeItem.team === this.game.team) {
+        const itemBounds = activeItem.getCollisionBounds()
+        if ((itemBounds.left < bgBounds.left && itemBounds.right < bgBounds.left) ||
+          (itemBounds.left > bgBounds.right && itemBounds.right > bgBounds.right) ||
+          (itemBounds.top < bgBounds.top && itemBounds.bottom < bgBounds.top) ||
+          (itemBounds.top > bgBounds.bottom && itemBounds.bottom > bgBounds.bottom)) {
+          // item outside of map bounds
+          // skip draw sight circle
+          activeItem.renderable = false
+          continue
+        }
+        activeItem.renderable = true
+        const itemCenter = activeItem.getCollisionPosition({ center: true })
+        if (!logNoFog.enabled) {
+          sight.beginFill(0xffffff)
+          sight.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize)
+          sight.endFill()
+          sightBlurred.beginFill(0xffffff)
+          sightBlurred.drawCircle(itemCenter.x, itemCenter.y, activeItem.sight * gridSize * blurFactor)
+          sightBlurred.endFill()
+        }
+        if (logNoSightHide.enabled) {
+          continue
+        }
+        for (let j = 0; j < activeItems.children.length; j++) {
+          const activeItemJ = activeItems.children[j]
+          if (activeItemJ.team !== this.game.team && !processedUids.includes(activeItemJ.uid)) {
+            const itemCenterJ = activeItemJ.getCollisionPosition({ center: true })
+            if (Math.hypot(itemCenter.y - itemCenterJ.y, itemCenter.x - itemCenterJ.x) < activeItem.sight * gridSize * blurFactor) {
+              activeItemJ.renderable = true
+            } else {
+              activeItemJ.renderable = false
+            }
+            processedUids.push(activeItem.uid)
+          }
+        }
+      }
+    }
+    if (!logNoFog.enabled) {
+      background.mask = sightBlurred
+      activeItems.mask = sightBlurred
+      projectiles.mask = sightBlurred
+      background.filters = [new BlurFilter()]
+      background3.mask = sight
+    }
   }
 }
