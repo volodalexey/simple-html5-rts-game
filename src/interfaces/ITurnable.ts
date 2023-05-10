@@ -1,4 +1,4 @@
-import { type Vector } from '../Vector'
+import { type Vector } from '../utils/Vector'
 
 export interface ITurnable {
   vector: Vector

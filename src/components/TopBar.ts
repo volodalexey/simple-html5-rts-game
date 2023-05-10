@@ -1,7 +1,7 @@
 import { Container } from 'pixi.js'
 import { StatusBar } from './StatusBar'
 import { MiniMap } from './MiniMap'
-import { type Game } from './Game'
+import { type Game } from '../Game'
 
 interface ITopBarOptions {
   game: Game

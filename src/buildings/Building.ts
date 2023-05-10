@@ -1,8 +1,8 @@
 import { AnimatedSprite, Container, type Texture } from 'pixi.js'
 import { EItemType } from '../interfaces/IItem'
-import { LifeBar } from '../LifeBar'
-import { type ECommandName } from '../Command'
-import { type ISelectableLifeableItemOptions, SelectableLifeableSquareItem } from '../SelectableLifeableItem'
+import { LifeBar } from '../components/LifeBar'
+import { type ECommandName } from '../interfaces/ICommand'
+import { type ISelectableLifeableItemOptions, SelectableLifeableSquareItem } from '../oop/SelectableLifeableItem'
 import { calcBuildablePoints, calcPassablePoints, type IBuildable } from '../interfaces/IBuildable'
 import { type IGridPoint } from '../interfaces/IGridPoint'
 

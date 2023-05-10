@@ -1,11 +1,11 @@
 import { Container, Graphics } from 'pixi.js'
-import { EItemName, EItemType, type IItem } from './interfaces/IItem'
-import { type Game } from './Game'
-import { generateUid } from './common'
-import { type ECommandName } from './Command'
-import { type IOrder } from './interfaces/IOrder'
-import { logItemBounds } from './logger'
-import { type IGridPoint } from './interfaces/IGridPoint'
+import { EItemName, EItemType, type IItem } from '../interfaces/IItem'
+import { type Game } from '../Game'
+import { generateUid } from '../utils/common'
+import { type ECommandName } from '../interfaces/ICommand'
+import { type IOrder } from '../interfaces/IOrder'
+import { logItemBounds } from '../utils/logger'
+import { type IGridPoint } from '../interfaces/IGridPoint'
 
 export interface IItemOptions {
   game: Game

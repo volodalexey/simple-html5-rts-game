@@ -1,10 +1,10 @@
 import { type Application, Container, Sprite, type Texture, type Spritesheet, Assets } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
-import { logLayout } from './logger'
-import { Button, type IButtonOptions } from './Button'
-import { TileMap } from './TileMap'
+import { logLayout } from '../utils/logger'
+import { Button, type IButtonOptions } from '../components/Button'
+import { TileMap } from '../components/TileMap'
 import { CampaignScene } from './CampaignScene'
-import { StatusBar } from './StatusBar'
+import { StatusBar } from '../components/StatusBar'
 import { VersusCPUScene } from './VersusCPUScene'
 
 interface IMenuSceneSceneOptions {

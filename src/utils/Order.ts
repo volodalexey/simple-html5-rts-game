@@ -1,11 +1,11 @@
 import { Graphics, Sprite } from 'pixi.js'
 import { Team, type SelectableItem } from './common'
-import { type IOrder } from './interfaces/IOrder'
-import { type TileMap } from './TileMap'
-import { EItemName } from './interfaces/IItem'
-import { GroundTurret } from './buildings/GroundTurret'
-import { Starport } from './buildings/Starport'
-import { OilDerrick } from './buildings/OilDerrick'
+import { type IOrder } from '../interfaces/IOrder'
+import { type TileMap } from '../components/TileMap'
+import { EItemName } from '../interfaces/IItem'
+import { GroundTurret } from '../buildings/GroundTurret'
+import { Starport } from '../buildings/Starport'
+import { OilDerrick } from '../buildings/OilDerrick'
 
 export class Order extends Graphics {
   public item!: SelectableItem

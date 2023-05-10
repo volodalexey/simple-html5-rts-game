@@ -1,5 +1,5 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
-import { Team } from '../common'
+import { Team } from '../utils/common'
 import { type IOrder } from '../interfaces/IOrder'
 import { type IAttackableBuildingTextures, type IAttackableBuildingOptions, AttackableBuilding } from './AttackableBuilding'
 import { EItemName, type ProjectileName } from '../interfaces/IItem'

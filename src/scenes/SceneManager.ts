@@ -1,5 +1,5 @@
 import { Application, Container, type DisplayObject } from 'pixi.js'
-import { logApp } from './logger'
+import { logApp } from '../utils/logger'
 
 export interface IScene extends DisplayObject {
   handleUpdate: (deltaMS: number) => void

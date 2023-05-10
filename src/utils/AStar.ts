@@ -1,4 +1,4 @@
-import { type IGridPoint } from './interfaces/IGridPoint'
+import { type IGridPoint } from '../interfaces/IGridPoint'
 
 type IGrid = Array<Array<0 | 1>>
 

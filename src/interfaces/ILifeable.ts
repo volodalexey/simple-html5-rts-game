@@ -1,4 +1,4 @@
-import { type LifeBar } from '../LifeBar'
+import { type LifeBar } from '../components/LifeBar'
 
 export interface ILifeable {
   life: number

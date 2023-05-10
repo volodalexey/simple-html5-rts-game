@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js'
-import { type IAttackable } from './interfaces/IAttackable'
+import { type IAttackable } from '../interfaces/IAttackable'
 
 type IReloadBarOptions = IAttackable['drawReloadBarOptions']
 

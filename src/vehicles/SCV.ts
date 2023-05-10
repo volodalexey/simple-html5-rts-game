@@ -1,7 +1,7 @@
-import { ECommandName } from '../Command'
-import { EMessageCharacter } from '../StatusBar'
+import { ECommandName } from '../interfaces/ICommand'
+import { EMessageCharacter } from '../components/StatusBar'
 import { AUDIO } from '../audio'
-import { Team } from '../common'
+import { Team } from '../utils/common'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 

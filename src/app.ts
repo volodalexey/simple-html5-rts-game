@@ -1,7 +1,7 @@
 import './styles.css'
-import { SceneManager } from './SceneManager'
-import { LoaderScene } from './LoaderScene'
-import { MenuScene } from './MenuScene'
+import { SceneManager } from './scenes/SceneManager'
+import { LoaderScene } from './scenes/LoaderScene'
+import { MenuScene } from './scenes/MenuScene'
 
 async function run (): Promise<void> {
   const loader: HTMLElement | null = document.querySelector('.loader')

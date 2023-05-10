@@ -1,11 +1,11 @@
 import { type EVectorDirection } from './Vector'
-import { type Building } from './buildings/Building'
-import { type IItem } from './interfaces/IItem'
-import { type ISelectable } from './interfaces/ISelectable'
-import { type Projectile } from './projectiles/Projectile'
-import { type Vehicle } from './vehicles/Vehicle'
-import { type AirVehicle } from './air-vehicles/AirVehicle'
-import { type IGridPoint } from './interfaces/IGridPoint'
+import { type Building } from '../buildings/Building'
+import { type IItem } from '../interfaces/IItem'
+import { type ISelectable } from '../interfaces/ISelectable'
+import { type Projectile } from '../projectiles/Projectile'
+import { type Vehicle } from '../vehicles/Vehicle'
+import { type AirVehicle } from '../air-vehicles/AirVehicle'
+import { type IGridPoint } from '../interfaces/IGridPoint'
 
 export enum Team {
   blue = 'blue',

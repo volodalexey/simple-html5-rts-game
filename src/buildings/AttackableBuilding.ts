@@ -1,12 +1,12 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
-import { ReloadBar } from '../ReloadBar'
-import { EVectorDirection, Vector } from '../Vector'
-import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../common'
+import { ReloadBar } from '../components/ReloadBar'
+import { EVectorDirection, Vector } from '../utils/Vector'
+import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../utils/common'
 import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType, type ProjectileName } from '../interfaces/IItem'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { Building, type IBuildingTextures, type IBuildingOptions, BuildingAnimation } from './Building'
-import { ECommandName } from '../Command'
+import { ECommandName } from '../interfaces/ICommand'
 
 export interface IAttackableBuildingOptions extends IBuildingOptions {
   direction?: EVectorDirection

@@ -1,8 +1,8 @@
 import { Container, Graphics } from 'pixi.js'
-import { type Game } from './Game'
+import { type Game } from '../Game'
 import { CommandsBar } from './CommandsBar'
-import { type SelectableItem } from './common'
-import { logSideBar } from './logger'
+import { type SelectableItem } from '../utils/common'
+import { logSideBar } from '../utils/logger'
 import { Button } from './Button'
 
 interface ISideBarOptions {

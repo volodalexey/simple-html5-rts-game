@@ -1,9 +1,9 @@
 import { AnimatedSprite, Container, type Texture } from 'pixi.js'
 import { EItemType } from '../interfaces/IItem'
 import { type IMoveable } from '../interfaces/IMoveable'
-import { EVectorDirection, Vector } from '../Vector'
-import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../common'
-import { type IItemOptions, Item } from '../Item'
+import { EVectorDirection, Vector } from '../utils/Vector'
+import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../utils/common'
+import { type IItemOptions, Item } from '../oop/Item'
 
 export interface IProjectileTextures {
   upTextures: Texture[]

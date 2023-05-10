@@ -1,14 +1,14 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
-import { Vector, EVectorDirection } from '../Vector'
-import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../common'
+import { Vector, EVectorDirection } from '../utils/Vector'
+import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../utils/common'
 import { EItemType } from '../interfaces/IItem'
-import { AStar } from '../AStar'
+import { AStar } from '../utils/AStar'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { type IPointGridData } from '../interfaces/IOrder'
-import { LifeBar } from '../LifeBar'
+import { LifeBar } from '../components/LifeBar'
 import { type ITurnable } from '../interfaces/ITurnable'
-import { ECommandName } from '../Command'
-import { TeleportableSelectableLifeableRoundItem, type ITeleportableSelectableLifeableRoundItemOptions } from '../TeleportableSelectableLifeableRoundItem'
+import { ECommandName } from '../interfaces/ICommand'
+import { TeleportableSelectableLifeableRoundItem, type ITeleportableSelectableLifeableRoundItemOptions } from '../oop/TeleportableSelectableLifeableRoundItem'
 
 export interface IVehicleTextures {
   upTextures: Texture[]

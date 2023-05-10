@@ -1,10 +1,10 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
-import { Team } from '../common'
+import { Team } from '../utils/common'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
 import { EItemName, type UnitName } from '../interfaces/IItem'
-import { ECommandName } from '../Command'
+import { ECommandName } from '../interfaces/ICommand'
 import { type IOrder } from '../interfaces/IOrder'
-import { EMessageCharacter } from '../StatusBar'
+import { EMessageCharacter } from '../components/StatusBar'
 import { type IGridPoint } from '../interfaces/IGridPoint'
 
 export type IBaseOptions = Pick<

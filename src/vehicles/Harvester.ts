@@ -1,9 +1,9 @@
 import { AUDIO } from '../audio'
 import { OilDerrick } from '../buildings/OilDerrick'
-import { ECommandName } from '../Command'
-import { wrapDirection, Team, angleDiff } from '../common'
+import { ECommandName } from '../interfaces/ICommand'
+import { wrapDirection, Team, angleDiff } from '../utils/common'
 import { EItemName, EItemType } from '../interfaces/IItem'
-import { EVectorDirection } from '../Vector'
+import { EVectorDirection } from '../utils/Vector'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 
 export type IHarvesterOptions = Pick<

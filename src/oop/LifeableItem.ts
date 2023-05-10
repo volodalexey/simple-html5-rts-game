@@ -1,6 +1,6 @@
 import { type IItemOptions, Item } from './Item'
-import { LifeBar } from './LifeBar'
-import { type ILifeable } from './interfaces/ILifeable'
+import { LifeBar } from '../components/LifeBar'
+import { type ILifeable } from '../interfaces/ILifeable'
 
 export interface ILifeableItemOptions extends IItemOptions {
   life?: number

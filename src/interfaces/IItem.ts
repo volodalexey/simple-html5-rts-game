@@ -1,6 +1,6 @@
 import { type Graphics } from 'pixi.js'
 import { type IOrder } from './IOrder'
-import { type ECommandName } from '../Command'
+import { type ECommandName } from '../interfaces/ICommand'
 import { type IGridPoint } from './IGridPoint'
 
 export enum EItemType {

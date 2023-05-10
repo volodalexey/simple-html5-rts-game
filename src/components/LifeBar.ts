@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js'
-import { type ILifeable } from './interfaces/ILifeable'
+import { type ILifeable } from '../interfaces/ILifeable'
 
 type ILifeBarOptions = ILifeable['drawLifeBarOptions']
 

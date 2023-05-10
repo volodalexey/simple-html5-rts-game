@@ -1,4 +1,4 @@
-import { Team } from '../common'
+import { Team } from '../utils/common'
 import { EItemName, type ProjectileName } from '../interfaces/IItem'
 import { AttackableVehicle } from './AttackableVehicle'
 import { type IVehicleOptions, type IVehicleTextures } from './Vehicle'

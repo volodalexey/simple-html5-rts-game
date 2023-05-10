@@ -1,7 +1,7 @@
 import { Graphics } from 'pixi.js'
 import { type ILifeableItemOptions, LifeableItem } from './LifeableItem'
-import { type Team } from './common'
-import { type ISelectable } from './interfaces/ISelectable'
+import { type Team } from '../utils/common'
+import { type ISelectable } from '../interfaces/ISelectable'
 
 export interface ISelectableLifeableItemOptions extends ILifeableItemOptions {
   team: Team

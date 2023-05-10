@@ -1,6 +1,6 @@
 import { Container, Graphics, Text, type Texture, type TextStyleFontWeight, ParticleContainer } from 'pixi.js'
 import { Button, type IButtonOptions } from './Button'
-import { Firework } from './Particle'
+import { Firework } from '../utils/Particle'
 
 export interface IStartModalTextures {
   iconHomeTexture: Texture

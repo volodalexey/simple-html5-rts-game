@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js'
-import { type Game } from './Game'
+import { type Game } from '../Game'
 
 export interface ICameraOptions {
   game: Game

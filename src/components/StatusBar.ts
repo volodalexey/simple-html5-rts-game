@@ -1,5 +1,5 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, Text, type Texture, type FederatedWheelEvent } from 'pixi.js'
-import { logPointerEvent } from './logger'
+import { logPointerEvent } from '../utils/logger'
 
 export interface IStatusBarTextures {
   girl1Texture: Texture

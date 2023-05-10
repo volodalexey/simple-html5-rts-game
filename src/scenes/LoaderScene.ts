@@ -1,5 +1,5 @@
 import { Container, Graphics, Assets, type ResolverManifest, type Spritesheet, type Texture } from 'pixi.js'
-import { logLayout } from './logger'
+import { logLayout } from '../utils/logger'
 import { type IScene } from './SceneManager'
 
 export const manifest: ResolverManifest = {

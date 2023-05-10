@@ -1,11 +1,11 @@
 import { type Application, Container } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
-import { Game } from './Game'
-import { Team } from './common'
-import { EMessageCharacter } from './StatusBar'
-import { type Trigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger, type IConditionalTrigger } from './Trigger'
-import { EItemName } from './interfaces/IItem'
-import { AI } from './AI'
+import { Game } from '../Game'
+import { Team } from '../utils/common'
+import { EMessageCharacter } from '../components/StatusBar'
+import { type Trigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger, type IConditionalTrigger } from '../utils/Trigger'
+import { EItemName } from '../interfaces/IItem'
+import { AI } from '../utils/AI'
 
 interface IVersusCPUSceneOptions {
   app: Application

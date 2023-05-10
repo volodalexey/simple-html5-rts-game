@@ -1,4 +1,4 @@
-import { type BaseActiveItem } from '../common'
+import { type BaseActiveItem } from '../utils/common'
 import { type IGridPoint } from './IGridPoint'
 import { type UnitName, type EItemType, type BuildName } from './IItem'
 
