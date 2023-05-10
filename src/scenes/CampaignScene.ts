@@ -7,13 +7,16 @@ import { HeavyTank } from '../vehicles/HeavyTank'
 import { ScoutTank } from '../vehicles/ScoutTank'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type IOrder } from '../interfaces/IOrder'
-import { type Trigger, type ITrigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger } from '../utils/Trigger'
+import { type Trigger, type TriggerUnion, createTrigger, ETriggerType, handleTiggers } from '../utils/Trigger'
 import { EItemName, type EItemNames } from '../interfaces/IItem'
 import { Chopper } from '../air-vehicles/Chopper'
 import { ECommandName } from '../interfaces/ICommand'
 import { Transport } from '../vehicles/Transport'
 import { Wraith } from '../air-vehicles/Wraith'
 import { AI } from '../utils/AI'
+import { logCash } from '../utils/logger'
+import { GroundTurret } from '../buildings/GroundTurret'
+import { SCV } from '../vehicles/SCV'
 
 interface IMissionItem {
   name: EItemNames
@@ -41,7 +44,7 @@ interface IMission {
     green: number
   }
   items: IMissionItem[]
-  triggers: ITrigger[]
+  triggers: TriggerUnion[]
 }
 
 interface ICampaignSceneOptions {
@@ -95,41 +98,7 @@ export class CampaignScene extends Container implements IScene {
       return
     }
 
-    for (let i = 0; i < this.triggers.length; i++) {
-      const trigger = this.triggers[i]
-      let triggered = false
-      switch (trigger.type) {
-        case ETriggerType.timed: {
-          if (this.game.time >= (trigger as TimedTrigger).time) {
-            trigger.action()
-            this.triggers.splice(i, 1)
-            i--
-            triggered = true
-          }
-          break
-        }
-        case ETriggerType.conditional: {
-          if ((trigger as ConditionalTrigger).condition()) {
-            trigger.action()
-            this.triggers.splice(i, 1)
-            i--
-            triggered = true
-          }
-          break
-        }
-        case ETriggerType.interval: {
-          if ((trigger as IntervalTrigger).isElapsed(deltaMS)) {
-            trigger.action()
-            triggered = true
-          }
-          break
-        }
-      }
-      if (triggered && trigger.insertTrigger != null) {
-        const newTrigger = createTrigger(trigger.insertTrigger)
-        this.triggers.push(newTrigger)
-      }
-    }
+    handleTiggers({ deltaMS, triggers: this.triggers })
   }
 
   startCurrentLevel (): void {
@@ -148,6 +117,7 @@ export class CampaignScene extends Container implements IScene {
 
     this.game.cash[Team.blue] = mission.cash.blue
     this.game.cash[Team.green] = mission.cash.green
+    logCash(`(${this.game.team}) initial b=${this.game.cash.blue} g=${this.game.cash.green}`)
 
     this.game.showMessage({
       character: EMessageCharacter.system,
@@ -341,20 +311,38 @@ export class CampaignScene extends Container implements IScene {
             }
           },
           {
-            type: ETriggerType.timed,
-            time: 25000,
+            type: ETriggerType.conditional,
+            interval: 5000,
+            remove: false,
+            condition: () => {
+              const groundTurrets = this.game.tileMap.staticItems.filter(item => item.itemName === EItemName.GroundTurret && item.team === this.game.team)
+              return groundTurrets.length < 2
+            },
             action: () => {
+              let showMessage = false
+              const scv = this.game.tileMap.moveableItems.filter(item => item.itemName === EItemName.SCV && item.team === this.game.team)
               // Supply extra cash
-              this.game.showMessage({
-                character: EMessageCharacter.op,
-                message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.'
-              })
-              this.game.cash[Team.blue] += 190
+              if (scv.length > 0) {
+                if (this.game.cash[this.game.team] < GroundTurret.cost) {
+                  this.game.cash[this.game.team] += GroundTurret.cost
+                  showMessage = true
+                }
+              } else if (this.game.cash[this.game.team] < GroundTurret.cost + SCV.cost) {
+                this.game.cash[this.game.team] += GroundTurret.cost + SCV.cost
+                showMessage = true
+              }
+              if (showMessage) {
+                this.game.showMessage({
+                  character: EMessageCharacter.op,
+                  message: 'Commander!! We have enough resources for another ground turret.\nSet up the turret to keep the base safe from any more attacks.',
+                  selfRemove: true
+                })
+              }
             }
           },
           {
             type: ETriggerType.interval,
-            interval: 1000,
+            interval: 10000,
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
               if (this.game.cash[Team.green] > 100 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {

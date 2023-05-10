@@ -6,6 +6,7 @@ import { ECommandName } from '../interfaces/ICommand'
 import { type IOrder } from '../interfaces/IOrder'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type IGridPoint } from '../interfaces/IGridPoint'
+import { logCash } from '../utils/logger'
 
 export type IBaseOptions = Pick<
 IBuildingOptions,
@@ -102,6 +103,7 @@ export class Base extends Building {
     initCenter?: boolean
     order?: IOrder
     teleport?: boolean
+    cost: number
   }
 
   constructor (options: IBaseOptions) {
@@ -170,6 +172,9 @@ export class Base extends Building {
           if (this.constructUnit != null) {
             const item = this.game.createItem(this.constructUnit)
             if (item != null) {
+              // Teleport in unit and subtract the cost from player cash
+              this.game.cash[this.team] -= this.constructUnit.cost
+              logCash(`(${this.team}) base construct (-${this.constructUnit.cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
               this.game.tileMap.addItem(item)
             }
           }
@@ -229,8 +234,6 @@ export class Base extends Building {
           } else {
             // Position new unit above center of starport
             const availablePlace = availablePlaces[Math.floor(Math.random() * availablePlaces.length)]
-            // Teleport in unit and subtract the cost from player cash
-            cash[this.team] -= cost
             this.constructUnit = {
               initGridX: availablePlace.gridX + 0.5,
               initGridY: availablePlace.gridY + 0.5,
@@ -238,7 +241,8 @@ export class Base extends Building {
               team: this.team,
               name: this.order.name,
               order: this.order.unitOrder,
-              teleport: true
+              teleport: true,
+              cost
             }
             this.switchAnimation(BaseAnimation.constructing)
           }

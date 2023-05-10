@@ -5,6 +5,7 @@ import { EItemName, type UnitName } from '../interfaces/IItem'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type IOrder } from '../interfaces/IOrder'
 import { ECommandName } from '../interfaces/ICommand'
+import { logCash } from '../utils/logger'
 
 export type IStarportOptions = Pick<
 IBuildingOptions,
@@ -202,6 +203,7 @@ export class Starport extends Building {
             const item = this.game.createItem(this.constructUnit)
             if (item != null) {
               this.game.cash[this.team] -= this.constructUnit.cost
+              logCash(`(${this.team}) starport construct (-${this.constructUnit.cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
               this.game.tileMap.addItem(item)
             }
           }

@@ -2,6 +2,7 @@ import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../utils/common'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
 import { EItemName } from '../interfaces/IItem'
+import { logCash } from '../utils/logger'
 
 export type IOilDerrickOptions = Pick<
 IBuildingOptions,
@@ -176,6 +177,7 @@ export class OilDerrick extends Building {
     if (this.isHealthy()) {
       if (this.elapsedTime >= this.harvestInterval) {
         this.game.cash[this.team] += this.harvestAmount
+        logCash(`(${this.team}) oil derrick (+${this.harvestAmount}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
         this.elapsedTime = 0
       }
       this.elapsedTime += deltaMS

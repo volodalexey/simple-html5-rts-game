@@ -3,9 +3,10 @@ import { SceneManager, type IScene } from './SceneManager'
 import { Game } from '../Game'
 import { Team } from '../utils/common'
 import { EMessageCharacter } from '../components/StatusBar'
-import { type Trigger, createTrigger, ETriggerType, type TimedTrigger, type ConditionalTrigger, type IntervalTrigger, type IConditionalTrigger } from '../utils/Trigger'
+import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
 import { EItemName } from '../interfaces/IItem'
 import { AI } from '../utils/AI'
+import { logCash } from '../utils/logger'
 
 interface IVersusCPUSceneOptions {
   app: Application
@@ -47,41 +48,7 @@ export class VersusCPUScene extends Container implements IScene {
       return
     }
 
-    for (let i = 0; i < this.triggers.length; i++) {
-      const trigger = this.triggers[i]
-      let triggered = false
-      switch (trigger.type) {
-        case ETriggerType.timed: {
-          if (this.game.time >= (trigger as TimedTrigger).time) {
-            trigger.action()
-            this.triggers.splice(i, 1)
-            i--
-            triggered = true
-          }
-          break
-        }
-        case ETriggerType.conditional: {
-          if ((trigger as ConditionalTrigger).condition()) {
-            trigger.action()
-            this.triggers.splice(i, 1)
-            i--
-            triggered = true
-          }
-          break
-        }
-        case ETriggerType.interval: {
-          if ((trigger as IntervalTrigger).isElapsed(deltaMS)) {
-            trigger.action()
-            triggered = true
-          }
-          break
-        }
-      }
-      if (triggered && trigger.insertTrigger != null) {
-        const newTrigger = createTrigger(trigger.insertTrigger)
-        this.triggers.push(newTrigger)
-      }
-    }
+    handleTiggers({ deltaMS, triggers: this.triggers })
   }
 
   start (): void {
@@ -125,6 +92,7 @@ export class VersusCPUScene extends Container implements IScene {
     this.game.tileMap.rebuildBuildableGrid()
     this.game.cash[Team.blue] = 1600
     this.game.cash[Team.green] = 1600
+    logCash(`(${this.game.team}) initial b=${this.game.cash.blue} g=${this.game.cash.green}`)
 
     this.game.showMessage({
       character: EMessageCharacter.system,

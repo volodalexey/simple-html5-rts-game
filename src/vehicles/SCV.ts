@@ -4,6 +4,7 @@ import { AUDIO } from '../audio'
 import { Team } from '../utils/common'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
+import { logCash } from '../utils/logger'
 
 export type ISCVOptions = Pick<
 IVehicleOptions,
@@ -170,6 +171,7 @@ export class SCV extends Vehicle {
           })
           if (building != null) {
             cash[this.team] -= cost
+            logCash(`(${this.game.team}) scv build (-${cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
             tileMap.addItem(building)
             tileMap.rebuildPassableRequired = true
           }
