@@ -2,6 +2,7 @@ import { type Graphics } from 'pixi.js'
 import { type IOrder } from './IOrder'
 import { type ECommandName } from '../interfaces/ICommand'
 import { type IGridPoint } from './IGridPoint'
+import { type IGridBound, type IBound } from './IBound'
 
 export enum EItemType {
   none = 'none',
@@ -62,7 +63,7 @@ export interface IItem {
   handleUpdate: (deltaMS: number) => void
   drawCollision: () => void
   getCollisionPosition: (options: { center?: boolean, air?: boolean }) => { x: number, y: number }
-  getCollisionBounds: () => { top: number, right: number, bottom: number, left: number }
-  getGridCollisionBounds: () => { topGridY: number, rightGridX: number, bottomGridY: number, leftGridX: number }
+  getCollisionBounds: () => IBound
+  getGridCollisionBounds: () => IGridBound
   processOrders: () => boolean
 }

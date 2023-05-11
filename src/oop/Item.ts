@@ -6,6 +6,7 @@ import { type ECommandName } from '../interfaces/ICommand'
 import { type IOrder } from '../interfaces/IOrder'
 import { logItemBounds } from '../utils/logger'
 import { type IGridPoint } from '../interfaces/IGridPoint'
+import { type IBound } from '../interfaces/IBound'
 
 export interface IItemOptions {
   game: Game
@@ -94,7 +95,7 @@ export class Item extends Container implements IItem {
     return ret
   }
 
-  getCollisionBounds (): { top: number, right: number, bottom: number, left: number } {
+  getCollisionBounds (): IBound {
     const collisionPosition = this.getCollisionPosition()
     return {
       top: collisionPosition.y,

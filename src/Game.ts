@@ -1,4 +1,4 @@
-import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphics, type IPointData, type FederatedWheelEvent } from 'pixi.js'
+import { Container, type Spritesheet, type FederatedPointerEvent, Assets, Graphics, type IPointData, type FederatedWheelEvent, type Point } from 'pixi.js'
 import { type EMessageCharacter } from './components/StatusBar'
 import { TileMap } from './components/TileMap'
 import { Camera } from './components/Camera'
@@ -148,13 +148,7 @@ export class Game extends Container {
     this.tileMap.on('wheel', this.handleWheel)
   }
 
-  handlePointerTap = (e: FederatedPointerEvent): void => {
-    logPointerEvent('Game pointertap')
-    if (this.gameEnded) {
-      return
-    }
-    const point = this.tileMap.toLocal(e)
-    const underPointerItem = this.tileMap.itemUnderPointer(point)
+  handlePointerDoubleTap ({ e, underPointerItem }: { e: FederatedPointerEvent, underPointerItem?: BaseActiveItem }): boolean {
     const { previousPointerTapEvent } = this
     logDoubleTapEvent(`ppte ${previousPointerTapEvent?.pointerId}<>${e.pointerId} ${previousPointerTapEvent?.pointerType}<>${e.pointerType}`)
     if (previousPointerTapEvent != null && underPointerItem != null) {
@@ -172,129 +166,155 @@ export class Game extends Container {
         if (isInThreshold) {
           this.clearSelection()
           const { activeItems } = this.tileMap
+          const cameraBounds = this.camera.getCameraBounds()
           for (let i = 0; i < activeItems.children.length; i++) {
             const item = activeItems.children[i]
-            if (underPointerItem.itemName === item.itemName && item.team === underPointerItem.team) {
-              // select all the same items include under pointer item
+            const itemBounds = item.getCollisionBounds()
+            const isOutside = itemBounds.right < cameraBounds.left || itemBounds.left > cameraBounds.right ||
+            itemBounds.bottom < cameraBounds.top || itemBounds.top > cameraBounds.bottom
+            if (underPointerItem.itemName === item.itemName && item.team === underPointerItem.team &&
+              !isOutside) {
+              // select all the same items include under pointer item within camera bounds
               this.selectItem(item)
             }
           }
           this.sideBar.handleSelectedItems(this.selectedItems)
-          return
+          return true
         }
       }
     }
-    let selectedCommandName = this.sideBar.commandsBar.getSelectedCommandName()
+    return false
+  }
 
-    let order: IOrder | undefined
-
+  handleItemPointerTap ({ selectedCommandName, underPointerItem }: { selectedCommandName?: ECommandName, underPointerItem: BaseActiveItem }): void {
     const uids: number[] = []
-    if (underPointerItem != null) {
-      switch (selectedCommandName) {
-        case ECommandName.moveFollow:
-          order = { type: 'follow', to: underPointerItem }
-          break
-        case ECommandName.attack:
+    let order: IOrder | undefined
+    switch (selectedCommandName) {
+      case ECommandName.moveFollow:
+        order = { type: 'follow', to: underPointerItem }
+        break
+      case ECommandName.attack:
+        order = { type: 'attack', to: underPointerItem }
+        break
+      case ECommandName.attackGuard:
+        if (underPointerItem.team === this.team) {
+          order = { type: 'guard', to: underPointerItem }
+        } else {
           order = { type: 'attack', to: underPointerItem }
-          break
-        case ECommandName.attackGuard:
-          if (underPointerItem.team === this.team) {
-            order = { type: 'guard', to: underPointerItem }
-          } else {
-            order = { type: 'attack', to: underPointerItem }
-          }
-          break
-      }
-      const teamItemsCount = this.selectedItems.filter(si => si.team === this.team && si !== underPointerItem).length
-      if (underPointerItem.team === this.team) {
-        if (selectedCommandName != null && teamItemsCount > 0 && order != null) {
-          // identify selected items from players team that can process command
-          for (let i = this.selectedItems.length - 1; i >= 0; i--) {
-            const item = this.selectedItems[i]
-            if (item.team === this.team && underPointerItem !== item &&
-            item.commands.includes(selectedCommandName)) {
-              uids.push(item.uid)
-            }
-          }
-          if (uids.length > 0) {
-            this.processOrder({ uids, order })
-          }
-        } else {
-          this.clearSelection()
-          this.selectItem(underPointerItem)
         }
-      } else {
-        // Player clicked on an enemy item
-        if (teamItemsCount > 0) {
-          if (selectedCommandName == null) {
-            selectedCommandName = ECommandName.attackGuard
-            order = { type: 'attack', to: underPointerItem }
-          }
-          // identify selected items from players team that can process command
-          for (let i = this.selectedItems.length - 1; i >= 0; i--) {
-            const item = this.selectedItems[i]
-            if (item.team === this.team && underPointerItem !== item &&
-              item.commands.includes(selectedCommandName)) {
-              uids.push(item.uid)
-            }
-          }
-          if (uids.length > 0) {
-            this.processOrder({ uids, order })
-          }
-        } else {
-          this.clearSelection()
-          this.selectItem(underPointerItem)
-        }
-      }
-    } else {
-      // Player clicked on the ground
-      if (selectedCommandName == null) {
-        selectedCommandName = ECommandName.moveFollow
-      }
-      const { gridSize, initialMapDeployableGrid } = this.tileMap
-      const gridX = point.x / gridSize
-      const gridY = point.y / gridSize
-      switch (selectedCommandName) {
-        case ECommandName.moveFollow:
-          order = { type: 'move', toPoint: { gridX, gridY } }
-          break
-        case ECommandName.attackGuard:
-          order = { type: 'move-and-attack', toPoint: { gridX, gridY } }
-          break
-        case ECommandName.buildTurret:
-          order = { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX, gridY } }
-          this.sideBar.commandsBar.deselectTiles()
-          break
-        case ECommandName.buildStarport:
-          order = { type: 'build', name: EItemName.Starport, toPoint: { gridX, gridY } }
-          this.sideBar.commandsBar.deselectTiles()
-          break
-        case ECommandName.deploy: {
-          const minGridX = initialMapDeployableGrid[Math.floor(gridY)][Math.floor(gridX) - 1] === 0 ? Math.floor(gridX) - 1 + 0.5 : gridX
-          order = { type: 'deploy', toPoint: { gridX: minGridX, gridY } }
-          this.sideBar.commandsBar.deselectTiles()
-          break
-        }
-      }
-      // identify selected items from players team that can process command
-      for (let i = this.selectedItems.length - 1; i >= 0; i--) {
-        const item = this.selectedItems[i]
-        if (item.team === this.team &&
-          (item.type === EItemType.vehicles || item.type === EItemType.airVehicles) &&
+        break
+    }
+    const teamItemsCount = this.selectedItems.filter(si => si.team === this.team && si !== underPointerItem).length
+    if (underPointerItem.team === this.team) {
+      if (selectedCommandName != null && teamItemsCount > 0 && order != null) {
+        // identify selected items from players team that can process command
+        for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+          const item = this.selectedItems[i]
+          if (item.team === this.team && underPointerItem !== item &&
           item.commands.includes(selectedCommandName)) {
-          if (selectedCommandName === ECommandName.patrol) {
-            // process patrol order individually
-            const thisGrid = item.getGridXY({ center: true })
-            this.processOrder({ uids: [item.uid], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
-          } else {
             uids.push(item.uid)
           }
         }
+        if (uids.length > 0) {
+          this.processOrder({ uids, order })
+        }
+      } else {
+        this.clearSelection()
+        this.selectItem(underPointerItem)
       }
-      // then command them to move to the clicked location
-      if (uids.length > 0) {
-        this.processOrder({ uids, order })
+    } else {
+      // Player clicked on an enemy item
+      if (teamItemsCount > 0) {
+        if (selectedCommandName == null) {
+          selectedCommandName = ECommandName.attackGuard
+          order = { type: 'attack', to: underPointerItem }
+        }
+        // identify selected items from players team that can process command
+        for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+          const item = this.selectedItems[i]
+          if (item.team === this.team && underPointerItem !== item &&
+            item.commands.includes(selectedCommandName)) {
+            uids.push(item.uid)
+          }
+        }
+        if (uids.length > 0) {
+          this.processOrder({ uids, order })
+        }
+      } else {
+        this.clearSelection()
+        this.selectItem(underPointerItem)
       }
+    }
+  }
+
+  handleTerrainPointerTap ({ selectedCommandName, point }: { selectedCommandName?: ECommandName, point: Point }): void {
+    const uids: number[] = []
+    let order: IOrder | undefined
+    if (selectedCommandName == null) {
+      selectedCommandName = ECommandName.moveFollow
+    }
+    const { gridSize, initialMapDeployableGrid } = this.tileMap
+    const gridX = point.x / gridSize
+    const gridY = point.y / gridSize
+    switch (selectedCommandName) {
+      case ECommandName.moveFollow:
+        order = { type: 'move', toPoint: { gridX, gridY } }
+        break
+      case ECommandName.attackGuard:
+        order = { type: 'move-and-attack', toPoint: { gridX, gridY } }
+        break
+      case ECommandName.buildTurret:
+        order = { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX, gridY } }
+        this.sideBar.commandsBar.deselectTiles()
+        break
+      case ECommandName.buildStarport:
+        order = { type: 'build', name: EItemName.Starport, toPoint: { gridX, gridY } }
+        this.sideBar.commandsBar.deselectTiles()
+        break
+      case ECommandName.deploy: {
+        const minGridX = initialMapDeployableGrid[Math.floor(gridY)][Math.floor(gridX) - 1] === 0 ? Math.floor(gridX) - 1 + 0.5 : gridX
+        order = { type: 'deploy', toPoint: { gridX: minGridX, gridY } }
+        this.sideBar.commandsBar.deselectTiles()
+        break
+      }
+    }
+    // identify selected items from players team that can process command
+    for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+      const item = this.selectedItems[i]
+      if (item.team === this.team &&
+        (item.type === EItemType.vehicles || item.type === EItemType.airVehicles) &&
+        item.commands.includes(selectedCommandName)) {
+        if (selectedCommandName === ECommandName.patrol) {
+          // process patrol order individually
+          const thisGrid = item.getGridXY({ center: true })
+          this.processOrder({ uids: [item.uid], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
+        } else {
+          uids.push(item.uid)
+        }
+      }
+    }
+    // then command them to move to the clicked location
+    if (uids.length > 0) {
+      this.processOrder({ uids, order })
+    }
+  }
+
+  handlePointerTap = (e: FederatedPointerEvent): void => {
+    logPointerEvent('Game pointertap')
+    if (this.gameEnded) {
+      return
+    }
+    const point = this.tileMap.toLocal(e)
+    const underPointerItem = this.tileMap.itemUnderPointer(point)
+    if (this.handlePointerDoubleTap({ e, underPointerItem })) {
+      return
+    }
+    const selectedCommandName = this.sideBar.commandsBar.getSelectedCommandName()
+
+    if (underPointerItem != null) {
+      this.handleItemPointerTap({ selectedCommandName, underPointerItem })
+    } else {
+      this.handleTerrainPointerTap({ selectedCommandName, point })
     }
 
     this.sideBar.handleSelectedItems(this.selectedItems)

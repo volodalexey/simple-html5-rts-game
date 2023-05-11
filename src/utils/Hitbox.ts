@@ -1,5 +1,5 @@
 import { type Container, Graphics, Sprite, type Texture } from 'pixi.js'
-import { type ICameraGridBounds } from '../components/Camera'
+import { type IGridBound } from '../interfaces/IBound'
 
 export class Hitbox extends Sprite {
   static prepareGraphics ({ tileWidth, tileHeight, borderWidth, mapGridHeight, mapGridWidth }:
@@ -39,7 +39,7 @@ export class Hitbox extends Sprite {
   }: {
     currentMapGrid: Array<Array<1 | 0>>
     hitboxes: Container<Hitbox>
-    cameraGridBounds: ICameraGridBounds
+    cameraGridBounds: IGridBound
   }): void {
     hitboxes.children.forEach(hitbox => {
       const { initGridX, initGridY } = hitbox

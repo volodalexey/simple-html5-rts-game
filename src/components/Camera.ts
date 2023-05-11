@@ -1,18 +1,12 @@
 import { Graphics } from 'pixi.js'
 import { type Game } from '../Game'
+import { type IBound, type IGridBound } from '../interfaces/IBound'
 
 export interface ICameraOptions {
   game: Game
   viewWidth: number
   viewHeight: number
   initY?: number
-}
-
-export interface ICameraGridBounds {
-  topGridY: number
-  bottomGridY: number
-  leftGridX: number
-  rightGridX: number
 }
 
 export class Camera extends Graphics {
@@ -55,14 +49,25 @@ export class Camera extends Graphics {
     })
   }
 
-  getCameraGridBounds (): ICameraGridBounds {
+  getCameraBounds (): IBound {
     const { width, height } = this
-    const { scale: { x: tmSX, y: tmSY }, pivot: { x: camX, y: camY }, gridSize } = this.game.tileMap
+    const { scale: { x: tmSX, y: tmSY }, pivot: { x: camX, y: camY } } = this.game.tileMap
     return {
-      topGridY: Math.floor(camY / gridSize),
-      bottomGridY: Math.floor((camY + height / tmSY) / gridSize),
-      leftGridX: Math.floor(camX / gridSize),
-      rightGridX: Math.floor((camX + width / tmSX) / gridSize)
+      top: camY,
+      right: camX + width / tmSX,
+      bottom: camY + height / tmSY,
+      left: camX
+    }
+  }
+
+  getCameraGridBounds (): IGridBound {
+    const { top, right, bottom, left } = this.getCameraBounds()
+    const { gridSize } = this.game.tileMap
+    return {
+      topGridY: Math.floor(top / gridSize),
+      bottomGridY: Math.floor(bottom / gridSize),
+      leftGridX: Math.floor(left / gridSize),
+      rightGridX: Math.floor(right / gridSize)
     }
   }
 }

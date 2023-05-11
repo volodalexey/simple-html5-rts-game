@@ -6,6 +6,7 @@ import { type Projectile } from '../projectiles/Projectile'
 import { type Vehicle } from '../vehicles/Vehicle'
 import { type AirVehicle } from '../air-vehicles/AirVehicle'
 import { type IGridPoint } from '../interfaces/IGridPoint'
+import { type IBound } from '../interfaces/IBound'
 
 export enum Team {
   blue = 'blue',
@@ -88,13 +89,6 @@ export function angleDiff ({ angle1, angle2, directions }: { angle1: number, ang
   }
 
   return diff
-}
-
-interface IBound {
-  top: number
-  right: number
-  bottom: number
-  left: number
 }
 
 export function checkCollision (a: IBound, b: IBound, compareWith: 'a' | 'b' = 'a'): number {
