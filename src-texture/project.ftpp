@@ -1185,6 +1185,16 @@
       "folder": ""
     },
     {
+      "name": "icon-circle-check.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-circle-check.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-circle-xmark.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-circle-xmark.png",
+      "folder": ""
+    },
+    {
       "name": "icon-command-attack-guard.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-command-attack-guard.png",
       "folder": ""
@@ -1210,6 +1220,11 @@
       "folder": ""
     },
     {
+      "name": "icon-gears.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-gears.png",
+      "folder": ""
+    },
+    {
       "name": "icon-home.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-home.png",
       "folder": ""
@@ -1222,6 +1237,26 @@
     {
       "name": "icon-repeat.png",
       "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-repeat.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-volume-high.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-volume-high.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-volume-low.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-volume-low.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-volume-middle.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-volume-middle.png",
+      "folder": ""
+    },
+    {
+      "name": "icon-volume-off.png",
+      "path": "/mnt/mystorage/js_projects/simple-html5-rts-game/src-texture/icon-volume-off.png",
       "folder": ""
     },
     {

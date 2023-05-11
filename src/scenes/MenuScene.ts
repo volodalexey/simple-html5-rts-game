@@ -8,6 +8,7 @@ import { StatusBar } from '../components/StatusBar'
 import { VersusCPUScene } from './VersusCPUScene'
 import { Game } from '../Game'
 import { Team } from '../utils/common'
+import { SettingsModal } from '../components/SettingsModal'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -16,13 +17,18 @@ interface IMenuSceneSceneOptions {
   menuTexture: Texture
 }
 
+class Choices extends Container<Button> {}
+class SettingsButton extends Button {}
+
 export class MenuScene extends Container implements IScene {
   public game!: Game
   public gravity = 0.7
   public gameEnded = false
 
   public background!: Sprite
-  public choices = new Container()
+  public choices = new Choices()
+  public settingsButton!: SettingsButton
+  public settingsModal!: SettingsModal
 
   static options = {
     choices: {
@@ -33,6 +39,12 @@ export class MenuScene extends Container implements IScene {
       missionOffset: {
         x: 50,
         y: 50
+      }
+    },
+    settingsButton: {
+      offset: {
+        x: 550,
+        y: 400
       }
     }
   }
@@ -64,6 +76,53 @@ export class MenuScene extends Container implements IScene {
     this.background = background
 
     this.addChild(this.choices)
+
+    const { textures }: Spritesheet = Assets.get('spritesheet')
+
+    const { x, y } = MenuScene.options.settingsButton.offset
+    this.settingsButton = new SettingsButton({
+      text: '',
+      textColor: 0xffffff,
+      initX: x,
+      initY: y,
+      iconColor: 0xffffff,
+      iconColorHover: 0xffff00,
+      iconPaddingLeft: 10,
+      iconPaddingTop: 10,
+      buttonWidth: 75,
+      buttonHeight: 65,
+      buttonIdleColor: 0x454545,
+      buttonBorderColor: 0xffffff,
+      buttonBorderHoverColor: 0xffff00,
+      buttonBorderWidth: 1,
+      buttonRadius: 10,
+      iconTexture: textures['icon-gears.png'],
+      onClick: () => {
+        this.settingsModal.showModal()
+      }
+    })
+    this.addChild(this.settingsButton)
+
+    SettingsModal.prepareTextures({
+      textures: {
+        iconHomeTexture: textures['icon-home.png'],
+        iconVolumeOffTexture: textures['icon-volume-off.png'],
+        iconVolumeLowTexture: textures['icon-volume-low.png'],
+        iconVolumeMiddleTexture: textures['icon-volume-middle.png'],
+        iconVolumeHighTexture: textures['icon-volume-high.png'],
+        iconCircleXMarkTexture: textures['icon-circle-xmark.png'],
+        iconCircleCheckTexture: textures['icon-circle-check.png'],
+        iconGearsTexture: textures['icon-gears.png']
+      }
+    })
+
+    const settingsModal = new SettingsModal({
+      viewWidth: SceneManager.width,
+      viewHeight: SceneManager.height,
+      onHomeClick: () => { console.log('onHomeClick') },
+      onApplyClick: () => { console.log('onApplyClick') }
+    })
+    this.settingsModal = settingsModal
   }
 
   clearFromAll (): void {
@@ -185,6 +244,9 @@ export class MenuScene extends Container implements IScene {
     this.y = y
     this.height = occupiedHeight
     logLayout(`x=${x} y=${y} w=${this.width} h=${this.height}`)
+    const calcWidth = availableWidth > occupiedWidth ? occupiedWidth : availableWidth
+    const calcHeight = availableHeight > occupiedHeight ? occupiedHeight : availableHeight
+    this.settingsModal.position.set(calcWidth / 2 - this.settingsModal.width / 2, calcHeight / 2 - this.settingsModal.height / 2)
   }
 
   handleUpdate (deltaMS: number): void {}
@@ -230,5 +292,10 @@ export class MenuScene extends Container implements IScene {
       }),
       initialResize: false
     }).catch(console.error)
+  }
+
+  mountedHandler (): void {
+    this.addChild(this.settingsModal)
+    this.settingsModal.hideModal()
   }
 }
