@@ -1,52 +1,45 @@
-import { Graphics } from 'pixi.js'
+import { type Container, Graphics, Sprite, type Texture } from 'pixi.js'
 
-export class Hitboxes extends Graphics {
-  draw ({
-    currentMapGrid: currentMapBuildableGrid, tileWidth, tileHeight, borderWidth
-  }: {
-    currentMapGrid: Array<Array<1 | 0>>
-    tileWidth: number
-    tileHeight: number
-    borderWidth: number
-  }): void {
-    this.clear()
-    for (let y = 0; y < currentMapBuildableGrid.length; y++) {
-      for (let x = 0; x < currentMapBuildableGrid[y].length; x++) {
-        const initX = tileWidth * x
-        const initY = tileWidth * y
-        this.beginFill(currentMapBuildableGrid[y][x] === 1 ? 0xff0000 : 0x00ff00)
-        this.drawRect(initX, initY, tileWidth, tileHeight)
-        this.endFill()
-        this.beginHole()
-        this.drawRect(initX + borderWidth, initY + borderWidth, tileWidth - borderWidth * 2, tileHeight - borderWidth * 2)
-        this.endHole()
-      }
-    }
+export class Hitbox extends Sprite {
+  static prepareGraphics ({ tileWidth, tileHeight, borderWidth, mapGridHeight, mapGridWidth }:
+  { tileWidth: number, tileHeight: number, borderWidth: number, mapGridHeight: number, mapGridWidth: number }): Graphics {
+    const graphics = new Graphics()
+    graphics.beginFill(0xffffff)
+    graphics.drawRect(0, 0, tileWidth, tileHeight)
+    graphics.endFill()
+    graphics.beginHole()
+    graphics.drawRect(borderWidth, borderWidth, tileWidth - borderWidth * 2, tileHeight - borderWidth * 2)
+    graphics.endHole()
+    return graphics
   }
 
-  toggleBuildableGrid ({
-    toggle,
-    currentMapBuildableGrid,
-    tileWidth,
-    tileHeight,
-    borderWidth
+  static cacheTexture: Texture
+  public initGridX: number
+  public initGridY: number
+
+  constructor ({ initGridX, initGridY }: { initGridX: number, initGridY: number }) {
+    super(Hitbox.cacheTexture)
+    this.initGridX = initGridX
+    this.initGridY = initGridY
+  }
+
+  static prepareTextures ({
+    texture
   }: {
-    toggle: boolean
-    currentMapBuildableGrid: Array<Array<1 | 0>>
-    tileWidth: number
-    tileHeight: number
-    borderWidth: number
+    texture: Texture
   }): void {
-    if (toggle) {
-      this.draw({
-        currentMapGrid: currentMapBuildableGrid,
-        tileWidth,
-        tileHeight,
-        borderWidth
-      })
-      this.visible = true
-    } else {
-      this.visible = false
-    }
+    Hitbox.cacheTexture = texture
+  }
+
+  static updateColor ({
+    currentMapGrid,
+    hitboxes
+  }: {
+    currentMapGrid: Array<Array<1 | 0>>
+    hitboxes: Container<Hitbox>
+  }): void {
+    hitboxes.children.forEach(hitbox => {
+      hitbox.tint = currentMapGrid[hitbox.initGridY][hitbox.initGridX] === 1 ? 0xff0000 : 0x00ff00
+    })
   }
 }

@@ -1,6 +1,6 @@
 import { Assets, Container, type IPointData, Sprite, type Texture, Text, Graphics, BlurFilter } from 'pixi.js'
 import { MapSettings, type IMapSettings } from '../utils/MapSettings'
-import { Hitboxes } from '../utils/Hitbox'
+import { Hitbox } from '../utils/Hitbox'
 import { manifest } from '../scenes/LoaderScene'
 import { type Building } from '../buildings/Building'
 import { type Vehicle } from '../vehicles/Vehicle'
@@ -15,6 +15,7 @@ import { ECommandName } from '../interfaces/ICommand'
 import { GroundTurret } from '../buildings/GroundTurret'
 import { Starport } from '../buildings/Starport'
 import { OilDerrick } from '../buildings/OilDerrick'
+import { SceneManager } from '../scenes/SceneManager'
 
 export interface ITileMapOptions {
   game: Game
@@ -30,6 +31,7 @@ class Projectiles extends Container<Projectile> {}
 class SightOuter extends Graphics {}
 class SightInner extends Graphics {}
 class Background extends Sprite {}
+class Hitboxes extends Container<Hitbox> {}
 
 export class TileMap extends Container {
   public game !: Game
@@ -162,6 +164,24 @@ export class TileMap extends Container {
         }
       }
     }
+    Hitbox.prepareTextures({
+      texture: SceneManager.app.renderer.generateTexture(Hitbox.prepareGraphics({
+        mapGridWidth: this.mapGridWidth,
+        mapGridHeight: this.mapGridHeight,
+        tileWidth: settings.tilewidth,
+        tileHeight: settings.tileheight,
+        borderWidth: 2
+      }))
+    })
+    for (let x = 0; x < this.mapGridWidth; x++) {
+      for (let y = 0; y < this.mapGridHeight; y++) {
+        const initX = settings.tilewidth * x
+        const initY = settings.tileheight * y
+        const hitbox = new Hitbox({ initGridX: x, initGridY: y })
+        hitbox.position.set(initX, initY)
+        this.hitboxes.addChild(hitbox)
+      }
+    }
 
     this._initialMapDeployableGrid = []
     const oilFieldsPoints = MapSettings.mapObjectToPositions({
@@ -249,7 +269,7 @@ export class TileMap extends Container {
 
   cleanFromAll (): void {
     this.pivot.set(0, 0)
-    this.hitboxes.clear()
+    this.scale.set(1, 1)
     while (this.activeItems.children[0] != null) {
       this.activeItems.children[0].removeFromParent()
     }
@@ -272,22 +292,12 @@ export class TileMap extends Container {
       (selectedCommandName === ECommandName.buildStarport && cash >= Starport.cost) ||
       logHitboxes.enabled) {
       this.rebuildBuildableGrid()
-      this.hitboxes.draw({
-        currentMapGrid: this.currentMapBuildableGrid,
-        tileWidth: this.gridSize,
-        tileHeight: this.gridSize,
-        borderWidth: 2
-      })
+      Hitbox.updateColor({ currentMapGrid: this.currentMapBuildableGrid, hitboxes: this.hitboxes })
       this.hitboxes.visible = true
     } else if (selectedCommandName === ECommandName.deploy || logHitboxes.enabled) {
       this.rebuildBuildableGrid()
       this.mergeBuildableGridIntoDeployable()
-      this.hitboxes.draw({
-        currentMapGrid: this._currentMapDeployableGrid,
-        tileWidth: this.gridSize,
-        tileHeight: this.gridSize,
-        borderWidth: 2
-      })
+      Hitbox.updateColor({ currentMapGrid: this._currentMapDeployableGrid, hitboxes: this.hitboxes })
       this.hitboxes.visible = true
     } else {
       this.hitboxes.visible = false
