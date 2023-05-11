@@ -160,7 +160,7 @@ export class TileMap extends Container {
           text.scale.set(0.4)
           gr.addChild(text)
           gr.alpha = 0.3
-          this.background.addChild(gr)
+          this.background3.addChild(gr)
         }
       }
     }
@@ -292,12 +292,20 @@ export class TileMap extends Container {
       (selectedCommandName === ECommandName.buildStarport && cash >= Starport.cost) ||
       logHitboxes.enabled) {
       this.rebuildBuildableGrid()
-      Hitbox.updateColor({ currentMapGrid: this.currentMapBuildableGrid, hitboxes: this.hitboxes })
+      Hitbox.updateColor({
+        currentMapGrid: this.currentMapBuildableGrid,
+        hitboxes: this.hitboxes,
+        cameraGridBounds: this.game.camera.getCameraGridBounds()
+      })
       this.hitboxes.visible = true
     } else if (selectedCommandName === ECommandName.deploy || logHitboxes.enabled) {
       this.rebuildBuildableGrid()
       this.mergeBuildableGridIntoDeployable()
-      Hitbox.updateColor({ currentMapGrid: this._currentMapDeployableGrid, hitboxes: this.hitboxes })
+      Hitbox.updateColor({
+        currentMapGrid: this._currentMapDeployableGrid,
+        hitboxes: this.hitboxes,
+        cameraGridBounds: this.game.camera.getCameraGridBounds()
+      })
       this.hitboxes.visible = true
     } else {
       this.hitboxes.visible = false

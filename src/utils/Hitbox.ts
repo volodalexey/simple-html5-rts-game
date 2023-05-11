@@ -1,4 +1,5 @@
 import { type Container, Graphics, Sprite, type Texture } from 'pixi.js'
+import { type ICameraGridBounds } from '../components/Camera'
 
 export class Hitbox extends Sprite {
   static prepareGraphics ({ tileWidth, tileHeight, borderWidth, mapGridHeight, mapGridWidth }:
@@ -33,13 +34,22 @@ export class Hitbox extends Sprite {
 
   static updateColor ({
     currentMapGrid,
-    hitboxes
+    hitboxes,
+    cameraGridBounds: { leftGridX, rightGridX, topGridY, bottomGridY }
   }: {
     currentMapGrid: Array<Array<1 | 0>>
     hitboxes: Container<Hitbox>
+    cameraGridBounds: ICameraGridBounds
   }): void {
     hitboxes.children.forEach(hitbox => {
-      hitbox.tint = currentMapGrid[hitbox.initGridY][hitbox.initGridX] === 1 ? 0xff0000 : 0x00ff00
+      const { initGridX, initGridY } = hitbox
+      hitbox.tint = currentMapGrid[initGridY][initGridX] === 1 ? 0xff0000 : 0x00ff00
+      if (initGridX >= leftGridX && initGridX <= rightGridX &&
+        initGridY >= topGridY && initGridY <= bottomGridY) {
+        hitbox.renderable = true
+      } else {
+        hitbox.renderable = false
+      }
     })
   }
 }

@@ -8,6 +8,13 @@ export interface ICameraOptions {
   initY?: number
 }
 
+export interface ICameraGridBounds {
+  topGridY: number
+  bottomGridY: number
+  leftGridX: number
+  rightGridX: number
+}
+
 export class Camera extends Graphics {
   public game !: Game
   static options = {
@@ -46,5 +53,16 @@ export class Camera extends Graphics {
       viewWidth: viewWidth > maxWidth ? maxWidth : viewWidth,
       viewHeight: viewHeight > maxHeight ? maxHeight : viewHeight
     })
+  }
+
+  getCameraGridBounds (): ICameraGridBounds {
+    const { width, height } = this
+    const { scale: { x: tmSX, y: tmSY }, pivot: { x: camX, y: camY }, gridSize } = this.game.tileMap
+    return {
+      topGridY: Math.floor(camY / gridSize),
+      bottomGridY: Math.floor((camY + height / tmSY) / gridSize),
+      leftGridX: Math.floor(camX / gridSize),
+      rightGridX: Math.floor((camX + width / tmSX) / gridSize)
+    }
   }
 }
