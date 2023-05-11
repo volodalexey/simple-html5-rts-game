@@ -1,6 +1,6 @@
 import { type Application, Container } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
-import { Game } from '../Game'
+import { type Game } from '../Game'
 import { EVectorDirection } from '../utils/Vector'
 import { Team } from '../utils/common'
 import { HeavyTank } from '../vehicles/HeavyTank'
@@ -49,6 +49,7 @@ interface IMission {
 
 interface ICampaignSceneOptions {
   app: Application
+  game: Game
   viewWidth: number
   viewHeight: number
   missionIdx?: number
@@ -73,14 +74,11 @@ export class CampaignScene extends Container implements IScene {
     this.setup(options)
   }
 
-  setup ({ viewWidth, viewHeight }: ICampaignSceneOptions): void {
-    const game = new Game({
-      viewWidth,
-      viewHeight,
-      team: Team.blue,
-      type: 'campaign'
-    })
-    this.addChild(game)
+  setup ({ viewWidth, viewHeight, game }: ICampaignSceneOptions): void {
+    game.viewWidth = viewWidth
+    game.viewHeight = viewHeight
+    game.team = Team.blue
+    game.type = 'campaign'
     this.game = game
   }
 
@@ -127,6 +125,7 @@ export class CampaignScene extends Container implements IScene {
   }
 
   mountedHandler (): void {
+    this.addChild(this.game)
     this.prepareMissions()
     this.startCurrentLevel()
   }

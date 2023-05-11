@@ -6,6 +6,8 @@ import { TileMap } from '../components/TileMap'
 import { CampaignScene } from './CampaignScene'
 import { StatusBar } from '../components/StatusBar'
 import { VersusCPUScene } from './VersusCPUScene'
+import { Game } from '../Game'
+import { Team } from '../utils/common'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -15,6 +17,7 @@ interface IMenuSceneSceneOptions {
 }
 
 export class MenuScene extends Container implements IScene {
+  public game!: Game
   public gravity = 0.7
   public gameEnded = false
 
@@ -184,14 +187,22 @@ export class MenuScene extends Container implements IScene {
     logLayout(`x=${x} y=${y} w=${this.width} h=${this.height}`)
   }
 
-  handleUpdate (deltaMS: number): void {
-  }
+  handleUpdate (deltaMS: number): void {}
 
   goToCampaignScene = (missionIdx?: number): void => {
+    if (this.game == null) {
+      this.game = new Game({
+        viewWidth: SceneManager.width,
+        viewHeight: SceneManager.height,
+        type: 'campaign',
+        team: Team.blue
+      })
+    }
     SceneManager.changeScene({
       name: 'campaign',
       newScene: new CampaignScene({
         app: SceneManager.app,
+        game: this.game,
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
         missionIdx
@@ -201,10 +212,19 @@ export class MenuScene extends Container implements IScene {
   }
 
   goToVersusCPUScene = (): void => {
+    if (this.game == null) {
+      this.game = new Game({
+        viewWidth: SceneManager.width,
+        viewHeight: SceneManager.height,
+        type: 'singleplayer',
+        team: Team.blue
+      })
+    }
     SceneManager.changeScene({
       name: 'versusCPU',
       newScene: new VersusCPUScene({
         app: SceneManager.app,
+        game: this.game,
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height
       }),

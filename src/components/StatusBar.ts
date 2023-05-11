@@ -272,7 +272,7 @@ export class StatusBar extends Container {
     const { padding } = StatusBar.options
     const mask = (this.messageList.mask as Container)
     const scrollHeight = mask.height - padding * 2
-    return this.messageList.height - scrollHeight
+    return this.messageList.height > 0 ? (this.messageList.height - scrollHeight) : 0
   }
 
   handleUpdate (deltaMS: number): void {

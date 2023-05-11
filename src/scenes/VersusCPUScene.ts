@@ -1,6 +1,6 @@
 import { type Application, Container } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
-import { Game } from '../Game'
+import { type Game } from '../Game'
 import { Team } from '../utils/common'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
@@ -10,6 +10,7 @@ import { logCash } from '../utils/logger'
 
 interface IVersusCPUSceneOptions {
   app: Application
+  game: Game
   viewWidth: number
   viewHeight: number
 }
@@ -23,14 +24,11 @@ export class VersusCPUScene extends Container implements IScene {
     this.setup(options)
   }
 
-  setup ({ viewWidth, viewHeight }: IVersusCPUSceneOptions): void {
-    const game = new Game({
-      viewWidth,
-      viewHeight,
-      team: Team.blue,
-      type: 'singleplayer'
-    })
-    this.addChild(game)
+  setup ({ viewWidth, viewHeight, game }: IVersusCPUSceneOptions): void {
+    game.viewWidth = viewWidth
+    game.viewHeight = viewHeight
+    game.team = Team.blue
+    game.type = 'singleplayer'
     this.game = game
   }
 
@@ -104,6 +102,7 @@ export class VersusCPUScene extends Container implements IScene {
   }
 
   mountedHandler (): void {
+    this.addChild(this.game)
     this.start()
   }
 
