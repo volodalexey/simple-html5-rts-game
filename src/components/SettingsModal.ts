@@ -1,5 +1,7 @@
 import { Container, type FederatedPointerEvent, Graphics, type Texture, Text, type TextStyleAlign, type TextStyleFontWeight } from 'pixi.js'
 import { Button } from './Button'
+import { logLayout } from '../utils/logger'
+import { type Audio } from '../utils/Audio'
 
 class VolumeButton extends Button {}
 class Bar extends Graphics {}
@@ -20,8 +22,7 @@ class Slider extends Container {
     caretRadius: 18,
     caretColor: 0x800080,
     caretBorderColor: 0x454545,
-    caretBorderWidth: 3,
-    caretOffset: { x: 3, y: 5 }
+    caretBorderWidth: 3
   }
 
   public dragStartX = -1
@@ -51,21 +52,24 @@ class Slider extends Container {
       caretRadius,
       caretBorderColor,
       caretBorderWidth,
-      caretColor,
-      caretOffset
+      caretColor
     } = Slider.options
     const { bar, caret } = this
     bar.beginFill(barBorderColor)
     bar.drawRoundedRect(0, 0, width, barHeight, barRadius)
     bar.endFill()
     bar.beginFill(barColor)
-    bar.drawRoundedRect(barBorderWidth, barBorderWidth, width - barBorderWidth * 2, barHeight - 2 * barBorderWidth, barRadius)
+    const innerBarHeight = barHeight - 2 * barBorderWidth
+    bar.drawRoundedRect(barBorderWidth, barBorderWidth, width - barBorderWidth * 2, innerBarHeight, barRadius)
     bar.endFill()
+    const barCenterX = barBorderWidth + innerBarHeight * 0.5
+    const barCenterY = barBorderWidth + innerBarHeight * 0.5
+    caret.position.set(barCenterX - caretRadius, barCenterY - caretRadius)
     caret.beginFill(caretBorderColor)
-    caret.drawCircle(caretOffset.x, caretOffset.y, caretRadius)
+    caret.drawCircle(caretRadius, caretRadius, caretRadius)
     caret.endFill()
     caret.beginFill(caretColor)
-    caret.drawCircle(caretOffset.x, caretOffset.y, caretRadius - caretBorderWidth)
+    caret.drawCircle(caretRadius, caretRadius, caretRadius - caretBorderWidth)
     caret.endFill()
   }
 
@@ -78,49 +82,62 @@ class Slider extends Container {
   }
 
   onPointerDown = (e: FederatedPointerEvent): void => {
-    this.dragStartX = this.toLocal(e).x
+    this.dragStartX = this.bar.toLocal(e).x
   }
 
   onPointerMove = (e: FederatedPointerEvent): void => {
     if (this.dragStartX > -1) {
-      const newX = this.toLocal(e).x
+      const newX = this.bar.toLocal(e).x
       const diffX = newX - this.dragStartX
       this.caret.position.x += diffX
       this.dragStartX = newX
-      this.limitCaret()
+      this.checkCaretLimits()
       this.triggerChangeEvent()
     }
   }
 
   onPointerUp = (e: FederatedPointerEvent): void => {
     this.dragStartX = -1
-    this.caret.position.x = this.toLocal(e).x - Slider.options.caretRadius / 2
-    this.limitCaret()
+    this.setCaretCenter(this.bar.toLocal(e).x)
+    this.checkCaretLimits()
     this.triggerChangeEvent()
   }
 
   getCaretCenter (): number {
-    return this.caret.position.x + Slider.options.caretRadius / 2
+    return this.caret.position.x + Slider.options.caretRadius
   }
 
   setCaretCenter (x: number): void {
-    this.caret.position.x = x - Slider.options.caretRadius / 2
+    this.caret.position.x = x - Slider.options.caretRadius
   }
 
-  limitCaret (): void {
-    const { barBorderWidth } = Slider.options
+  calcCaretLimits (): { min: number, max: number } {
     const { width } = this.bar
+    const { barHeight, barBorderWidth } = Slider.options
+    const halfInnerBarHeight = (barHeight - 2 * barBorderWidth) / 2
+    const diffX = barBorderWidth + halfInnerBarHeight
+    return { min: diffX, max: width - diffX }
+  }
+
+  checkCaretLimits (): void {
     const center = this.getCaretCenter()
-    if (center < barBorderWidth) {
-      this.setCaretCenter(barBorderWidth)
-    } else if (center > width - barBorderWidth) {
-      this.setCaretCenter(width - barBorderWidth)
+    const { min, max } = this.calcCaretLimits()
+    if (center < min) {
+      this.setCaretCenter(min)
+    } else if (center > max) {
+      this.setCaretCenter(max)
     }
   }
 
   triggerChangeEvent (): void {
-    const { barBorderWidth, caretRadius } = Slider.options
-    this.onChange((this.caret.position.x + caretRadius / 2) / (this.bar.width - barBorderWidth * 2))
+    const center = this.getCaretCenter()
+    const { min, max } = this.calcCaretLimits()
+    this.onChange((center - min) / (max - min))
+  }
+
+  updateCaretCenter (value: number): void {
+    const { min, max } = this.calcCaretLimits()
+    this.setCaretCenter(min + (max - min) * value)
   }
 }
 
@@ -134,6 +151,7 @@ interface IFormLineTextures {
 interface IFormLineOptions {
   text: string
   volume?: number
+  onChanged?: (volume: number) => void
 }
 
 class FormLine extends Container {
@@ -167,27 +185,33 @@ class FormLine extends Container {
       buttonIdleAlpha: 0,
       buttonHoverAlpha: 0,
       buttonSelectedAlpha: 0,
-      offset: { x: 0, y: 0 }
+      offset: { x: 50, y: 0 }
     },
     slider: {
-      width: 200,
-      offset: { x: 240, y: 18 }
+      width: 300,
+      offset: { x: 5, y: 50 }
     }
   }
 
   public volume: number
   public volumeButton!: VolumeButton
   public slider!: Slider
+  public onChanged!: IFormLineOptions['onChanged']
+  static triggerTimeout = 200
+  public resizeTimeoutId = 0
   constructor (options: IFormLineOptions) {
     super()
+    this.onChanged = options.onChanged
     this.volume = options.volume ?? 0
     this.setup(options)
     this.updateTexture()
+    this.slider.updateCaretCenter(this.volume)
   }
 
   setup ({ text }: IFormLineOptions): void {
     const {
       minVolume, maxVolume, slider, volumeButton: {
+        offset,
         textColor,
         textColorHover,
         textPaddingLeft,
@@ -217,6 +241,8 @@ class FormLine extends Container {
       onClick: () => {
         this.volume = this.volume > minVolume ? minVolume : maxVolume
         this.updateTexture()
+        this.slider.updateCaretCenter(this.volume)
+        this.triggerDeBounce()
       },
       iconPaddingLeft,
       iconPaddingTop,
@@ -226,12 +252,15 @@ class FormLine extends Container {
       buttonHoverAlpha,
       buttonSelectedAlpha
     })
+    this.volumeButton.position.set(offset.x, offset.y)
     this.addChild(this.volumeButton)
 
     this.slider = new Slider({
       width: slider.width,
       onChange: (value: number) => {
-        console.log(value)
+        this.volume = value
+        this.updateTexture()
+        this.triggerDeBounce()
       }
     })
     this.slider.position.set(slider.offset.x, slider.offset.y)
@@ -267,6 +296,28 @@ class FormLine extends Container {
       icon.texture = iconVolumeHighTexture
     }
   }
+
+  triggerDeBounce (): void {
+    this.cancelScheduledTriggerHandler()
+    this.scheduleTriggerHandler()
+  }
+
+  cancelScheduledTriggerHandler (): void {
+    clearTimeout(this.resizeTimeoutId)
+  }
+
+  scheduleTriggerHandler (): void {
+    this.resizeTimeoutId = window.setTimeout(() => {
+      this.cancelScheduledTriggerHandler()
+      this.triggerOnChanged()
+    }, FormLine.triggerTimeout)
+  }
+
+  triggerOnChanged (): void {
+    if (typeof this.onChanged === 'function') {
+      this.onChanged(this.volume)
+    }
+  }
 }
 
 export interface ISettingsModalTextures extends IFormLineTextures {
@@ -279,8 +330,9 @@ export interface ISettingsModalTextures extends IFormLineTextures {
 interface ISettingsModalOptions {
   viewWidth: number
   viewHeight: number
+  audio: Audio
   onHomeClick?: () => void
-  onApplyClick?: () => void
+  onClosed: () => void
 }
 
 class ModalBox extends Graphics {}
@@ -316,8 +368,8 @@ export class SettingsModal extends Container {
     backgroundColor: 0x454545,
     outerBorderColor: 0x485b6c,
     outerBorderWidth: 3,
-    width: 500,
-    height: 400,
+    width: 350,
+    height: 500,
     borderRadius: 5
   }
 
@@ -330,23 +382,23 @@ export class SettingsModal extends Container {
     shadowTextColor: 0x800080,
     shadowThickness: 1,
     offset: {
-      x: 190,
+      x: 110,
       y: 25
     }
   }
 
   static volumeLinesOptions = {
     voiceLine: { offset: { x: 20, y: 80 } },
-    shootLine: { offset: { x: 20, y: 130 } },
-    hitLine: { offset: { x: 20, y: 180 } },
-    messageLine: { offset: { x: 20, y: 230 } }
+    shootLine: { offset: { x: 20, y: 160 } },
+    hitLine: { offset: { x: 20, y: 240 } },
+    messageLine: { offset: { x: 20, y: 320 } }
   }
 
   static buttonOptions = {
-    top: 320,
-    leftTwo: 50,
+    top: 430,
+    leftTwo: 15,
     paddingLeft: 12,
-    twoPaddingLeft: 100,
+    twoPaddingLeft: 20,
     iconPaddingTop: 10,
     textPaddingTop: 16,
     widthLeft: 150,
@@ -369,8 +421,13 @@ export class SettingsModal extends Container {
     textColorHover: 0xffff00
   }
 
+  public audio!: Audio
+  public onClosed!: ISettingsModalOptions['onClosed']
+
   constructor (options: ISettingsModalOptions) {
     super()
+    this.audio = options.audio
+    this.onClosed = options.onClosed
     this.setup(options)
     this.draw(options)
   }
@@ -394,29 +451,49 @@ export class SettingsModal extends Container {
 
     const { voiceLine, shootLine, hitLine, messageLine } = SettingsModal.volumeLinesOptions
     this.voiceVolumeFormLine = new FormLine({
+      ...SettingsModal.textures,
+      volume: this.audio.voiceVolume,
       text: 'Voice volume',
-      ...SettingsModal.textures
+      onChanged: (volume: number) => {
+        this.audio.voiceVolume = volume
+        this.audio.playRandomVoice()
+      }
     })
     this.voiceVolumeFormLine.position.set(voiceLine.offset.x, voiceLine.offset.y)
     this.addChild(this.voiceVolumeFormLine)
 
     this.shootVolumeFormLine = new FormLine({
+      ...SettingsModal.textures,
+      volume: this.audio.shootVolume,
       text: 'Shoot volume',
-      ...SettingsModal.textures
+      onChanged: (volume: number) => {
+        this.audio.shootVolume = volume
+        this.audio.playRandomShoot()
+      }
     })
     this.shootVolumeFormLine.position.set(shootLine.offset.x, shootLine.offset.y)
     this.addChild(this.shootVolumeFormLine)
 
     this.hitVolumeFormLine = new FormLine({
+      ...SettingsModal.textures,
+      volume: this.audio.hitVolume,
       text: 'Hit volume',
-      ...SettingsModal.textures
+      onChanged: (volume: number) => {
+        this.audio.hitVolume = volume
+        this.audio.playRandomHit()
+      }
     })
     this.hitVolumeFormLine.position.set(hitLine.offset.x, hitLine.offset.y)
     this.addChild(this.hitVolumeFormLine)
 
     this.messageVolumeFormLine = new FormLine({
+      ...SettingsModal.textures,
+      volume: this.audio.messageVolume,
       text: 'Message volume',
-      ...SettingsModal.textures
+      onChanged: (volume: number) => {
+        this.audio.messageVolume = volume
+        this.audio.playRandomMessage()
+      }
     })
     this.messageVolumeFormLine.position.set(messageLine.offset.x, messageLine.offset.y)
     this.addChild(this.messageVolumeFormLine)
@@ -425,7 +502,7 @@ export class SettingsModal extends Container {
     this.addChild(this.buttons)
   }
 
-  draw ({ onApplyClick }: ISettingsModalOptions): void {
+  draw (_: ISettingsModalOptions): void {
     const {
       boxOptions: { width, height, backgroundColor, outerBorderWidth, outerBorderColor, borderRadius }
     } = SettingsModal
@@ -483,7 +560,9 @@ export class SettingsModal extends Container {
       initX: leftTwo,
       initY: top,
       onClick: () => {
+        this.audio.resetAll()
         this.hideModal()
+        this.onClosed()
       }
     })
     this.buttons.addChild(buttonLeft)
@@ -511,7 +590,11 @@ export class SettingsModal extends Container {
       buttonBorderWidth,
       initX: leftTwo + widthLeft + twoPaddingLeft,
       initY: top,
-      onClick: onApplyClick
+      onClick: () => {
+        this.audio.saveAll()
+        this.hideModal()
+        this.onClosed()
+      }
     })
     this.buttons.addChild(buttonRight)
     this.buttonRight = buttonRight
@@ -526,4 +609,43 @@ export class SettingsModal extends Container {
   }
 
   handleUpdate (deltaMS: number): void {}
+
+  handleResize ({ viewWidth, viewHeight }: {
+    viewWidth: number
+    viewHeight: number
+  }): void {
+    const availableWidth = viewWidth
+    const availableHeight = viewHeight
+    const { width: tWidth, height: tHeight } = SettingsModal.boxOptions
+    const totalWidth = tWidth
+    const totalHeight = tHeight
+    let scale = 1
+    if (totalHeight >= totalWidth) {
+      if (availableHeight < totalHeight) {
+        scale = availableHeight / totalHeight
+        if (scale * totalWidth > availableWidth) {
+          scale = availableWidth / totalWidth
+        }
+        logLayout(`Settings Modal by height (sc=${scale})`)
+      }
+    } else {
+      if (availableWidth < totalWidth) {
+        scale = availableWidth / totalWidth
+        if (scale * totalHeight > availableHeight) {
+          scale = availableHeight / totalHeight
+        }
+        logLayout(`Settings Modal by width (sc=${scale})`)
+      }
+    }
+    const occupiedWidth = Math.floor(totalWidth * scale)
+    const occupiedHeight = Math.floor(totalHeight * scale)
+    const x = availableWidth > occupiedWidth ? (availableWidth - occupiedWidth) / 2 : 0
+    const y = availableHeight > occupiedHeight ? (availableHeight - occupiedHeight) / 2 : 0
+    logLayout(`aw=${availableWidth} (ow=${occupiedWidth}) x=${x} ah=${availableHeight} (oh=${occupiedHeight}) y=${y}`)
+    this.x = x
+    this.width = occupiedWidth
+    this.y = y
+    this.height = occupiedHeight
+    logLayout(`x=${x} y=${y} w=${this.width} h=${this.height}`)
+  }
 }

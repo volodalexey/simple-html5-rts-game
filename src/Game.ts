@@ -11,7 +11,7 @@ import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
 import { EItemName, type EItemNames, EItemType } from './interfaces/IItem'
 import { type OrderTypes, type IOrder } from './interfaces/IOrder'
-import { AUDIO } from './audio'
+import { type Audio } from './utils/Audio'
 import { Bullet } from './projectiles/Bullet'
 import { CannonBall } from './projectiles/CannonBall'
 import { Laser } from './projectiles/Laser'
@@ -38,6 +38,7 @@ export interface IGameOptions {
   viewHeight: number
   type: 'campaign' | 'singleplayer' | 'multiplayer'
   team: Team
+  audio: Audio
 }
 
 class DragSelect extends Graphics {}
@@ -53,6 +54,7 @@ export class Game extends Container {
   }
 
   public ai?: AI
+  public audio!: Audio
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
   public speedAdjustmentWhileTurningFactor = 0.4
@@ -98,6 +100,7 @@ export class Game extends Container {
     this.viewHeight = options.viewHeight
     this.type = options.type
     this.team = options.team
+    this.audio = options.audio
     this.setup(options)
 
     this.prepareTextures()
@@ -981,37 +984,13 @@ export class Game extends Container {
         item.order = (order ?? unitOrder) as IOrder
         if (item.team === this.team) {
           if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
-            if (item.itemName === EItemName.SCV) {
-              AUDIO.play('scv-yes')
-            } else if (item.itemName === EItemName.Harvester) {
-              AUDIO.play('harvester-yes')
-            } else if (item.itemName === EItemName.ScoutTank) {
-              AUDIO.play('scout-tank-yes')
-            } else if (item.itemName === EItemName.HeavyTank) {
-              AUDIO.play('heavy-tank-yes')
-            } else if (item.itemName === EItemName.Chopper) {
-              AUDIO.play('chopper-yes')
-            } else if (item.itemName === EItemName.Wraith) {
-              AUDIO.play('wraith-yes')
-            } else {
-              AUDIO.play('acknowledge-moving')
-            }
+            this.audio.playYes(item.itemName)
           } else if (['attack', 'move-and-attack'].includes(item.order.type)) {
-            if (item.itemName === EItemName.ScoutTank) {
-              AUDIO.play('scout-tank-attack')
-            } else if (item.itemName === EItemName.HeavyTank) {
-              AUDIO.play('heavy-tank-attack')
-            } else if (item.itemName === EItemName.Chopper) {
-              AUDIO.play('chopper-attack')
-            } else if (item.itemName === EItemName.Wraith) {
-              AUDIO.play('wraith-attack')
-            } else {
-              AUDIO.play('acknowledge-attacking')
-            }
+            this.audio.playAttack(item.itemName)
           } else if (item.order.type === 'build') {
-            AUDIO.play('scv-yes')
+            this.audio.playYes(item.itemName)
           } else if (item.order.type === 'deploy') {
-            AUDIO.play('harvester-yes')
+            this.audio.playYes(item.itemName)
           }
         }
         if (toObject != null && (item.order.type === 'attack' || item.order.type === 'guard')) {
@@ -1025,9 +1004,9 @@ export class Game extends Container {
   showMessage ({ character, message, playSound = true, selfRemove = false }: { character: EMessageCharacter, message: string, playSound?: boolean, selfRemove?: boolean }): void {
     if (playSound) {
       if (selfRemove) {
-        AUDIO.play('message-error')
+        this.audio.playError()
       } else {
-        AUDIO.play('message-received')
+        this.audio.playMessage()
       }
     }
     this.topBar.statusBar.appendMessage({ character, message, time: this.time, selfRemove, height: TopBar.options.initHeight })

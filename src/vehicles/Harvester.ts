@@ -1,4 +1,3 @@
-import { AUDIO } from '../audio'
 import { OilDerrick } from '../buildings/OilDerrick'
 import { ECommandName } from '../interfaces/ICommand'
 import { wrapDirection, Team, angleDiff } from '../utils/common'
@@ -115,7 +114,7 @@ export class Harvester extends Vehicle {
             if (currentMapDeployableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
               // If oilfield has been used already, then cancel order
               if (this.team === this.game.team) {
-                AUDIO.play('harvester-error')
+                this.game.audio.playHarvesterError()
               }
               this.order = { type: 'stand' }
               return true
@@ -159,7 +158,7 @@ export class Harvester extends Vehicle {
           // Pathfinding couldn't find a path so stop
           if (!moving) {
             if (this.team === this.game.team) {
-              AUDIO.play('harvester-error')
+              this.game.audio.playHarvesterError()
             }
             this.order = { type: 'stand' }
           }

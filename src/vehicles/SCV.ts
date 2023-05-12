@@ -1,6 +1,5 @@
 import { ECommandName } from '../interfaces/ICommand'
 import { EMessageCharacter } from '../components/StatusBar'
-import { AUDIO } from '../audio'
 import { Team } from '../utils/common'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
@@ -133,7 +132,7 @@ export class SCV extends Vehicle {
           for (let x = buildableGrid[y].length - 1; x >= 0; x--) {
             if (currentMapBuildableGrid[Math.floor(toPoint.gridY) + y][Math.floor(toPoint.gridX) + x] === 1) {
               if (this.team === this.game.team) {
-                AUDIO.play('scv-error')
+                this.game.audio.playSCVError()
               }
               this.order = { type: 'stand' }
               return true
@@ -184,7 +183,7 @@ export class SCV extends Vehicle {
 
           if (!moving) {
             if (this.team === this.game.team) {
-              AUDIO.play('scv-error')
+              this.game.audio.playSCVError()
             }
             this.order = { type: 'stand' }
           }

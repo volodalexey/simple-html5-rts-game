@@ -1,4 +1,3 @@
-import { AUDIO } from '../audio'
 import { EItemName } from '../interfaces/IItem'
 import { Projectile, type IProjectileOptions, type IProjectileTextures } from './Projectile'
 
@@ -33,7 +32,7 @@ export class CannonBall extends Projectile {
 
     this.drawCollision()
     this.setPositionByXY({ x: options.initX, y: options.initY, center: true })
-    AUDIO.play('cannon-ball')
+    this.game.audio.playShoot('cannon-ball')
   }
 
   static prepareTextures ({
@@ -45,6 +44,6 @@ export class CannonBall extends Projectile {
   }
 
   playHitSound (): void {
-    AUDIO.play('cannon-hit')
+    this.game.audio.playHit('cannon-hit')
   }
 }

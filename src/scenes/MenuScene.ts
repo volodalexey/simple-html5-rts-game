@@ -9,6 +9,7 @@ import { VersusCPUScene } from './VersusCPUScene'
 import { Game } from '../Game'
 import { Team } from '../utils/common'
 import { SettingsModal } from '../components/SettingsModal'
+import { Audio } from '../utils/Audio'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -17,15 +18,18 @@ interface IMenuSceneSceneOptions {
   menuTexture: Texture
 }
 
+class Content extends Container {}
 class Choices extends Container<Button> {}
 class SettingsButton extends Button {}
 
 export class MenuScene extends Container implements IScene {
   public game!: Game
+  public audio = new Audio()
   public gravity = 0.7
   public gameEnded = false
 
   public background!: Sprite
+  public content = new Content()
   public choices = new Choices()
   public settingsButton!: SettingsButton
   public settingsModal!: SettingsModal
@@ -43,8 +47,8 @@ export class MenuScene extends Container implements IScene {
     },
     settingsButton: {
       offset: {
-        x: 550,
-        y: 400
+        x: 50,
+        y: 20
       }
     }
   }
@@ -71,20 +75,19 @@ export class MenuScene extends Container implements IScene {
   }
 
   setup ({ menuTexture }: IMenuSceneSceneOptions): void {
+    this.addChild(this.content)
+
     const background = new Sprite(menuTexture)
-    this.addChild(background)
+    this.content.addChild(background)
     this.background = background
 
-    this.addChild(this.choices)
+    this.content.addChild(this.choices)
 
     const { textures }: Spritesheet = Assets.get('spritesheet')
 
-    const { x, y } = MenuScene.options.settingsButton.offset
     this.settingsButton = new SettingsButton({
       text: '',
       textColor: 0xffffff,
-      initX: x,
-      initY: y,
       iconColor: 0xffffff,
       iconColorHover: 0xffff00,
       iconPaddingLeft: 10,
@@ -98,10 +101,11 @@ export class MenuScene extends Container implements IScene {
       buttonRadius: 10,
       iconTexture: textures['icon-gears.png'],
       onClick: () => {
+        this.disableInteractivity()
         this.settingsModal.showModal()
       }
     })
-    this.addChild(this.settingsButton)
+    this.content.addChild(this.settingsButton)
 
     SettingsModal.prepareTextures({
       textures: {
@@ -117,10 +121,13 @@ export class MenuScene extends Container implements IScene {
     })
 
     const settingsModal = new SettingsModal({
+      audio: this.audio,
       viewWidth: SceneManager.width,
       viewHeight: SceneManager.height,
       onHomeClick: () => { console.log('onHomeClick') },
-      onApplyClick: () => { console.log('onApplyClick') }
+      onClosed: () => {
+        this.enableInteractivity()
+      }
     })
     this.settingsModal = settingsModal
   }
@@ -133,8 +140,6 @@ export class MenuScene extends Container implements IScene {
 
   drawMainOptions = (): void => {
     this.clearFromAll()
-    const { mainOffset } = MenuScene.options.choices
-    this.choices.position.set(mainOffset.x, mainOffset.y)
 
     const style: IButtonOptions = {
       text: '',
@@ -165,8 +170,6 @@ export class MenuScene extends Container implements IScene {
 
   drawMissionOptions = (): void => {
     this.clearFromAll()
-    const { missionOffset } = MenuScene.options.choices
-    this.choices.position.set(missionOffset.x, missionOffset.y)
 
     const spritesheet: Spritesheet = Assets.get('spritesheet')
     const { textures } = spritesheet
@@ -239,14 +242,18 @@ export class MenuScene extends Container implements IScene {
     const x = availableWidth > occupiedWidth ? (availableWidth - occupiedWidth) / 2 : 0
     const y = availableHeight > occupiedHeight ? (availableHeight - occupiedHeight) / 2 : 0
     logLayout(`aw=${availableWidth} (ow=${occupiedWidth}) x=${x} ah=${availableHeight} (oh=${occupiedHeight}) y=${y}`)
-    this.x = x
-    this.width = occupiedWidth
-    this.y = y
-    this.height = occupiedHeight
+    this.content.x = x
+    this.background.width = occupiedWidth
+    this.content.y = y
+    this.background.height = occupiedHeight
     logLayout(`x=${x} y=${y} w=${this.width} h=${this.height}`)
-    const calcWidth = availableWidth > occupiedWidth ? occupiedWidth : availableWidth
-    const calcHeight = availableHeight > occupiedHeight ? occupiedHeight : availableHeight
-    this.settingsModal.position.set(calcWidth / 2 - this.settingsModal.width / 2, calcHeight / 2 - this.settingsModal.height / 2)
+    const { offset } = MenuScene.options.settingsButton
+    this.settingsButton.position.set(offset.x, offset.y * scale)
+    // const { missionOffset } = MenuScene.options.choices
+
+    const { mainOffset } = MenuScene.options.choices
+    this.choices.position.set(mainOffset.x, (tHeight - mainOffset.y) * scale)
+    this.settingsModal.handleResize({ viewWidth, viewHeight })
   }
 
   handleUpdate (deltaMS: number): void {}
@@ -257,7 +264,8 @@ export class MenuScene extends Container implements IScene {
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
         type: 'campaign',
-        team: Team.blue
+        team: Team.blue,
+        audio: this.audio
       })
     }
     SceneManager.changeScene({
@@ -279,7 +287,8 @@ export class MenuScene extends Container implements IScene {
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
         type: 'singleplayer',
-        team: Team.blue
+        team: Team.blue,
+        audio: this.audio
       })
     }
     SceneManager.changeScene({
@@ -297,5 +306,15 @@ export class MenuScene extends Container implements IScene {
   mountedHandler (): void {
     this.addChild(this.settingsModal)
     this.settingsModal.hideModal()
+  }
+
+  enableInteractivity (): void {
+    this.settingsButton.eventMode = 'static'
+    this.choices.interactiveChildren = true
+  }
+
+  disableInteractivity (): void {
+    this.settingsButton.eventMode = 'none'
+    this.choices.interactiveChildren = false
   }
 }
