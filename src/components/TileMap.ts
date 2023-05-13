@@ -354,18 +354,17 @@ export class TileMap extends Container {
   }
 
   itemUnderPointer (point: IPointData): BaseActiveItem | undefined {
-    // if (fog.isPointOverFog(mouse.gameX, mouse.gameY)) {
-    //   return;
-    // }
     const detect = (activeItem: BaseActiveItem): boolean => {
-      const itemBounds = activeItem.getCollisionBounds()
-      if (activeItem.isAlive() &&
-        point.x >= itemBounds.left &&
-        point.x <= itemBounds.right &&
-        point.y >= itemBounds.top &&
-        point.y <= itemBounds.bottom
-      ) {
-        return true
+      if (activeItem.renderable) {
+        const itemBounds = activeItem.getCollisionBounds()
+        if (activeItem.isAlive() &&
+          point.x >= itemBounds.left &&
+          point.x <= itemBounds.right &&
+          point.y >= itemBounds.top &&
+          point.y <= itemBounds.bottom
+        ) {
+          return true
+        }
       }
       return false
     }

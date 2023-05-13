@@ -377,7 +377,7 @@ export class Game extends Container {
       const bottom = endPoint.y
       const { moveableItems } = this.tileMap
       moveableItems.forEach((moveableItem) => {
-        if (!moveableItem.selectable || moveableItem.isDead()) {
+        if (!moveableItem.selectable || moveableItem.isDead() || !moveableItem.renderable) {
           return
         }
 
