@@ -32,6 +32,7 @@ import { CommandsBar } from './components/CommandsBar'
 import { ECommandName } from './interfaces/ICommand'
 import { SCV } from './vehicles/SCV'
 import { type AI } from './utils/AI'
+import { type SettingsModal } from './components/SettingsModal'
 
 export interface IGameOptions {
   viewWidth: number
@@ -39,6 +40,7 @@ export interface IGameOptions {
   type: 'campaign' | 'singleplayer' | 'multiplayer'
   team: Team
   audio: Audio
+  settingsModal: SettingsModal
 }
 
 class DragSelect extends Graphics {}
@@ -55,6 +57,7 @@ export class Game extends Container {
 
   public ai?: AI
   public audio!: Audio
+  public settingsModal!: SettingsModal
   public speedAdjustmentFactor = 1 / 512
   public turnSpeedAdjustmentFactor = 1 / 64
   public speedAdjustmentWhileTurningFactor = 0.4
@@ -101,6 +104,7 @@ export class Game extends Container {
     this.type = options.type
     this.team = options.team
     this.audio = options.audio
+    this.settingsModal = options.settingsModal
     this.setup(options)
 
     this.prepareTextures()
@@ -133,7 +137,12 @@ export class Game extends Container {
     this.addChild(this.topBar)
 
     this.sideBar = new SideBar({
-      game: this, viewWidth, initY: TopBar.options.initHeight
+      game: this,
+      viewWidth,
+      initY: TopBar.options.initHeight,
+      onSettingsClick: () => {
+        this.settingsModal.showModal(true)
+      }
     })
     this.addChild(this.sideBar)
 

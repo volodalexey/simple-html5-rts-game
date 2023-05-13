@@ -1,7 +1,7 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, Text, type Texture } from 'pixi.js'
 
 export interface IButtonOptions {
-  text: string
+  text?: string
   buttonWidth?: number
   buttonHeight?: number
   buttonRadius?: number
@@ -51,10 +51,14 @@ export interface IButtonOptions {
   flexDirection?: 'row' | 'col' | 'col-center'
 }
 
+class Border extends Graphics {}
+class Background extends Graphics {}
+class Icon extends Sprite {}
+
 export class Button extends Container {
-  public border!: Graphics
-  public background!: Graphics
-  public icon!: Sprite
+  public border!: Border
+  public background!: Background
+  public icon!: Icon
   public text!: Text
   public iconPaddingTop !: number
   public iconPaddingLeft !: number
@@ -161,15 +165,15 @@ export class Button extends Container {
     iconHeight,
     buttonBorderWidth = 0
   }: IButtonOptions): void {
-    const border = new Graphics()
+    const border = new Border()
     this.addChild(border)
     this.border = border
-    const background = new Graphics()
+    const background = new Background()
     this.addChild(background)
     this.background = background
     this.background.position.set(buttonBorderWidth, buttonBorderWidth)
     const { iconPaddingTop, iconPaddingLeft, textPaddingTop, textPaddingLeft, flexDirection } = this
-    const icon = new Sprite(iconTexture)
+    const icon = new Icon(iconTexture)
     icon.scale.set(iconScale)
     if (typeof iconWidth === 'number') {
       icon.width = iconWidth
@@ -192,6 +196,11 @@ export class Button extends Container {
       stroke: this.shadowTextColor,
       strokeThickness: this.shadowThickness
     })
+    if (typeof initText === 'string' && initText.length > 0) {
+      // do nothing with text
+    } else {
+      text.visible = false
+    }
     if (iconTexture != null) {
       if (flexDirection === 'row') {
         text.position.set(icon.x + icon.width + textPaddingLeft, textPaddingTop)

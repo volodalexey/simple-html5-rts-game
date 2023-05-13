@@ -2,6 +2,7 @@ import { Container, type FederatedPointerEvent, Graphics, type Texture, Text, ty
 import { Button } from './Button'
 import { logLayout } from '../utils/logger'
 import { type Audio } from '../utils/Audio'
+import { SceneManager } from '../scenes/SceneManager'
 
 class VolumeButton extends Button {}
 class Bar extends Graphics {}
@@ -340,6 +341,7 @@ class Buttons extends Container {}
 class ButtonLeft extends Button {}
 class ButtonRight extends Button {}
 class HeaderText extends Text {}
+class HomeButton extends Button {}
 
 export class SettingsModal extends Container {
   static textures: ISettingsModalTextures
@@ -357,6 +359,7 @@ export class SettingsModal extends Container {
 
   public modalBox!: ModalBox
   public headerText!: HeaderText
+  public homeButton!: HomeButton
   public voiceVolumeFormLine!: FormLine
   public shootVolumeFormLine!: FormLine
   public hitVolumeFormLine!: FormLine
@@ -371,6 +374,16 @@ export class SettingsModal extends Container {
     width: 350,
     height: 500,
     borderRadius: 5
+  }
+
+  static homeButtonOptions = {
+    offset: { x: 0, y: 0 },
+    iconColor: 0xffffff,
+    iconColorHover: 0xffff00,
+    iconScale: 0.7,
+    buttonIdleAlpha: 0,
+    buttonHoverAlpha: 0,
+    buttonSelectedAlpha: 0
   }
 
   static headerTextOptions = {
@@ -435,6 +448,17 @@ export class SettingsModal extends Container {
   setup (_: ISettingsModalOptions): void {
     this.modalBox = new ModalBox()
     this.addChild(this.modalBox)
+
+    const { homeButtonOptions } = SettingsModal
+    this.homeButton = new HomeButton({
+      iconTexture: SettingsModal.textures.iconHomeTexture,
+      ...homeButtonOptions,
+      onClick: () => {
+        SceneManager.changeScene({ name: 'menu' }).catch(console.error)
+      }
+    })
+    this.homeButton.position.set(homeButtonOptions.offset.x, homeButtonOptions.offset.y)
+    this.addChild(this.homeButton)
 
     const { fontFamily, fontSize, fontWeight, fill, align, shadowTextColor, shadowThickness, offset } = SettingsModal.headerTextOptions
     this.headerText = new HeaderText('Settings', {
@@ -600,7 +624,8 @@ export class SettingsModal extends Container {
     this.buttonRight = buttonRight
   }
 
-  showModal (): void {
+  showModal (showHome: boolean): void {
+    this.homeButton.visible = showHome
     this.visible = true
   }
 

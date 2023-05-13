@@ -10,6 +10,7 @@ import { Game } from '../Game'
 import { Team } from '../utils/common'
 import { SettingsModal } from '../components/SettingsModal'
 import { Audio } from '../utils/Audio'
+import { SideBar } from '../components/SideBar'
 
 interface IMenuSceneSceneOptions {
   app: Application
@@ -102,7 +103,7 @@ export class MenuScene extends Container implements IScene {
       iconTexture: textures['icon-gears.png'],
       onClick: () => {
         this.disableInteractivity()
-        this.settingsModal.showModal()
+        this.settingsModal.showModal(false)
       }
     })
     this.content.addChild(this.settingsButton)
@@ -116,6 +117,12 @@ export class MenuScene extends Container implements IScene {
         iconVolumeHighTexture: textures['icon-volume-high.png'],
         iconCircleXMarkTexture: textures['icon-circle-xmark.png'],
         iconCircleCheckTexture: textures['icon-circle-check.png'],
+        iconGearsTexture: textures['icon-gears.png']
+      }
+    })
+
+    SideBar.prepareTextures({
+      textures: {
         iconGearsTexture: textures['icon-gears.png']
       }
     })
@@ -265,7 +272,8 @@ export class MenuScene extends Container implements IScene {
         viewHeight: SceneManager.height,
         type: 'campaign',
         team: Team.blue,
-        audio: this.audio
+        audio: this.audio,
+        settingsModal: this.settingsModal
       })
     }
     SceneManager.changeScene({
@@ -273,6 +281,7 @@ export class MenuScene extends Container implements IScene {
       newScene: new CampaignScene({
         app: SceneManager.app,
         game: this.game,
+        settingsModal: this.settingsModal,
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
         missionIdx
@@ -288,7 +297,8 @@ export class MenuScene extends Container implements IScene {
         viewHeight: SceneManager.height,
         type: 'singleplayer',
         team: Team.blue,
-        audio: this.audio
+        audio: this.audio,
+        settingsModal: this.settingsModal
       })
     }
     SceneManager.changeScene({
@@ -296,6 +306,7 @@ export class MenuScene extends Container implements IScene {
       newScene: new VersusCPUScene({
         app: SceneManager.app,
         game: this.game,
+        settingsModal: this.settingsModal,
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height
       }),
@@ -306,6 +317,7 @@ export class MenuScene extends Container implements IScene {
   mountedHandler (): void {
     this.addChild(this.settingsModal)
     this.settingsModal.hideModal()
+    this.enableInteractivity()
   }
 
   enableInteractivity (): void {

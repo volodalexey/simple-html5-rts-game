@@ -17,6 +17,7 @@ import { AI } from '../utils/AI'
 import { logCash } from '../utils/logger'
 import { GroundTurret } from '../buildings/GroundTurret'
 import { SCV } from '../vehicles/SCV'
+import { type SettingsModal } from '../components/SettingsModal'
 
 interface IMissionItem {
   name: EItemNames
@@ -50,6 +51,7 @@ interface IMission {
 interface ICampaignSceneOptions {
   app: Application
   game: Game
+  settingsModal: SettingsModal
   viewWidth: number
   viewHeight: number
   missionIdx?: number
@@ -57,6 +59,7 @@ interface ICampaignSceneOptions {
 
 export class CampaignScene extends Container implements IScene {
   public game!: Game
+  public settingsModal!: SettingsModal
   public missions: IMission[] = []
   static options = {
     startMission: 0
@@ -71,6 +74,7 @@ export class CampaignScene extends Container implements IScene {
       this.currentMissionIdx = options.missionIdx
     }
 
+    this.settingsModal = options.settingsModal
     this.setup(options)
   }
 
@@ -87,6 +91,7 @@ export class CampaignScene extends Container implements IScene {
     viewHeight: number
   }): void {
     this.game.handleResize(options)
+    this.settingsModal.handleResize(options)
   }
 
   handleUpdate (deltaMS: number): void {
@@ -126,6 +131,7 @@ export class CampaignScene extends Container implements IScene {
 
   mountedHandler (): void {
     this.addChild(this.game)
+    this.addChild(this.settingsModal)
     this.prepareMissions()
     this.startCurrentLevel()
   }

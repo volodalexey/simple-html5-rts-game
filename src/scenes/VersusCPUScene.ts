@@ -7,20 +7,24 @@ import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, ha
 import { EItemName } from '../interfaces/IItem'
 import { AI } from '../utils/AI'
 import { logCash } from '../utils/logger'
+import { type SettingsModal } from '../components/SettingsModal'
 
 interface IVersusCPUSceneOptions {
   app: Application
   game: Game
+  settingsModal: SettingsModal
   viewWidth: number
   viewHeight: number
 }
 
 export class VersusCPUScene extends Container implements IScene {
   public game!: Game
+  public settingsModal!: SettingsModal
   public triggers: Trigger[] = []
 
   constructor (options: IVersusCPUSceneOptions) {
     super()
+    this.settingsModal = options.settingsModal
     this.setup(options)
   }
 
@@ -37,6 +41,7 @@ export class VersusCPUScene extends Container implements IScene {
     viewHeight: number
   }): void {
     this.game.handleResize(options)
+    this.settingsModal.handleResize(options)
   }
 
   handleUpdate (deltaMS: number): void {
@@ -103,6 +108,7 @@ export class VersusCPUScene extends Container implements IScene {
 
   mountedHandler (): void {
     this.addChild(this.game)
+    this.addChild(this.settingsModal)
     this.start()
   }
 

@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js'
+import { Container, Graphics, type Texture } from 'pixi.js'
 import { type Game } from '../Game'
 import { CommandsBar } from './CommandsBar'
 import { type SelectableItem } from '../utils/common'
@@ -7,24 +7,43 @@ import { Button } from './Button'
 
 interface ISideBarOptions {
   game: Game
+  onSettingsClick: () => void
   viewWidth: number
   initY?: number
   align?: 'left' | 'right'
 }
 
+interface ISideBarTextures {
+  iconGearsTexture: Texture
+}
+
+class StaticContent extends Container {}
+class HideableContent extends Container {}
+class ContentMask extends Graphics {}
+class SettingsButton extends Button {}
+class ToggleButton extends Button {}
+
 export class SideBar extends Container {
+  static textures: ISideBarTextures
+
+  static prepareTextures ({ textures }: { textures: ISideBarTextures }): void {
+    SideBar.textures = textures
+  }
+
   public toX = 0
   public toOpen = false
   public toClose = false
   public opened = false
   public closed = true
   public game!: Game
+  public onSettingsClick!: ISideBarOptions['onSettingsClick']
   public align!: ISideBarOptions['align']
-  public staticContent!: Container
-  public toggleButton!: Button
-  public hideableContent!: Container
+  public staticContent!: StaticContent
+  public settingsButton!: SettingsButton
+  public toggleButton!: ToggleButton
+  public hideableContent!: HideableContent
   public commandsBar!: CommandsBar
-  public contentMask!: Graphics
+  public contentMask!: ContentMask
   public viewWidth!: number
 
   static options = {
@@ -35,6 +54,7 @@ export class SideBar extends Container {
   constructor (options: ISideBarOptions) {
     super()
     this.game = options.game
+    this.onSettingsClick = options.onSettingsClick
     this.viewWidth = options.viewWidth
     this.align = options.align ?? 'left'
     this.setup(options)
@@ -43,13 +63,14 @@ export class SideBar extends Container {
     this.drawMask()
 
     this.setAlignment()
+    this.setStaticContentAlignment()
   }
 
   setup (options: ISideBarOptions): void {
-    this.staticContent = new Container()
+    this.staticContent = new StaticContent()
     this.addChild(this.staticContent)
 
-    this.hideableContent = new Container()
+    this.hideableContent = new HideableContent()
     this.addChild(this.hideableContent)
 
     this.commandsBar = new CommandsBar({
@@ -57,7 +78,7 @@ export class SideBar extends Container {
     })
     this.hideableContent.addChild(this.commandsBar)
 
-    this.contentMask = new Graphics()
+    this.contentMask = new ContentMask()
 
     this.addChild(this.contentMask)
 
@@ -69,24 +90,38 @@ export class SideBar extends Container {
   setAlignment (): void {
     if (this.align === 'left') {
       this.position.x = 0
+      this.settingsButton.position.x = 0
+      this.toggleButton.position.x = this.settingsButton.width
     } else {
       this.position.x = this.viewWidth - this.width
+      this.settingsButton.position.x = -this.settingsButton.width
+      this.toggleButton.position.x = this.settingsButton.position.x - this.toggleButton.width
+    }
+  }
+
+  setStaticContentAlignment (): void {
+    if (this.align === 'left') {
+      this.settingsButton.position.x = 0
+      this.toggleButton.position.x = this.settingsButton.width
+    } else {
+      this.toggleButton.position.x = 0
+      this.settingsButton.position.x = this.toggleButton.width
     }
   }
 
   setHideableContentPosition (): void {
     if (this.closed) {
       if (this.align === 'left') {
-        this.hideableContent.position.x = -this.width
+        this.hideableContent.position.x = -this.hideableContent.width
       } else {
         this.hideableContent.position.x = this.width
       }
       logSideBar(`closed hideable-${this.align} ${this.hideableContent.position.x}`)
     } else if (this.opened) {
       if (this.align === 'left') {
-        this.hideableContent.position.x = this.width > this.hideableContent.width ? this.width - this.hideableContent.width : 0
-      } else {
         this.hideableContent.position.x = 0
+      } else {
+        this.hideableContent.position.x = this.width - this.hideableContent.width
       }
       logSideBar(`opened hideable-${this.align} ${this.hideableContent.position.x}`)
     }
@@ -95,14 +130,14 @@ export class SideBar extends Container {
   calcHideableContentPosition ({ forceOpen = false, forceClose = false }: { forceOpen?: boolean, forceClose?: boolean } = {}): void {
     if (forceOpen) {
       if (this.align === 'left') {
-        this.toX = this.width > this.hideableContent.width ? this.width - this.hideableContent.width : 0
-      } else {
         this.toX = 0
+      } else {
+        this.toX = this.width - this.hideableContent.width
       }
       logSideBar(`force open hideable-${this.align} toX=${this.toX}`)
     } else if (forceClose) {
       if (this.align === 'left') {
-        this.toX = -this.width
+        this.toX = -this.hideableContent.width
       } else {
         this.toX = this.width
       }
@@ -115,7 +150,27 @@ export class SideBar extends Container {
   }
 
   drawStaticContent (): void {
-    this.toggleButton = new Button({
+    this.settingsButton = new SettingsButton({
+      textColor: 0xffffff,
+      iconColor: 0xffffff,
+      iconColorHover: 0xffff00,
+      iconPaddingLeft: 5,
+      iconPaddingTop: 7,
+      buttonHeight: 60,
+      buttonWidth: 63,
+      buttonIdleColor: 0x454545,
+      buttonBorderColor: 0x181716,
+      buttonBorderHoverColor: 0xffff00,
+      buttonBorderWidth: 2,
+      textPaddingLeft: 0,
+      textPaddingTop: 0,
+      iconTexture: SideBar.textures.iconGearsTexture,
+      iconWidth: 50,
+      iconHeight: 40,
+      onClick: this.onSettingsClick
+    })
+    this.staticContent.addChild(this.settingsButton)
+    this.toggleButton = new ToggleButton({
       text: this.getToggleText(),
       fontSize: 16,
       textColor: 0xffffff,
@@ -130,8 +185,12 @@ export class SideBar extends Container {
       buttonBorderWidth: 2,
       buttonBorderColor: 0x181716,
       onClick: () => {
+        if (this.game.gameEnded) {
+          return
+        }
         this.align = this.align === 'left' ? 'right' : 'left'
         this.setAlignment()
+        this.setStaticContentAlignment()
         this.setHideableContentPosition()
         this.calcHideableContentPosition({ forceOpen: this.toOpen, forceClose: this.toClose })
       }
@@ -157,6 +216,7 @@ export class SideBar extends Container {
   }): void {
     this.viewWidth = viewWidth
     this.position.y = initY
+    this.setStaticContentAlignment()
   }
 
   handleUpdate (deltaMS: number): void {
