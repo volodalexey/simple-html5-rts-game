@@ -9,7 +9,8 @@ import { EItemName } from '../interfaces/IItem'
 import { logCash, logLayout } from '../utils/logger'
 import { type SettingsModal } from '../components/SettingsModal'
 import { Input } from '../components/Input'
-import { Button } from '../components/Button'
+import { Button, type IButtonOptions } from '../components/Button'
+import { type IGameRoomRes, type ClientToServerEvents, type ServerToClientEvents } from '../socket.types'
 
 interface IMultiplayerSceneOptions {
   app: Application
@@ -24,6 +25,8 @@ class Box extends Graphics {}
 class HeaderText extends Text {}
 class URLLabelText extends Text {}
 class HomeButton extends Button {}
+class RoomsListHeader extends Text {}
+class RoomsList extends Container<Button> {}
 
 export class MultiplayerScene extends Container implements IScene {
   public game!: Game
@@ -35,7 +38,9 @@ export class MultiplayerScene extends Container implements IScene {
   public urlLabelText!: URLLabelText
   public homeButton!: HomeButton
   public input!: Input
-  public socket?: Socket
+  public roomsListHeader!: RoomsListHeader
+  public roomsList = new RoomsList()
+  public socket?: Socket<ServerToClientEvents, ClientToServerEvents>
   public socketConnected = false
   static wsURLKey = 'wsURLKey'
   static boxOptions = {
@@ -91,6 +96,37 @@ export class MultiplayerScene extends Container implements IScene {
     },
     height: 22,
     width: 300
+  }
+
+  static roomsHeaderOptions = {
+    fontFamily: "'Courier New', Courier, monospace",
+    fontSize: 16,
+    fill: 0xffffff,
+    align: 'center' as TextStyleAlign,
+    shadowTextColor: 0x800080,
+    shadowThickness: 1,
+    offset: {
+      x: 25,
+      y: 150
+    }
+  }
+
+  static roomsListOptions = {
+    offset: {
+      x: 25,
+      y: 180
+    },
+    height: 22,
+    width: 300,
+    buttonStyle: {
+      text: '',
+      fontSize: 20,
+      textColor: 0x111111,
+      textColorHover: 0xffff00,
+      buttonIdleColor: 0xb3b3b3,
+      buttonSelectedColor: 0xb3b3b3,
+      buttonHoverColor: 0xb3b3b3
+    } satisfies IButtonOptions
   }
 
   constructor (options: IMultiplayerSceneOptions) {
@@ -150,16 +186,13 @@ export class MultiplayerScene extends Container implements IScene {
     this.headerText.position.set(headerTextOptions.offset.x, headerTextOptions.offset.y)
     this.content.addChild(this.headerText)
 
-    const { fontFamily, fontSize, fill, align, shadowTextColor, shadowThickness, offset } = MultiplayerScene.urlTextOptions
+    const { urlTextOptions } = MultiplayerScene
     this.urlLabelText = new URLLabelText('Web socket server url:', {
-      fontFamily,
-      fontSize,
-      fill,
-      align,
-      stroke: shadowTextColor,
-      strokeThickness: shadowThickness
+      ...urlTextOptions,
+      stroke: urlTextOptions.shadowTextColor,
+      strokeThickness: urlTextOptions.shadowThickness
     })
-    this.urlLabelText.position.set(offset.x, offset.y)
+    this.urlLabelText.position.set(urlTextOptions.offset.x, urlTextOptions.offset.y)
     this.content.addChild(this.urlLabelText)
 
     const { urlInputOptions } = MultiplayerScene
@@ -174,6 +207,19 @@ export class MultiplayerScene extends Container implements IScene {
     })
     this.input.position.set(urlInputOptions.offset.x, urlInputOptions.offset.y)
     this.content.addChild(this.input)
+
+    const { roomsHeaderOptions } = MultiplayerScene
+    this.roomsListHeader = new RoomsListHeader('Rooms:', {
+      ...roomsHeaderOptions,
+      stroke: roomsHeaderOptions.shadowTextColor,
+      strokeThickness: roomsHeaderOptions.shadowThickness
+    })
+    this.roomsListHeader.position.set(roomsHeaderOptions.offset.x, roomsHeaderOptions.offset.y)
+    this.content.addChild(this.roomsListHeader)
+
+    const { roomsListOptions } = MultiplayerScene
+    this.roomsList.position.set(roomsListOptions.offset.x, roomsListOptions.offset.y)
+    this.content.addChild(this.roomsList)
   }
 
   handleResize (options: {
@@ -182,6 +228,7 @@ export class MultiplayerScene extends Container implements IScene {
   }): void {
     if (this.content.visible) {
       this.resizeBox(options)
+      this.input.handleResize()
     } else {
       this.game.handleResize(options)
     }
@@ -318,16 +365,18 @@ export class MultiplayerScene extends Container implements IScene {
     this.headerText.text = 'Connecting...'
     this.socket = io(this.input.text.text)
     this.socket.once('connect', this.onSocketConnect)
+    this.socket.on('latency_ping', () => {
+      this.socket?.emit('latency_pong')
+    })
+    this.socket.on('room_list', ({ list }) => {
+      this.renderRoomsList(list)
+    })
     this.socket.io.once('error', this.onSocketError)
   }
 
   onSocketConnect = (): void => {
     this.socketConnected = true
     this.headerText.text = 'Connected'
-  }
-
-  onWSMessage = (e: MessageEvent): void => {
-
   }
 
   onSocketError = (e: Error): void => {
@@ -341,5 +390,23 @@ export class MultiplayerScene extends Container implements IScene {
     this.input.blur()
     this.closeSocket()
     SceneManager.changeScene({ name: 'menu' }).catch(console.error)
+  }
+
+  renderRoomsList (rooms: IGameRoomRes[]): void {
+    while (this.roomsList.children.length > 0) {
+      this.roomsList.children[0].removeFromParent()
+    }
+    const { buttonStyle } = MultiplayerScene.roomsListOptions
+    for (const room of rooms) {
+      const roomButton = new Button({
+        onClick: () => {
+          console.log(room)
+        },
+        ...buttonStyle,
+        text: `Room [${room.roomId}] (${room.status})`
+      })
+      roomButton.position.set(0, this.roomsList.height)
+      this.roomsList.addChild(roomButton)
+    }
   }
 }

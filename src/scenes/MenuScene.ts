@@ -264,11 +264,9 @@ export class MenuScene extends Container implements IScene {
     this.background.height = occupiedHeight
     logLayout(`x=${x} y=${y} w=${this.width} h=${this.height}`)
     const { offset } = MenuScene.options.settingsButton
-    this.settingsButton.position.set(offset.x, offset.y * scale)
-    // const { missionOffset } = MenuScene.options.choices
-
+    this.settingsButton.position.set(offset.x * scale, offset.y * scale)
     const { mainOffset } = MenuScene.options.choices
-    this.choices.position.set(mainOffset.x, (tHeight - mainOffset.y) * scale)
+    this.choices.position.set(mainOffset.x * scale, (tHeight - mainOffset.y) * scale)
     this.settingsModal.handleResize({ viewWidth, viewHeight })
   }
 

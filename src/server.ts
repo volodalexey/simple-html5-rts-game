@@ -1,7 +1,7 @@
 
 import { createServer } from 'http'
-import { Server } from 'socket.io'
-import { type ClientToServerEvents, type InterServerEvents, type ServerToClientEvents, type SocketData } from './socket.types'
+import { Server, type Socket } from 'socket.io'
+import { type IGameRoom, type ClientToServerEvents, type InterServerEvents, type ServerToClientEvents, type SocketData, type IGameRoomRes } from './socket.types'
 
 const httpServer = createServer()
 const io = new Server<
@@ -21,36 +21,41 @@ httpServer.listen(port)
 httpServer.on('listening', () => {
   console.log(`Server has started listening on port ${port}`)
 })
-// httpServer.on('request', (req, res) => {
-//   console.log(req.method, req.url)
-//   const headers = {
-//     'Access-Control-Allow-Origin': '*',
-//     'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
-//     'Access-Control-Max-Age': 2592000 // 30 days
-//   }
-//   res.writeHead(200, headers)
-//   res.end()
-// })
 
-// const players = []
+interface ILatency {
+  start: number
+  end?: number
+  roundTrip?: number
+}
+
+interface IPlayer {
+  socket: Socket
+  averageLatency: number
+  tickLag: number
+  latencyTrips: ILatency[]
+}
+
+const players: IPlayer[] = []
 
 io.on('connection', socket => {
   console.log('Client connection', socket.client.conn.remoteAddress)
 
-  // const player = {
-  //   connection,
-  //   latencyTrips: []
-  // }
+  const player: IPlayer = {
+    socket,
+    averageLatency: 0,
+    tickLag: 0,
+    latencyTrips: []
+  }
   // Add the player to the players array
 
-  // players.push(player)
-/*
+  players.push(player)
+
   // Measure latency for player
   measureLatency(player)
 
   // Send a fresh game room status list the first time player connects
-  sendRoomList(connection)
-
+  sendRoomsList(player)
+/*
   // On Message event handler for a connection
   connection.on('message', function (message) {
     if (message.type === 'utf8') {
@@ -126,12 +131,6 @@ io.on('connection', socket => {
   }) */
 })
 
-interface IGameRoom {
-  status: 'empty'
-  players: number[]
-  roomId: number
-}
-
 // Initialize a set of rooms
 const gameRooms: IGameRoom[] = []
 for (let i = 0; i < 1; i++) {
@@ -139,15 +138,6 @@ for (let i = 0; i < 1; i++) {
 };
 
 /*
-function sendRoomList (connection) {
-  const status = []
-  for (let i = 0; i < gameRooms.length; i++) {
-    status.push(gameRooms[i].status)
-  };
-  const clientMessage = { type: 'room_list', status }
-  connection.send(JSON.stringify(clientMessage))
-}
-
 function sendRoomListToEveryone () {
   // Notify all connected players of the room status changes
   const status = []
@@ -255,26 +245,6 @@ function sendRoomWebSocketMessage (room, messageObject) {
     room.players[i].connection.send(messageString)
   };
 }
-
-function measureLatency (player) {
-  const connection = player.connection
-  const measurement = { start: Date.now() }
-  player.latencyTrips.push(measurement)
-  const clientMessage = { type: 'latency_ping' }
-  connection.send(JSON.stringify(clientMessage))
-}
-function finishMeasuringLatency (player, clientMessage) {
-  const measurement = player.latencyTrips[player.latencyTrips.length - 1]
-  measurement.end = Date.now()
-  measurement.roundTrip = measurement.end - measurement.start
-  player.averageLatency = 0
-  for (let i = 0; i < player.latencyTrips.length; i++) {
-    player.averageLatency += measurement.roundTrip / 2
-  };
-  player.averageLatency = player.averageLatency / player.latencyTrips.length
-  player.tickLag = Math.round(player.averageLatency * 2 / 100) + 1
-  console.log('Measuring Latency for player. Attempt', player.latencyTrips.length, '- Average Latency:', player.averageLatency, 'Tick Lag:', player.tickLag)
-}
 function endGame (room, reason) {
   clearInterval(room.interval)
   room.status = 'empty'
@@ -285,3 +255,38 @@ function endGame (room, reason) {
   sendRoomListToEveryone()
 }
 */
+
+function measureLatency (player: IPlayer): void {
+  const { socket } = player
+  const measurement: ILatency = { start: Date.now() }
+  player.latencyTrips.push(measurement)
+  socket.once('latency_pong', () => {
+    finishMeasuringLatency(player)
+    // Measure latency atleast thrice
+    if (player.latencyTrips.length < 3) {
+      measureLatency(player)
+    }
+  })
+  socket.emit('latency_ping')
+}
+
+function finishMeasuringLatency (player: IPlayer): void {
+  const measurement = player.latencyTrips[player.latencyTrips.length - 1]
+  measurement.end = Date.now()
+  measurement.roundTrip = measurement.end - measurement.start
+  player.averageLatency = 0
+  for (let i = 0; i < player.latencyTrips.length; i++) {
+    player.averageLatency += measurement.roundTrip / 2
+  };
+  player.averageLatency = player.averageLatency / player.latencyTrips.length
+  player.tickLag = Math.round(player.averageLatency * 2 / 100) + 1
+  console.log(`Measuring Latency for player. Attempt ${player.latencyTrips.length} - Average Latency: ${player.averageLatency} Tick Lag: ${player.tickLag}`)
+}
+
+function sendRoomsList (player: IPlayer): void {
+  const list: IGameRoomRes[] = []
+  for (const gameRoom of gameRooms) {
+    list.push({ status: gameRoom.status, roomId: gameRoom.roomId })
+  };
+  player.socket.emit('room_list', { list })
+}

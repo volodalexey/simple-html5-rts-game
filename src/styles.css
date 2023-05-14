@@ -24,6 +24,9 @@ canvas {
 }
 
 .dom-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   position: absolute;
   font-family: 'Courier New', Courier, monospace;
   font-size: 16px;

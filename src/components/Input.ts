@@ -38,7 +38,7 @@ export class Input extends Graphics {
   setup ({ initValue }: IInputOptions): void {
     this.addChild(this.text)
     const { textOptions } = this
-    this.text.position.set(this.boxOptions.outerBorderWidth + textOptions.offset.x, this.boxOptions.outerBorderWidth + textOptions.offset.y - 1)
+    this.text.position.set(this.boxOptions.outerBorderWidth + textOptions.offset.x, this.boxOptions.outerBorderWidth + textOptions.offset.y)
     this.text.text = initValue ?? ''
   }
 
@@ -111,5 +111,15 @@ export class Input extends Graphics {
       domForm.classList.add('hidden')
     }
     this.onChanged(this.text.text)
+  }
+
+  handleResize (): void {
+    const domForm = document.querySelector<HTMLFormElement>('form')
+    const domInput = document.querySelector<HTMLInputElement>('.dom-input')
+    if (domInput != null && domForm != null && !domForm.classList.contains('hidden')) {
+      const globalPosition = this.getGlobalPosition()
+      domInput.style.top = `${globalPosition.y}px`
+      domInput.style.left = `${globalPosition.x}px`
+    }
   }
 }

@@ -1,11 +1,18 @@
+export interface IGameRoom {
+  status: 'empty'
+  players: number[]
+  roomId: number
+}
+
+export type IGameRoomRes = Omit<IGameRoom, 'players'>
+
 export interface ServerToClientEvents {
-  noArg: () => void
-  basicEmit: (a: number, b: string, c: Buffer) => void
-  withAck: (d: string, callback: (e: number) => void) => void
+  latency_ping: () => void
+  room_list: ({ list }: { list: IGameRoomRes[] }) => void
 }
 
 export interface ClientToServerEvents {
-  hello: () => void
+  latency_pong: () => void
 }
 
 export interface InterServerEvents {
