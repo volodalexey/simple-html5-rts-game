@@ -6,6 +6,7 @@ import { TileMap } from '../components/TileMap'
 import { CampaignScene } from './CampaignScene'
 import { StatusBar } from '../components/StatusBar'
 import { VersusCPUScene } from './VersusCPUScene'
+// import { MultiplayerScene } from './MultiplayerScene'
 import { Game } from '../Game'
 import { Team } from '../utils/common'
 import { SettingsModal } from '../components/SettingsModal'
@@ -172,7 +173,15 @@ export class MenuScene extends Container implements IScene {
       text: 'Versus CPU'
     })
     this.choices.addChild(vsCPUButton)
-    vsCPUButton.position.set(0, campaignButton.height)
+    vsCPUButton.position.set(0, campaignButton.y + campaignButton.height)
+
+    const multiplayerButton = new Button({
+      onClick: this.goToMultiplayerScene,
+      ...style,
+      text: 'Multiplayer'
+    })
+    this.choices.addChild(multiplayerButton)
+    multiplayerButton.position.set(0, vsCPUButton.y + vsCPUButton.height)
   }
 
   drawMissionOptions = (): void => {
@@ -312,6 +321,33 @@ export class MenuScene extends Container implements IScene {
       }),
       initialResize: false
     }).catch(console.error)
+  }
+
+  goToMultiplayerScene = (): void => {
+    if (this.game == null) {
+      this.game = new Game({
+        viewWidth: SceneManager.width,
+        viewHeight: SceneManager.height,
+        type: 'multiplayer',
+        team: Team.blue,
+        audio: this.audio,
+        settingsModal: this.settingsModal
+      })
+    }
+    import('./MultiplayerScene').then(async ({ MultiplayerScene }) => {
+      await SceneManager.changeScene({
+        name: 'multiplayer',
+        newScene: new MultiplayerScene({
+          app: SceneManager.app,
+          game: this.game,
+          settingsModal: this.settingsModal,
+          viewWidth: SceneManager.width,
+          viewHeight: SceneManager.height
+        }),
+        initialResize: false
+      })
+    })
+      .catch(console.error)
   }
 
   mountedHandler (): void {
