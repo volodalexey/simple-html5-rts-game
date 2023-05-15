@@ -80,7 +80,9 @@ export class VersusCPUScene extends Container implements IScene {
       mapImageSrc: 'level2Background',
       mapSettingsSrc: 'level2Settings',
       startGridX: 2,
-      startGridY: 37
+      startGridY: 37,
+      team: Team.blue,
+      type: 'singleplayer'
     });
 
     [

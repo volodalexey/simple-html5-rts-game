@@ -37,19 +37,20 @@ import { type SettingsModal } from './components/SettingsModal'
 export interface IGameOptions {
   viewWidth: number
   viewHeight: number
-  type: 'campaign' | 'singleplayer' | 'multiplayer'
-  team: Team
   audio: Audio
   settingsModal: SettingsModal
+  serializeOrders?: (options: { uids: number[], order: IOrder }) => void
 }
 
+type GameType = 'campaign' | 'singleplayer' | 'multiplayer'
 class DragSelect extends Graphics {}
 
 export class Game extends Container {
   public gameEnded = false
   public time = 0
-  public type!: IGameOptions['type']
-  public team!: IGameOptions['team']
+  public type!: GameType
+  public serializeOrders?: IGameOptions['serializeOrders']
+  public team!: Team
   public cash = {
     [Team.blue]: 0,
     [Team.green]: 0
@@ -101,8 +102,6 @@ export class Game extends Container {
     super()
     this.viewWidth = options.viewWidth
     this.viewHeight = options.viewHeight
-    this.type = options.type
-    this.team = options.team
     this.audio = options.audio
     this.settingsModal = options.settingsModal
     this.setup(options)
@@ -199,7 +198,7 @@ export class Game extends Container {
   }
 
   handleItemPointerTap ({ selectedCommandName, underPointerItem }: { selectedCommandName?: ECommandName, underPointerItem: BaseActiveItem }): void {
-    const uids: number[] = []
+    const items: BaseActiveItem[] = []
     let order: IOrder | undefined
     switch (selectedCommandName) {
       case ECommandName.moveFollow:
@@ -224,11 +223,11 @@ export class Game extends Container {
           const item = this.selectedItems[i]
           if (item.team === this.team && underPointerItem !== item &&
           item.commands.includes(selectedCommandName)) {
-            uids.push(item.uid)
+            items.push(item as BaseActiveItem)
           }
         }
-        if (uids.length > 0) {
-          this.processOrder({ uids, order })
+        if (items.length > 0) {
+          this.processOrder({ items, order })
         }
       } else {
         this.clearSelection()
@@ -246,11 +245,11 @@ export class Game extends Container {
           const item = this.selectedItems[i]
           if (item.team === this.team && underPointerItem !== item &&
             item.commands.includes(selectedCommandName)) {
-            uids.push(item.uid)
+            items.push(item as BaseActiveItem)
           }
         }
-        if (uids.length > 0) {
-          this.processOrder({ uids, order })
+        if (items.length > 0) {
+          this.processOrder({ items, order })
         }
       } else {
         this.clearSelection()
@@ -260,7 +259,7 @@ export class Game extends Container {
   }
 
   handleTerrainPointerTap ({ selectedCommandName, point }: { selectedCommandName?: ECommandName, point: Point }): void {
-    const uids: number[] = []
+    const items: BaseActiveItem[] = []
     let order: IOrder | undefined
     if (selectedCommandName == null) {
       selectedCommandName = ECommandName.moveFollow
@@ -299,15 +298,15 @@ export class Game extends Container {
         if (selectedCommandName === ECommandName.patrol) {
           // process patrol order individually
           const thisGrid = item.getGridXY({ center: true })
-          this.processOrder({ uids: [item.uid], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
+          this.processOrder({ items: [item as BaseActiveItem], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
         } else {
-          uids.push(item.uid)
+          items.push(item as BaseActiveItem)
         }
       }
     }
     // then command them to move to the clicked location
-    if (uids.length > 0) {
-      this.processOrder({ uids, order })
+    if (items.length > 0) {
+      this.processOrder({ items, order })
     }
   }
 
@@ -510,13 +509,25 @@ export class Game extends Container {
   }
 
   startGame = ({
-    mapImageSrc, mapSettingsSrc, startGridX = 0, startGridY = 0
+    mapImageSrc,
+    mapSettingsSrc,
+    type,
+    team,
+    startGridX = 0,
+    startGridY = 0,
+    serializeOrders
   }: {
     mapImageSrc: string
     mapSettingsSrc: string
+    type: GameType
+    team: Team
     startGridX?: number
     startGridY?: number
+    serializeOrders?: IGameOptions['serializeOrders']
   }): void => {
+    this.type = type
+    this.serializeOrders = serializeOrders
+    this.team = team
     this.ai = undefined
     this.gameEnded = false
     this.time = 0
@@ -965,8 +976,20 @@ export class Game extends Container {
     })
   }
 
-  // Receive command from singleplayer or multiplayer object and send it to units
-  processOrder ({ uids, items, order, toUid, orderType }: { uids?: number[], items?: BaseActiveItem[], order?: IOrder, orderType?: OrderTypes, toUid?: number }): boolean {
+  // Receive order from singleplayer or multiplayer object and send it to units
+  processOrder ({
+    uids,
+    items,
+    order,
+    toUid,
+    orderType
+  }: {
+    uids?: number[]
+    items?: BaseActiveItem[]
+    order?: IOrder
+    orderType?: OrderTypes
+    toUid?: number
+  }): boolean {
     // In case the target "to" object is in terms of uid, fetch the target object
     let toObject
     let unitOrder: IOrder | undefined
@@ -988,6 +1011,12 @@ export class Game extends Container {
       .filter((item): item is BaseActiveItem => Boolean(item))
       .concat(Array.isArray(items) ? items : [])
       .filter((item): item is BaseActiveItem => Boolean(item))
+    if (this.serializeOrders != null) {
+      if (order != null) {
+        this.serializeOrders({ uids: items.map(i => i.uid), order })
+      }
+      return true
+    }
     for (const item of items) {
       if (order != null || unitOrder != null) {
         item.order = (order ?? unitOrder) as IOrder

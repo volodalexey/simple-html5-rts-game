@@ -2,7 +2,7 @@ import { type Socket, io } from 'socket.io-client'
 import { type Application, Container, Graphics, type TextStyleAlign, Assets, type Spritesheet, Text, type TextStyleFontWeight } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
 import { type Game } from '../Game'
-import { Team } from '../utils/common'
+import { type BaseActiveItem, Team } from '../utils/common'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
 import { EItemName } from '../interfaces/IItem'
@@ -10,7 +10,9 @@ import { logCash, logLayout } from '../utils/logger'
 import { type SettingsModal } from '../components/SettingsModal'
 import { Input } from '../components/Input'
 import { Button, type IButtonOptions } from '../components/Button'
-import { type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents } from '../socket.types'
+import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents } from '../socket.types'
+import { type IMapSettings, MapSettings } from '../utils/MapSettings'
+import { castToClientOrder, castToServerOrder } from '../utils/Order'
 
 interface IMultiplayerSceneOptions {
   app: Application
@@ -193,6 +195,11 @@ export class MultiplayerScene extends Container implements IScene {
     } satisfies IButtonOptions
   }
 
+  public lastReceivedTick = 0
+  public currentTick = 0
+  public playerId = ''
+  public ordersByTick: Record<string, ISendOrder[]> = {}
+  public sentOrdersForTick = false
   constructor (options: IMultiplayerSceneOptions) {
     super()
     this.game = options.game
@@ -291,7 +298,7 @@ export class MultiplayerScene extends Container implements IScene {
       iconTexture: textures['icon-next.png'],
       onClick: () => {
         if (this.selectedRoom != null) {
-          this.socket?.once('init_level', this.handleInitLevel)
+          this.socket?.once('init_level', this.start)
           this.socket?.emit('join_room', { roomId: this.selectedRoom.roomId })
         }
       }
@@ -367,7 +374,31 @@ export class MultiplayerScene extends Container implements IScene {
   }
 
   handleUpdate (deltaMS: number): void {
-    this.game.handleUpdate(deltaMS)
+    // if the commands for that tick have been received
+    // execute the commands and move on to the next tick
+    // otherwise wait for server to catch up
+    if (this.currentTick <= this.lastReceivedTick) {
+      const orders = this.ordersByTick[this.currentTick]
+      if (Array.isArray(orders)) {
+        for (const { uids, order } of orders) {
+          this.game.processOrder({
+            uids,
+            order: castToClientOrder(order, (uid: number) => {
+              return this.game.tileMap.getItemByUid(uid) ?? {} as unknown as BaseActiveItem
+            })
+          })
+        };
+      }
+
+      this.game.handleUpdate(deltaMS)
+      // In case no command was sent for this current tick, send an empty command to the server
+      // So that the server knows that everything is working smoothly
+      if (!this.sentOrdersForTick) {
+        this.sendOrders()
+      }
+      this.currentTick++
+      this.sentOrdersForTick = false
+    }
 
     if (this.game.gameEnded) {
       return
@@ -376,7 +407,28 @@ export class MultiplayerScene extends Container implements IScene {
     handleTiggers({ deltaMS, triggers: this.triggers })
   }
 
-  start (): void {
+  sendOrders (): void {
+    this.sentOrdersForTick = true
+    this.socket?.emit('orders', { currentTick: this.currentTick })
+  }
+
+  start = ({ spawnLocations, players }: Parameters<IServerToClientEvents['init_level']>[0]): void => {
+    if (this.socket == null) {
+      return
+    }
+    const settings: IMapSettings = Assets.get('level2Settings')
+
+    const spawnLocationPoints = MapSettings.mapObjectToPositions({
+      mapSettings: settings,
+      layerName: 'Spawn-Locations'
+    })
+    const blueSpawnPoint = spawnLocationPoints[spawnLocations.blue]
+    const blueSpawnGridPoint = { initGridX: blueSpawnPoint.x / settings.tilewidth, initGridY: blueSpawnPoint.y / settings.tileheight }
+    const greenSpawnPoint = spawnLocationPoints[spawnLocations.green]
+    const greenSpawnGridPoint = { initGridX: greenSpawnPoint.x / settings.tilewidth, initGridY: greenSpawnPoint.y / settings.tileheight }
+    const isBlue = this.playerId === players.blue
+    const team = isBlue ? Team.blue : Team.green
+
     this.triggers = [
       {
         type: ETriggerType.conditional,
@@ -384,16 +436,8 @@ export class MultiplayerScene extends Container implements IScene {
           return this.game.tileMap.staticItems.filter(item => item.team === this.game.team).length === 0
         },
         action: () => {
-          this.endMultiplayer({ success: false })
-        }
-      } satisfies IConditionalTrigger,
-      {
-        type: ETriggerType.conditional,
-        condition: () => {
-          return this.game.tileMap.staticItems.filter(item => item.team === Team.green).length === 0
-        },
-        action: () => {
-          this.endMultiplayer({ success: true })
+          this.socket?.emit('lose_game')
+          // this.endMultiplayer({ success: false })
         }
       } satisfies IConditionalTrigger
     ].map(triggerDescription => createTrigger(triggerDescription))
@@ -401,13 +445,18 @@ export class MultiplayerScene extends Container implements IScene {
     this.game.startGame({
       mapImageSrc: 'level2Background',
       mapSettingsSrc: 'level2Settings',
-      startGridX: 2,
-      startGridY: 37
+      startGridX: (isBlue ? blueSpawnGridPoint.initGridX : greenSpawnGridPoint.initGridX),
+      startGridY: (isBlue ? blueSpawnGridPoint.initGridY : greenSpawnGridPoint.initGridY),
+      team,
+      type: 'multiplayer',
+      serializeOrders: ({ uids, order }) => {
+        this.socket?.emit('orders', { currentTick: this.currentTick, orders: [{ uids, order: castToServerOrder(order) }] })
+      }
     });
 
     [
-      { name: EItemName.Base, initGridX: 2, initGridY: 36, team: Team.blue },
-      { name: EItemName.Base, initGridX: 56, initGridY: 2, team: Team.green }
+      { name: EItemName.Base, initGridX: blueSpawnGridPoint.initGridX, initGridY: blueSpawnGridPoint.initGridY, team: Team.blue },
+      { name: EItemName.Base, initGridX: greenSpawnGridPoint.initGridX, initGridY: greenSpawnGridPoint.initGridY, team: Team.green }
     ].forEach((itemOptions) => {
       const item = this.game.createItem(itemOptions)
       if (item != null) {
@@ -421,9 +470,28 @@ export class MultiplayerScene extends Container implements IScene {
 
     this.game.showMessage({
       character: EMessageCharacter.system,
-      message: 'Multiplayer',
+      message: `Multiplayer. You (${team}) Opponent (${team === Team.blue ? Team.green : Team.blue})`,
       playSound: false
     })
+
+    this.socket.emit('initialized_level')
+    this.socket.on('game_tick', ({ tick, orders }) => {
+      this.lastReceivedTick = tick
+      this.ordersByTick[tick] = orders
+    })
+    this.socket.once('end_game', ({ wonPlayerId, reason }) => {
+      this.endMultiplayer({ success: this.playerId === wonPlayerId, reason })
+    })
+    this.socket.once('chat_message', ({ playerId, message }) => {
+      this.game.showMessage({
+        character: EMessageCharacter.driver,
+        message
+      })
+    })
+
+    this.addChild(this.game)
+    this.content.visible = false
+    this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
   }
 
   mountedHandler (): void {
@@ -433,12 +501,10 @@ export class MultiplayerScene extends Container implements IScene {
     this.connect()
   }
 
-  endMultiplayer ({ success }: { success: boolean }): void {
+  endMultiplayer ({ success, reason }: { success: boolean, reason: string }): void {
     this.game.endGame({
       success,
-      message: success
-        ? 'You win!'
-        : 'You lose...',
+      message: reason,
       view: 'home',
       onLeftClick: () => {
         SceneManager.changeScene({ name: 'menu' }).catch(console.error)
@@ -463,7 +529,8 @@ export class MultiplayerScene extends Container implements IScene {
     this.socket.on('latency_ping', () => {
       this.socket?.emit('latency_pong')
     })
-    this.socket.on('room_list', ({ list }) => {
+    this.socket.on('room_list', ({ list, playerId }) => {
+      this.playerId = playerId
       this.renderRoomsList(list)
     })
     this.socket.on('joined_room', ({ room }) => {
@@ -539,9 +606,5 @@ export class MultiplayerScene extends Container implements IScene {
         roomButton.setSelected(false)
       }
     }
-  }
-
-  handleInitLevel = ({ spawnLocations, level }: Parameters<IServerToClientEvents['init_level']>[0]): void => {
-    console.log(spawnLocations, level)
   }
 }

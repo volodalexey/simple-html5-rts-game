@@ -1,11 +1,12 @@
 import { Graphics, Sprite } from 'pixi.js'
-import { Team, type SelectableItem } from './common'
-import { type IOrder } from '../interfaces/IOrder'
+import { Team, type SelectableItem, type BaseActiveItem } from './common'
+import { type IGridPointData, type IOrder } from '../interfaces/IOrder'
 import { type TileMap } from '../components/TileMap'
-import { EItemName } from '../interfaces/IItem'
+import { type BuildName, EItemName, type UnitName, type EItemType } from '../interfaces/IItem'
 import { GroundTurret } from '../buildings/GroundTurret'
 import { Starport } from '../buildings/Starport'
 import { OilDerrick } from '../buildings/OilDerrick'
+import { type IServerGridPointData, type IServerOrder } from '../socket.types'
 
 export class Order extends Graphics {
   public item!: SelectableItem
@@ -177,5 +178,47 @@ export class Order extends Graphics {
       Math.floor(to.y / tileMap.gridSize) * tileMap.gridSize - offset.y
     )
     this.buildSprite.visible = true
+  }
+}
+
+export function castToServerOrder (order: IOrder): IServerOrder {
+  switch (order.type) {
+    case 'move': case 'patrol': case 'stand': case 'hunt': case 'deploy':
+      return order
+    case 'move-and-attack':
+      return { type: order.type, toPoint: order.toPoint, nextOrder: order.nextOrder != null ? castToServerOrder(order.nextOrder) : undefined }
+    case 'attack': case 'guard': case 'follow':
+      return { type: order.type, toUid: order.to.uid, nextOrder: order.nextOrder != null ? castToServerOrder(order.nextOrder) : undefined }
+    case 'fire':
+      return { type: order.type, toUid: order.to.uid }
+    case 'build':
+      return { type: order.type, name: order.name as string, toPoint: order.toPoint }
+    case 'construct-unit':
+      return { type: order.type, name: order.name as string, unitOrder: order.unitOrder != null ? castToServerOrder(order.unitOrder) : undefined, unitUid: order.unitUid }
+  }
+}
+
+function castToClientGridPointData (point: IServerGridPointData): IGridPointData {
+  return { gridX: point.gridX, gridY: point.gridY, type: point.type as EItemType }
+}
+
+export function castToClientOrder (order: IServerOrder, find: (uid: number) => BaseActiveItem): IOrder {
+  switch (order.type) {
+    case 'move': case 'deploy':
+      return { type: order.type, toPoint: castToClientGridPointData(order.toPoint) }
+    case 'patrol':
+      return { type: order.type, fromPoint: castToClientGridPointData(order.fromPoint), toPoint: castToClientGridPointData(order.toPoint) }
+    case 'stand': case 'hunt':
+      return order
+    case 'move-and-attack':
+      return { type: order.type, toPoint: castToClientGridPointData(order.toPoint), nextOrder: order.nextOrder != null ? castToClientOrder(order.nextOrder, find) : undefined }
+    case 'attack': case 'guard': case 'follow':
+      return { type: order.type, to: find(order.toUid), nextOrder: order.nextOrder != null ? castToClientOrder(order.nextOrder, find) : undefined }
+    case 'fire':
+      return { type: order.type, to: find(order.toUid) }
+    case 'build':
+      return { type: order.type, name: order.name as BuildName, toPoint: castToClientGridPointData(order.toPoint) }
+    case 'construct-unit':
+      return { type: order.type, name: order.name as UnitName, unitOrder: order.unitOrder != null ? castToClientOrder(order.unitOrder, find) : undefined, unitUid: order.unitUid }
   }
 }

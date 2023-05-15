@@ -4,7 +4,7 @@ import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../utils/com
 import { EItemType } from '../interfaces/IItem'
 import { AStar } from '../utils/AStar'
 import { type IMoveable } from '../interfaces/IMoveable'
-import { type IPointGridData } from '../interfaces/IOrder'
+import { type IGridPointData } from '../interfaces/IOrder'
 import { LifeBar } from '../components/LifeBar'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { ECommandName } from '../interfaces/ICommand'
@@ -319,7 +319,7 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
     return collisionObjects
   }
 
-  _moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
+  _moveTo (destination: IGridPointData, distanceFromDestination: number): boolean {
     const { tileMap, turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
 

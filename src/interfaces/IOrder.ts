@@ -28,7 +28,7 @@ export type IOrder = IMoveOrder | IMoveAndAttack
 
 interface IMoveOrder {
   type: 'move'
-  toPoint: IPointGridData
+  toPoint: IGridPointData
 }
 
 export interface IFireOrder {
@@ -54,14 +54,14 @@ interface IFollowOrder {
   nextOrder?: IOrder
 }
 
-export interface IPointGridData extends IGridPoint {
+export interface IGridPointData extends IGridPoint {
   type?: EItemType
 }
 
 interface IPatrolOrder {
   type: 'patrol'
-  fromPoint: IPointGridData
-  toPoint: IPointGridData
+  fromPoint: IGridPointData
+  toPoint: IGridPointData
 }
 
 interface IStandOrder {
@@ -74,12 +74,12 @@ interface IHuntOrder {
 
 interface IDeployOrder {
   type: 'deploy'
-  toPoint: IPointGridData
+  toPoint: IGridPointData
 }
 
 interface IBuildOrder {
   type: 'build'
-  toPoint: IPointGridData
+  toPoint: IGridPointData
   name: BuildName
 }
 
@@ -92,6 +92,6 @@ interface IConstructUnitOrder {
 
 interface IMoveAndAttack {
   type: 'move-and-attack'
-  toPoint: IPointGridData
+  toPoint: IGridPointData
   nextOrder?: IOrder
 }

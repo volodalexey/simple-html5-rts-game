@@ -1,14 +1,16 @@
 
 import { createServer } from 'http'
 import { Server, type Socket } from 'socket.io'
-import { type IGameRoom, type IClientToServerEvents, type IInterServerEvents, type IServerToClientEvents, type ISocketData, type IClientGameRoom } from './socket.types'
+import { type IGameRoom, type IClientToServerEvents, type IInterServerEvents, type IServerToClientEvents, type ISocketData, type IClientGameRoom, type ISendOrder } from './socket.types'
 import debug from 'debug'
 
-export const logServer = debug('rts-srv')
-export const logConnection = debug('rts-srv-connection')
-export const logLatency = debug('rts-srv-latency')
-export const logPlayer = debug('rts-srv-player')
-export const logRooms = debug('rts-srv-rooms')
+const logServer = debug('rts-srv')
+const logConnection = debug('rts-srv-connection')
+const logLatency = debug('rts-srv-latency')
+const logRooms = debug('rts-srv-rooms')
+const logGame = debug('rts-srv-game')
+
+const TIMEOUT = 16
 
 interface ILatency {
   start: number
@@ -25,7 +27,12 @@ interface IPlayer {
   color?: 'blue' | 'green'
 }
 
-type IServerGameRoom = IGameRoom<IPlayer>
+type IServerGameRoom = IGameRoom<IPlayer> & {
+  orders: ISendOrder[]
+  lastTickConfirmed: { blue: number, green: number }
+  currentTick: number
+  timeout?: NodeJS.Timeout
+}
 
 const httpServer = createServer()
 const io = new Server<
@@ -80,7 +87,7 @@ io.on('connection', socket => {
     sendRoomListToEveryone()
   })
 
-  player.socket.on('disconnect', (err) => {
+  player.socket.once('disconnect', (err) => {
     logConnection(`Connection error [${socket.id}] ${socket.client.conn.remoteAddress} disconnected.`, err)
 
     for (let i = players.length - 1; i >= 0; i--) {
@@ -102,7 +109,7 @@ io.on('connection', socket => {
     }
   })
 
-  player.socket.on('error', (err) => {
+  player.socket.once('error', (err) => {
     logConnection(`Connection error [${socket.id}] ${socket.client.conn.remoteAddress} disconnected.`, err)
 
     for (let i = players.length - 1; i >= 0; i--) {
@@ -116,55 +123,36 @@ io.on('connection', socket => {
       const { status, roomId } = player.room
       // If the game was running, end the game as well
       if (status === 'running') {
-        endGame(player.room, `The ${player.color} player has disconnected.`)
+        endGame(player.room, `The ${player.color} player has error.`)
       } else {
         leaveRoom(player, roomId)
       }
       sendRoomListToEveryone()
     }
   })
-/*
-  // On Message event handler for a connection
-  connection.on('message', function (message) {
-    if (message.type === 'utf8') {
-        const clientMessage = JSON.parse(message.utf8Data)
-        switch (clientMessage.type) {
-            case 'initialized_level':
-                player.room.playersReady++
-                if (player.room.playersReady == 2) {
-                    startGame(player.room)
-                }
-                break
-          break
-            case 'command':
-                if (player.room && player.room.status == 'running') {
-                    if (clientMessage.uids) {
-                        player.room.commands.push({ uids: clientMessage.uids, details: clientMessage.details })
-                    }
-                    player.room.lastTickConfirmed[player.color] = clientMessage.currentTick + player.tickLag
-                }
-                break
-        case 'lose_game':
-          endGame(player.room, 'The ' + player.color + ' team has been defeated.')
-          break
-        case 'chat':
-          if (player.room && player.room.status == 'running') {
-            const cleanedMessage = clientMessage.message.replace(/[<>]/g, '')
-   sendRoomWebSocketMessage(player.room, { type: 'chat', from: player.color, message: cleanedMessage })
-            console.log(clientMessage.message, 'was cleaned to', cleanedMessage)
-          }
-          break
-        }
+
+  player.socket.once('initialized_level', () => {
+    if (player.room != null) {
+      player.room.playersReady++
+      if (player.room.playersReady === 2) {
+        startGame(player.room)
+      }
     }
   })
-
-   */
 })
 
 // Initialize a set of rooms
 const gameRooms: IServerGameRoom[] = []
 for (let i = 0; i < 9; i++) {
-  gameRooms.push({ status: 'empty', players: [], roomId: i + 1, playersReady: 0 })
+  gameRooms.push({
+    status: 'empty',
+    players: [],
+    roomId: i + 1,
+    playersReady: 0,
+    orders: [],
+    lastTickConfirmed: { blue: 0, green: 0 },
+    currentTick: 0
+  })
 };
 
 function joinRoom (player: IPlayer, roomId: IServerGameRoom['roomId']): IServerGameRoom {
@@ -221,7 +209,7 @@ function leaveRoom (player: IPlayer, roomId: IGameRoom['roomId']): void {
 }
 
 function castGameRoom (room: IServerGameRoom): IClientGameRoom {
-  return { status: room.status, roomId: room.roomId, playersReady: room.playersReady }
+  return { status: room.status, roomId: room.roomId }
 }
 
 function prepareRoomsList (): IClientGameRoom[] {
@@ -229,7 +217,7 @@ function prepareRoomsList (): IClientGameRoom[] {
   for (const gameRoom of gameRooms) {
     list.push(castGameRoom(gameRoom))
   };
-  logRooms(`prepareRoomsList() [${list.map(r => `id=${r.roomId} status=${r.status} playersReady=${r.playersReady}`).join(', ')}]`)
+  logRooms(`prepareRoomsList() [${list.map(r => `id=${r.roomId} status=${r.status}`).join(', ')}]`)
   return list
 }
 
@@ -237,7 +225,7 @@ function sendRoomListToEveryone (): void {
   // Notify all connected players of the room status changes
   const roomsList = prepareRoomsList()
   for (const player of players) {
-    player.socket.emit('room_list', { list: roomsList })
+    player.socket.emit('room_list', { list: roomsList, playerId: player.socket.id })
   };
 }
 
@@ -247,21 +235,87 @@ function initGame (room: IServerGameRoom): void {
   // Number of players who have loaded the level
   room.playersReady = 0
 
-  // Load the first multiplayer level for both players
-  // This logic can change later to let the players pick a level
-  const currentLevel = 0
-
   // Randomly select two spawn locations between 0 and 3 for both players.
-  const spawns = [0, 1]
-  const spawnLocations = { blue: spawns.splice(Math.floor(Math.random() * spawns.length), 1)[0], green: spawns.splice(Math.floor(Math.random() * spawns.length), 1)[0] }
+  let spawns = [0, 1]
+  const blueSpawn = spawns[Math.floor(Math.random() * spawns.length)]
+  spawns = spawns.filter(spawn => spawn !== blueSpawn)
+  const greenSpawn = spawns[Math.floor(Math.random() * spawns.length)]
+  let players = room.players.map(p => p.socket.id)
+  const bluePlayer = players[Math.floor(Math.random() * players.length)]
+  players = players.filter(player => player !== bluePlayer)
+  const greenPlayer = players[Math.floor(Math.random() * players.length)]
 
-  sendRoomWebSocketMessage(room, 'init_level', [{ spawnLocations, level: currentLevel }])
+  sendRoomWebSocketMessage(room, 'init_level', [{
+    spawnLocations: { blue: blueSpawn, green: greenSpawn }, players: { blue: bluePlayer, green: greenPlayer }
+  }])
 }
 
-function endGame (room: IServerGameRoom, reason: string): void {
-  // clearInterval(room.interval)
+function startGame (room: IServerGameRoom): void {
+  logGame(`Both players are ready. Starting game in room ${room.roomId}`)
+  room.status = 'running'
+  sendRoomListToEveryone()
+  // Notify players to start the game
+  sendRoomWebSocketMessage(room, 'start_game', [])
+
+  room.orders = []
+  room.lastTickConfirmed = { blue: 0, green: 0 }
+  room.currentTick = 0
+
+  // Calculate tick lag for room as the max of both player's tick lags
+  const roomTickLag = Math.max(room.players[0].tickLag, room.players[1].tickLag)
+
+  const serverTick = (): void => {
+    if (room.status !== 'running') {
+      return
+    }
+    // schedule next tick
+    room.timeout = setTimeout(serverTick, TIMEOUT)
+    // Confirm that both players have send in commands for upto present tick
+    if (room.lastTickConfirmed.blue >= room.currentTick && room.lastTickConfirmed.green >= room.currentTick) {
+      // Commands should be executed after the tick lag
+      sendRoomWebSocketMessage(room, 'game_tick', [{ tick: room.currentTick + roomTickLag, orders: room.orders }])
+      room.currentTick++
+      room.orders = []
+    } else {
+      // One of the players is causing the game to lag. Handle appropriately
+      if (room.lastTickConfirmed.blue < room.currentTick) {
+        logGame(`Room ${room.roomId} Blue is lagging on Tick: ${room.currentTick} by ${room.currentTick - room.lastTickConfirmed.blue}`)
+      }
+      if (room.lastTickConfirmed.green < room.currentTick) {
+        logGame(`Room ${room.roomId} Green is lagging on Tick: ${room.currentTick} by ${room.currentTick - room.lastTickConfirmed.green}`)
+      }
+    }
+  }
+
+  room.timeout = setTimeout(serverTick, TIMEOUT)
+
+  for (const player of room.players) {
+    player.socket.on('orders', ({ currentTick, orders }) => {
+      if (player.room != null && player.room.status === 'running' && player.color != null) {
+        if (Array.isArray(orders)) {
+          player.room.orders.push(...orders)
+        }
+        player.room.lastTickConfirmed[player.color] = currentTick + player.tickLag
+      }
+    })
+
+    player.socket.once('lose_game', () => {
+      endGame(room, `The ${player.color} team has been defeated.`, player)
+    })
+
+    player.socket.on('chat_message', ({ playerId, message }) => {
+      if (player.room != null && player.room.status === 'running') {
+        sendRoomWebSocketMessage(room, 'chat_message', [{ playerId, message }])
+      }
+    })
+  }
+}
+
+function endGame (room: IServerGameRoom, reason: string, losePlayer?: IPlayer): void {
+  clearTimeout(room.timeout)
   room.status = 'empty'
-  sendRoomWebSocketMessage(room, 'end_game', [{ reason }])
+  const wonPlayer = room.players.find(p => p !== losePlayer)
+  sendRoomWebSocketMessage(room, 'end_game', [{ wonPlayerId: wonPlayer?.socket.id ?? '', reason }])
   for (let i = room.players.length - 1; i >= 0; i--) {
     leaveRoom(room.players[i], room.roomId)
   };
@@ -277,43 +331,6 @@ function sendRoomWebSocketMessage<Key extends keyof IServerToClientEvents> (
     player.socket.emit(event, ...params)
   };
 }
-
-/*
-
-function startGame (room) {
-  console.log('Both players are ready. Starting game in room', room.roomId)
-  room.status = 'running'
-  sendRoomListToEveryone()
-  // Notify players to start the game
-  sendRoomWebSocketMessage(room, { type: 'start_game' })
-
-  room.commands = []
-  room.lastTickConfirmed = { blue: 0, green: 0 }
-  room.currentTick = 0
-
-  // Calculate tick lag for room as the max of both player's tick lags
-  const roomTickLag = Math.max(room.players[0].tickLag, room.players[1].tickLag)
-
-  room.interval = setInterval(function () {
-    // Confirm that both players have send in commands for upto present tick
-    if (room.lastTickConfirmed.blue >= room.currentTick && room.lastTickConfirmed.green >= room.currentTick) {
-      // Commands should be executed after the tick lag
-      sendRoomWebSocketMessage(room, { type: 'game_tick', tick: room.currentTick + roomTickLag, commands: room.commands })
-      room.currentTick++
-      room.commands = []
-    } else {
-      // One of the players is causing the game to lag. Handle appropriately
-      if (room.lastTickConfirmed.blue < room.currentTick) {
-        console.log('Room', room.roomId, 'Blue is lagging on Tick:', room.currentTick, 'by', room.currentTick - room.lastTickConfirmed.blue)
-      }
-      if (room.lastTickConfirmed.green < room.currentTick) {
-        console.log('Room', room.roomId, 'Green is lagging on Tick:', room.currentTick, 'by', room.currentTick - room.lastTickConfirmed.green)
-      }
-    }
-  }, 100)
-}
-
-*/
 
 function measureLatency (player: IPlayer): void {
   const { socket } = player
@@ -344,5 +361,5 @@ function finishMeasuringLatency (player: IPlayer): void {
 }
 
 function sendRoomsList (player: IPlayer): void {
-  player.socket.emit('room_list', { list: prepareRoomsList() })
+  player.socket.emit('room_list', { list: prepareRoomsList(), playerId: player.socket.id })
 }

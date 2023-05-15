@@ -3,7 +3,7 @@ import { Vector, EVectorDirection } from '../utils/Vector'
 import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../utils/common'
 import { EItemType } from '../interfaces/IItem'
 import { type IMoveable } from '../interfaces/IMoveable'
-import { type IPointGridData } from '../interfaces/IOrder'
+import { type IGridPointData } from '../interfaces/IOrder'
 import { LifeBar } from '../components/LifeBar'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { ECommandName } from '../interfaces/ICommand'
@@ -367,7 +367,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     return collisionObjects
   }
 
-  _moveTo (destination: IPointGridData, distanceFromDestination: number): boolean {
+  _moveTo (destination: IGridPointData, distanceFromDestination: number): boolean {
     const { turnSpeedAdjustmentFactor, speedAdjustmentFactor, speedAdjustmentWhileTurningFactor } = this.game
     const thisGrid = this.getGridXY({ center: true })
     // First find path to destination

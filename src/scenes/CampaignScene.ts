@@ -108,7 +108,7 @@ export class CampaignScene extends Container implements IScene {
     const mission = this.missions[this.currentMissionIdx]
     this.triggers = mission.triggers.map(triggerDescription => createTrigger(triggerDescription))
 
-    this.game.startGame(mission)
+    this.game.startGame({ type: 'campaign', team: Team.blue, ...mission })
 
     mission.items.forEach((itemOptions) => {
       const item = this.game.createItem(itemOptions)
@@ -697,7 +697,6 @@ export class CampaignScene extends Container implements IScene {
           green: 0
         },
         items: [
-          /* The Rebel Base now in our hands */
           { name: 'base', initGridX: 2, initGridY: 36, team: Team.blue, commands: [ECommandName.constructHarvester], uid: -1 },
           { name: 'base', initGridX: 56, initGridY: 2, team: Team.green, uid: -2 }
         ],

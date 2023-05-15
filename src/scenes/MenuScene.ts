@@ -6,9 +6,7 @@ import { TileMap } from '../components/TileMap'
 import { CampaignScene } from './CampaignScene'
 import { StatusBar } from '../components/StatusBar'
 import { VersusCPUScene } from './VersusCPUScene'
-// import { MultiplayerScene } from './MultiplayerScene'
 import { Game } from '../Game'
-import { Team } from '../utils/common'
 import { SettingsModal } from '../components/SettingsModal'
 import { Audio } from '../utils/Audio'
 import { SideBar } from '../components/SideBar'
@@ -279,8 +277,6 @@ export class MenuScene extends Container implements IScene {
       this.game = new Game({
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
-        type: 'campaign',
-        team: Team.blue,
         audio: this.audio,
         settingsModal: this.settingsModal
       })
@@ -304,8 +300,6 @@ export class MenuScene extends Container implements IScene {
       this.game = new Game({
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
-        type: 'singleplayer',
-        team: Team.blue,
         audio: this.audio,
         settingsModal: this.settingsModal
       })
@@ -328,8 +322,6 @@ export class MenuScene extends Container implements IScene {
       this.game = new Game({
         viewWidth: SceneManager.width,
         viewHeight: SceneManager.height,
-        type: 'multiplayer',
-        team: Team.blue,
         audio: this.audio,
         settingsModal: this.settingsModal
       })
