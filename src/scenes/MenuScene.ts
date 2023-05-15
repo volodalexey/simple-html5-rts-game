@@ -62,18 +62,20 @@ export class MenuScene extends Container implements IScene {
 
     this.drawMainOptions()
 
-    setTimeout(() => {
-      TileMap.idleLoad().then(() => {
-        StatusBar.prepareTextures({
-          textures: {
-            girl1Texture: Assets.get('characterGirl1'),
-            girl2Texture: Assets.get('characterGirl2'),
-            man1Texture: Assets.get('characterMan1'),
-            systemTexture: Assets.get('characterSystem')
-          }
-        })
-      }).catch(console.error)
-    })
+    if (Assets.get('characterGirl1') == null) {
+      setTimeout(() => {
+        TileMap.idleLoad().then(() => {
+          StatusBar.prepareTextures({
+            textures: {
+              girl1Texture: Assets.get('characterGirl1'),
+              girl2Texture: Assets.get('characterGirl2'),
+              man1Texture: Assets.get('characterMan1'),
+              systemTexture: Assets.get('characterSystem')
+            }
+          })
+        }).catch(console.error)
+      })
+    }
   }
 
   setup ({ menuTexture }: IMenuSceneSceneOptions): void {

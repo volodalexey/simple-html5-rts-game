@@ -10,7 +10,7 @@ import { logCash, logLayout } from '../utils/logger'
 import { type SettingsModal } from '../components/SettingsModal'
 import { Input } from '../components/Input'
 import { Button, type IButtonOptions } from '../components/Button'
-import { type IGameRoomRes, type ClientToServerEvents, type ServerToClientEvents } from '../socket.types'
+import { type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents } from '../socket.types'
 
 interface IMultiplayerSceneOptions {
   app: Application
@@ -26,7 +26,16 @@ class HeaderText extends Text {}
 class URLLabelText extends Text {}
 class HomeButton extends Button {}
 class RoomsListHeader extends Text {}
-class RoomsList extends Container<Button> {}
+class RoomButton extends Button {
+  public room: IClientGameRoom
+  constructor (options: IButtonOptions & { room: IClientGameRoom }) {
+    super(options)
+    this.room = options.room
+  }
+}
+class RoomsList extends Container<RoomButton> {}
+class ConnectButton extends Button {}
+class LeaveButton extends Button {}
 
 export class MultiplayerScene extends Container implements IScene {
   public game!: Game
@@ -40,8 +49,12 @@ export class MultiplayerScene extends Container implements IScene {
   public input!: Input
   public roomsListHeader!: RoomsListHeader
   public roomsList = new RoomsList()
-  public socket?: Socket<ServerToClientEvents, ClientToServerEvents>
+  public connectButton!: ConnectButton
+  public leaveButton!: LeaveButton
+  public socket?: Socket<IServerToClientEvents, IClientToServerEvents>
   public socketConnected = false
+  public selectedRoom?: IClientGameRoom
+  public joinedRoom?: IClientGameRoom
   static wsURLKey = 'wsURLKey'
   static boxOptions = {
     backgroundColor: 0x454545,
@@ -124,8 +137,59 @@ export class MultiplayerScene extends Container implements IScene {
       textColor: 0x111111,
       textColorHover: 0xffff00,
       buttonIdleColor: 0xb3b3b3,
-      buttonSelectedColor: 0xb3b3b3,
+      buttonSelectedColor: 0x22c55e,
+      textColorSelected: 0xffff00,
       buttonHoverColor: 0xb3b3b3
+    } satisfies IButtonOptions
+  }
+
+  static connectButtonOptions = {
+    offset: {
+      x: 105,
+      y: 430
+    },
+    buttonStyle: {
+      text: 'Connect',
+      fontSize: 20,
+      textColor: 0x111111,
+      textColorHover: 0xffff00,
+      buttonIdleColor: 0x22c55e,
+      buttonSelectedColor: 0x22c55e,
+      buttonHoverColor: 0x22c55e,
+      iconScale: 0.5,
+      iconColorHover: 0xffff00,
+      iconPaddingLeft: 10,
+      iconPaddingTop: 13,
+      textPaddingLeft: 10,
+      textPaddingTop: 14,
+      buttonWidth: 150,
+      buttonHeight: 50,
+      buttonRadius: 3
+    } satisfies IButtonOptions
+  }
+
+  static leaveButtonOptions = {
+    offset: {
+      x: 105,
+      y: 430
+    },
+    buttonStyle: {
+      text: 'Leave',
+      fontSize: 20,
+      textColor: 0x111111,
+      textColorHover: 0xffff00,
+      buttonIdleColor: 0x9a3412,
+      buttonSelectedColor: 0x9a3412,
+      buttonHoverColor: 0x9a3412,
+      iconScale: 0.5,
+      iconColorHover: 0xffff00,
+      iconPaddingLeft: 10,
+      iconPaddingTop: 13,
+      textPaddingLeft: 10,
+      textPaddingTop: 14,
+      buttonWidth: 150,
+      buttonHeight: 50,
+      buttonRadius: 3
     } satisfies IButtonOptions
   }
 
@@ -220,6 +284,37 @@ export class MultiplayerScene extends Container implements IScene {
     const { roomsListOptions } = MultiplayerScene
     this.roomsList.position.set(roomsListOptions.offset.x, roomsListOptions.offset.y)
     this.content.addChild(this.roomsList)
+
+    const { connectButtonOptions, leaveButtonOptions } = MultiplayerScene
+    const connectButton = new ConnectButton({
+      ...connectButtonOptions.buttonStyle,
+      iconTexture: textures['icon-next.png'],
+      onClick: () => {
+        if (this.selectedRoom != null) {
+          this.socket?.once('init_level', this.handleInitLevel)
+          this.socket?.emit('join_room', { roomId: this.selectedRoom.roomId })
+        }
+      }
+    })
+    const leaveButton = new LeaveButton({
+      ...leaveButtonOptions.buttonStyle,
+      iconTexture: textures['icon-circle-xmark.png'],
+      onClick: () => {
+        if (this.selectedRoom != null) {
+          this.joinedRoom = undefined
+          this.socket?.emit('leave_room', { roomId: this.selectedRoom.roomId })
+          this.updateButtons()
+        }
+      }
+    })
+    connectButton.position.set(connectButtonOptions.offset.x, connectButtonOptions.offset.y)
+    connectButton.visible = false
+    this.content.addChild(connectButton)
+    this.connectButton = connectButton
+    leaveButton.position.set(connectButtonOptions.offset.x, connectButtonOptions.offset.y)
+    leaveButton.visible = false
+    this.content.addChild(leaveButton)
+    this.leaveButton = leaveButton
   }
 
   handleResize (options: {
@@ -371,6 +466,10 @@ export class MultiplayerScene extends Container implements IScene {
     this.socket.on('room_list', ({ list }) => {
       this.renderRoomsList(list)
     })
+    this.socket.on('joined_room', ({ room }) => {
+      this.joinedRoom = room
+      this.updateButtons()
+    })
     this.socket.io.once('error', this.onSocketError)
   }
 
@@ -392,21 +491,57 @@ export class MultiplayerScene extends Container implements IScene {
     SceneManager.changeScene({ name: 'menu' }).catch(console.error)
   }
 
-  renderRoomsList (rooms: IGameRoomRes[]): void {
+  renderRoomsList (rooms: IClientGameRoom[]): void {
     while (this.roomsList.children.length > 0) {
       this.roomsList.children[0].removeFromParent()
     }
     const { buttonStyle } = MultiplayerScene.roomsListOptions
     for (const room of rooms) {
-      const roomButton = new Button({
-        onClick: () => {
-          console.log(room)
-        },
+      const roomButton = new RoomButton({
         ...buttonStyle,
-        text: `Room [${room.roomId}] (${room.status})`
+        room,
+        onClick: () => {
+          this.selectedRoom = room
+          this.updateButtons()
+        },
+        text: `Room [${room.roomId}] (${room.status})`,
+        selected: this.selectedRoom != null ? this.selectedRoom.roomId === room.roomId : undefined
       })
       roomButton.position.set(0, this.roomsList.height)
       this.roomsList.addChild(roomButton)
     }
+  }
+
+  updateButtons (): void {
+    if (this.selectedRoom != null) {
+      if (this.joinedRoom != null) {
+        if (this.joinedRoom.roomId === this.selectedRoom.roomId) {
+          this.connectButton.visible = false
+          this.leaveButton.visible = true
+        } else {
+          this.connectButton.visible = true
+          this.leaveButton.visible = false
+        }
+      } else {
+        this.connectButton.visible = true
+        this.leaveButton.visible = false
+      }
+      for (const roomButton of this.roomsList.children) {
+        if (roomButton.room === this.selectedRoom) {
+          roomButton.setSelected(true)
+        } else {
+          roomButton.setSelected(false)
+        }
+      }
+    } else {
+      this.connectButton.visible = this.leaveButton.visible = false
+      for (const roomButton of this.roomsList.children) {
+        roomButton.setSelected(false)
+      }
+    }
+  }
+
+  handleInitLevel = ({ spawnLocations, level }: Parameters<IServerToClientEvents['init_level']>[0]): void => {
+    console.log(spawnLocations, level)
   }
 }

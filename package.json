@@ -17,7 +17,6 @@
     "@types/howler": "^2.2.7",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
-    "debug": "^4.3.4",
     "eslint": "^8.37.0",
     "eslint-config-standard-with-typescript": "^34.0.1",
     "html-webpack-plugin": "^5.5.0",
@@ -30,6 +29,7 @@
     "webpack-dev-server": "^4.13.2"
   },
   "dependencies": {
+    "debug": "^4.3.4",
     "howler": "^2.2.3",
     "pixi.js": "^7.2.4",
     "socket.io": "^4.6.1",

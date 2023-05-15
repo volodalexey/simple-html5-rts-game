@@ -49,6 +49,7 @@ export interface IButtonOptions {
   iconColorSelected?: number
   iconColorDisabled?: number
   flexDirection?: 'row' | 'col' | 'col-center'
+  selected?: boolean
 }
 
 class Border extends Graphics {}
@@ -102,6 +103,9 @@ export class Button extends Container {
   public disabled = false
   constructor (options: IButtonOptions) {
     super()
+    if (typeof options.selected === 'boolean') {
+      this.selected = options.selected
+    }
     this.eventMode = 'static'
     this.cursor = 'pointer'
     this.onClick = options.onClick
@@ -394,12 +398,19 @@ export class Button extends Container {
 
   setSelected (selected: boolean): void {
     this.selected = selected
-    this.selected ? this.selectedColor() : this.idleColor()
+    this.updateState()
   }
 
   setDisabled (disabled: boolean): void {
     this.disabled = disabled
-    this.disabled ? this.selectedColor() : this.idleColor()
+    if (disabled) {
+      this.eventMode = 'none'
+      this.cursor = 'normal'
+    } else {
+      this.eventMode = 'static'
+      this.cursor = 'pointer'
+    }
+    this.updateState()
   }
 
   updateState (hovered = false): void {
