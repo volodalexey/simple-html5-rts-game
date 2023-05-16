@@ -163,7 +163,7 @@ export class MultiplayerScene extends Container implements IScene {
       iconPaddingLeft: 10,
       iconPaddingTop: 13,
       textPaddingLeft: 10,
-      textPaddingTop: 14,
+      textPaddingTop: 15,
       buttonWidth: 150,
       buttonHeight: 50,
       buttonRadius: 3
@@ -188,7 +188,7 @@ export class MultiplayerScene extends Container implements IScene {
       iconPaddingLeft: 10,
       iconPaddingTop: 13,
       textPaddingLeft: 10,
-      textPaddingTop: 14,
+      textPaddingTop: 16,
       buttonWidth: 150,
       buttonHeight: 50,
       buttonRadius: 3
@@ -507,6 +507,7 @@ export class MultiplayerScene extends Container implements IScene {
       message: reason,
       view: 'home',
       onLeftClick: () => {
+        this.game.removeFromParent()
         SceneManager.changeScene({ name: 'menu' }).catch(console.error)
       }
     })
@@ -538,6 +539,7 @@ export class MultiplayerScene extends Container implements IScene {
       this.updateButtons()
     })
     this.socket.io.once('error', this.onSocketError)
+    this.socket.io.once('close', this.onSocketClose)
   }
 
   onSocketConnect = (): void => {
@@ -546,10 +548,26 @@ export class MultiplayerScene extends Container implements IScene {
   }
 
   onSocketError = (e: Error): void => {
+    console.error(e)
     this.socketConnected = false
     this.headerText.text = 'Error!'
+    this.selectedRoom = undefined
+    this.joinedRoom = undefined
     this.closeSocket()
-    console.error(e)
+    this.clearRoomsList()
+    this.updateButtons()
+    this.endMultiplayer({ success: false, reason: 'Wesocket error!' })
+  }
+
+  onSocketClose = (): void => {
+    this.socketConnected = false
+    this.headerText.text = 'Closed'
+    this.selectedRoom = undefined
+    this.joinedRoom = undefined
+    this.closeSocket()
+    this.clearRoomsList()
+    this.updateButtons()
+    this.endMultiplayer({ success: false, reason: 'Wesocket was closed' })
   }
 
   returnToMenuScene = (): void => {
@@ -558,10 +576,14 @@ export class MultiplayerScene extends Container implements IScene {
     SceneManager.changeScene({ name: 'menu' }).catch(console.error)
   }
 
-  renderRoomsList (rooms: IClientGameRoom[]): void {
+  clearRoomsList (): void {
     while (this.roomsList.children.length > 0) {
       this.roomsList.children[0].removeFromParent()
     }
+  }
+
+  renderRoomsList (rooms: IClientGameRoom[]): void {
+    this.clearRoomsList()
     const { buttonStyle } = MultiplayerScene.roomsListOptions
     for (const room of rooms) {
       const roomButton = new RoomButton({

@@ -55,7 +55,6 @@ export class TopBar extends Container {
   }
 
   handleUpdate (deltaMS: number): void {
-    this.statusBar.handleUpdate(deltaMS)
     this.miniMap.handleUpdate(deltaMS)
   }
 }

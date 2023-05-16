@@ -4,6 +4,7 @@ import { CommandsBar } from './CommandsBar'
 import { type SelectableItem } from '../utils/common'
 import { logSideBar } from '../utils/logger'
 import { Button } from './Button'
+import { SceneManager } from '../scenes/SceneManager'
 
 interface ISideBarOptions {
   game: Game
@@ -85,6 +86,8 @@ export class SideBar extends Container {
     if (typeof options.initY === 'number') {
       this.position.y = options.initY
     }
+
+    SceneManager.app.ticker.add(this.handleUpdate)
   }
 
   setAlignment (): void {
@@ -219,8 +222,11 @@ export class SideBar extends Container {
     this.setStaticContentAlignment()
   }
 
-  handleUpdate (deltaMS: number): void {
-    this.toggleButton.text.text = this.getToggleText()
+  handleUpdate = (deltaMS: number): void => {
+    const text = this.getToggleText()
+    if (this.toggleButton.text.text !== text) {
+      this.toggleButton.text.text = text
+    }
     const isLeft = this.align === 'left'
     if (this.toOpen) {
       logSideBar(`update-to-open (${this.hideableContent.position.x}) toX=${this.toX}`)

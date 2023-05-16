@@ -1,5 +1,6 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, Text, type Texture, type FederatedWheelEvent } from 'pixi.js'
 import { logPointerEvent } from '../utils/logger'
+import { SceneManager } from '../scenes/SceneManager'
 
 export interface IStatusBarTextures {
   girl1Texture: Texture
@@ -275,7 +276,7 @@ export class StatusBar extends Container {
     return this.messageList.height > 0 ? (this.messageList.height - scrollHeight) : 0
   }
 
-  handleUpdate (deltaMS: number): void {
+  handleUpdate = (deltaMS: number): void => {
     if (this.scrollToLastMessage) {
       const { maxPivot } = this
       if (this.messageList.pivot.y < (maxPivot - 0.01)) {
@@ -293,6 +294,7 @@ export class StatusBar extends Container {
     this.on('pointerup', this.handlePointerUp)
     this.on('pointerleave', this.handlePointerLeave)
     this.on('wheel', this.handleWheel)
+    SceneManager.app.ticker.add(this.handleUpdate)
   }
 
   handlePointerDown = (e: FederatedPointerEvent): void => {

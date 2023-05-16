@@ -587,7 +587,6 @@ export class Game extends Container {
     }
     this.time += deltaMS
     this.topBar.handleUpdate(deltaMS)
-    this.sideBar.handleUpdate(deltaMS)
     this.tileMap.handleUpdate(deltaMS)
     this.camera.handleUpdate(deltaMS)
 

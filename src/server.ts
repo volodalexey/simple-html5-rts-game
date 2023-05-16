@@ -5,10 +5,10 @@ import { type IGameRoom, type IClientToServerEvents, type IInterServerEvents, ty
 import debug from 'debug'
 
 const logServer = debug('rts-srv')
-const logConnection = debug('rts-srv-connection')
 const logLatency = debug('rts-srv-latency')
 const logRooms = debug('rts-srv-rooms')
 const logGame = debug('rts-srv-game')
+const logWebsocket = debug('rts-srv-websocket')
 
 const TIMEOUT = 16
 
@@ -56,7 +56,7 @@ httpServer.on('listening', () => {
 const players: IPlayer[] = []
 
 io.on('connection', socket => {
-  logConnection(`Client connection [${socket.id}] ${socket.client.conn.remoteAddress}`)
+  logWebsocket(`Client connection [${socket.id}] ${socket.client.conn.remoteAddress}`)
 
   const player: IPlayer = {
     socket,
@@ -75,6 +75,7 @@ io.on('connection', socket => {
   sendRoomsList(player)
 
   player.socket.on('join_room', ({ roomId }) => {
+    logWebsocket(`Join room [${socket.id}] ${roomId}`)
     const room = joinRoom(player, roomId)
     sendRoomListToEveryone()
     if (room.players.length === 2) {
@@ -83,12 +84,13 @@ io.on('connection', socket => {
   })
 
   player.socket.on('leave_room', ({ roomId }) => {
+    logWebsocket(`Leave room [${socket.id}] ${roomId}`)
     leaveRoom(player, roomId)
     sendRoomListToEveryone()
   })
 
   player.socket.once('disconnect', (err) => {
-    logConnection(`Connection error [${socket.id}] ${socket.client.conn.remoteAddress} disconnected.`, err)
+    logWebsocket(`Disconnected [${socket.id}] ${socket.client.conn.remoteAddress}`, err)
 
     for (let i = players.length - 1; i >= 0; i--) {
       if (players[i] === player) {
@@ -110,7 +112,7 @@ io.on('connection', socket => {
   })
 
   player.socket.once('error', (err) => {
-    logConnection(`Connection error [${socket.id}] ${socket.client.conn.remoteAddress} disconnected.`, err)
+    logWebsocket(`Error [${socket.id}] ${socket.client.conn.remoteAddress}`, err)
 
     for (let i = players.length - 1; i >= 0; i--) {
       if (players[i] === player) {
@@ -132,6 +134,7 @@ io.on('connection', socket => {
   })
 
   player.socket.once('initialized_level', () => {
+    logWebsocket(`initialized_level [${socket.id}]`)
     if (player.room != null) {
       player.room.playersReady++
       if (player.room.playersReady === 2) {
@@ -166,10 +169,9 @@ function joinRoom (player: IPlayer, roomId: IServerGameRoom['roomId']): IServerG
       logRooms(`Attempt to join anohter room ${roomId}, while participating in ${alreadyJoinedRoom.roomId}`)
       alreadyJoinedRoom.players = alreadyJoinedRoom.players.filter(p => p !== player)
       alreadyJoinedRoom.status = alreadyJoinedRoom.players.length > 0 ? 'waiting' : 'empty'
-      console.log('alreadyJoinedRoom.players.length', alreadyJoinedRoom.roomId, alreadyJoinedRoom.status)
     }
   }
-  logRooms('Adding player to room', roomId)
+  logRooms(`Adding player [${player.socket.id}] to room ${roomId}`)
   // Add the player to the room
   room.players.push(player)
   player.room = room
@@ -185,14 +187,18 @@ function joinRoom (player: IPlayer, roomId: IServerGameRoom['roomId']): IServerG
   }
   // Confirm to player that he was added
   if (player.color != null) {
-    player.socket.emit('joined_room', { room: castGameRoom(room) })
+    const params = { room: castGameRoom(room) }
+    if (logWebsocket.enabled) {
+      logWebsocket(`joined_room ${printObject(params)}`)
+    }
+    player.socket.emit('joined_room', params)
   }
   return room
 }
 
 function leaveRoom (player: IPlayer, roomId: IGameRoom['roomId']): void {
   const room = gameRooms[roomId - 1]
-  logRooms(`Removing player from room ${roomId}`)
+  logRooms(`Removing player [${player.socket.id}] from room ${roomId}`)
 
   for (let i = room.players.length - 1; i >= 0; i--) {
     if (room.players[i] === player) {
@@ -225,12 +231,16 @@ function sendRoomListToEveryone (): void {
   // Notify all connected players of the room status changes
   const roomsList = prepareRoomsList()
   for (const player of players) {
-    player.socket.emit('room_list', { list: roomsList, playerId: player.socket.id })
+    const params = { list: roomsList, playerId: player.socket.id }
+    if (logWebsocket.enabled) {
+      logWebsocket(`room_list ${printObject(params)}`)
+    }
+    player.socket.emit('room_list', params)
   };
 }
 
 function initGame (room: IServerGameRoom): void {
-  console.log(`Both players Joined. Initializing game for Room ${room.roomId}`)
+  logGame(`Both players [${room.players.map(p => p.socket.id).join(', ')}] joined. Initializing game for Room ${room.roomId}`)
 
   // Number of players who have loaded the level
   room.playersReady = 0
@@ -251,7 +261,7 @@ function initGame (room: IServerGameRoom): void {
 }
 
 function startGame (room: IServerGameRoom): void {
-  logGame(`Both players are ready. Starting game in room ${room.roomId}`)
+  logGame(`Both players [${players.map(p => p.socket.id).join(', ')}] are ready. Starting game in room ${room.roomId}`)
   room.status = 'running'
   sendRoomListToEveryone()
   // Notify players to start the game
@@ -266,6 +276,7 @@ function startGame (room: IServerGameRoom): void {
 
   const serverTick = (): void => {
     if (room.status !== 'running') {
+      logGame('Skip tick, room status is not running')
       return
     }
     // schedule next tick
@@ -291,6 +302,9 @@ function startGame (room: IServerGameRoom): void {
 
   for (const player of room.players) {
     player.socket.on('orders', ({ currentTick, orders }) => {
+      if (logWebsocket.enabled) {
+        logWebsocket(`orders [${player.socket.id}] ${currentTick} ${printObject(orders)}`)
+      }
       if (player.room != null && player.room.status === 'running' && player.color != null) {
         if (Array.isArray(orders)) {
           player.room.orders.push(...orders)
@@ -300,10 +314,12 @@ function startGame (room: IServerGameRoom): void {
     })
 
     player.socket.once('lose_game', () => {
+      logWebsocket(`lose_game [${player.socket.id}]`)
       endGame(room, `The ${player.color} team has been defeated.`, player)
     })
 
     player.socket.on('chat_message', ({ playerId, message }) => {
+      logWebsocket(`chat_message [${player.socket.id}] ${playerId} ${message}`)
       if (player.room != null && player.room.status === 'running') {
         sendRoomWebSocketMessage(room, 'chat_message', [{ playerId, message }])
       }
@@ -328,6 +344,9 @@ function sendRoomWebSocketMessage<Key extends keyof IServerToClientEvents> (
   params: Parameters<IServerToClientEvents[Key]>
 ): void {
   for (const player of room.players) {
+    if (logWebsocket.enabled) {
+      logWebsocket(`[${player.socket.id}] ${event} ${printObject(params)}`)
+    }
     player.socket.emit(event, ...params)
   };
 }
@@ -344,6 +363,9 @@ function measureLatency (player: IPlayer): void {
     }
   })
   logLatency(`Ping (${measurement.start})`)
+  if (logWebsocket.enabled) {
+    logWebsocket('latency_ping')
+  }
   socket.emit('latency_ping')
 }
 
@@ -361,5 +383,30 @@ function finishMeasuringLatency (player: IPlayer): void {
 }
 
 function sendRoomsList (player: IPlayer): void {
-  player.socket.emit('room_list', { list: prepareRoomsList(), playerId: player.socket.id })
+  const params = { list: prepareRoomsList(), playerId: player.socket.id }
+  if (logWebsocket.enabled) {
+    logWebsocket(`room_list ${printObject(params)}`)
+  }
+  player.socket.emit('room_list', params)
+}
+
+export function printObject (obj: any): string {
+  const type = typeof obj
+  if (Array.isArray(obj)) {
+    return `[${obj.map((i) => printObject(i)).join(', ')}]`
+  } else if (obj !== null && type === 'object') {
+    return JSON.stringify(obj)
+  } else if (obj === null) {
+    return 'null'
+  } else if (obj === true) {
+    return 'true'
+  } else if (obj === false) {
+    return 'false'
+  } else if (type === 'string') {
+    return obj
+  } else if (type === 'number') {
+    return obj
+  } else {
+    return `${type} ${obj}`
+  }
 }
