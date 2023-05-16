@@ -235,7 +235,7 @@ export class MultiplayerScene extends Container implements IScene {
   calcDefaultWSAddress (): string {
     const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://'
     const port = location.port === '8878' ? '8879' : location.port
-    return port.length > 0 ? `${protocol}${location.host}:${port}` : ''
+    return port.length > 0 ? `${protocol}${location.hostname}:${port}` : ''
   }
 
   setup (_: IMultiplayerSceneOptions): void {
