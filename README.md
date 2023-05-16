@@ -23,3 +23,11 @@ npm run serve
 ```
 
 ## Open browser at [http://localhost:8878](http://localhost:8878)
+
+# Run local websocket server + static server (dist folder)
+
+```
+npm run socket
+```
+
+## Connect to [http://localhost:8879](http://localhost:8879)

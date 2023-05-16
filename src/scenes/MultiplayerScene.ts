@@ -232,6 +232,12 @@ export class MultiplayerScene extends Container implements IScene {
     this.box.endFill()
   }
 
+  calcDefaultWSAddress (): string {
+    const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://'
+    const port = location.port === '8878' ? '8879' : location.port
+    return port.length > 0 ? `${protocol}${location.host}:${port}` : ''
+  }
+
   setup (_: IMultiplayerSceneOptions): void {
     this.addChild(this.content)
 
@@ -270,7 +276,7 @@ export class MultiplayerScene extends Container implements IScene {
     this.input = new Input({
       initHeight: urlInputOptions.height,
       initWidth: urlInputOptions.width,
-      initValue: localStorage.getItem(MultiplayerScene.wsURLKey) ?? 'ws://localhost:8879',
+      initValue: localStorage.getItem(MultiplayerScene.wsURLKey) ?? this.calcDefaultWSAddress(),
       onChanged: (value) => {
         localStorage.setItem(MultiplayerScene.wsURLKey, value)
         this.connect()

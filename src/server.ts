@@ -12,6 +12,7 @@ import {
   printObject
 } from './common'
 import debug from 'debug'
+import express from 'express'
 
 const logServer = debug('rts-srv')
 const logLatency = debug('rts-srv-latency')
@@ -43,7 +44,8 @@ type IServerGameRoom = IGameRoom<IPlayer> & {
   timeout?: NodeJS.Timeout
 }
 
-const httpServer = createServer()
+const app = express()
+const httpServer = createServer(app)
 const io = new Server<
 IClientToServerEvents,
 IServerToClientEvents,
@@ -54,6 +56,8 @@ ISocketData
     origin: '*'
   }
 })
+
+app.use('/', express.static('./dist/'))
 
 const port = typeof process.env.PORT === 'string' ? Number(process.env.PORT) : 8879
 
