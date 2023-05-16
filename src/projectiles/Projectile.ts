@@ -57,7 +57,7 @@ export class Projectile extends Item implements IMoveable {
     super(options)
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
-    this.setOrder({ type: 'fire', to: options.target })
+    this.setOrderImmediate({ type: 'fire', to: options.target })
     this.setup(options)
     this.vector.setDirection({ direction: options.direction })
     this.switchAnimation()

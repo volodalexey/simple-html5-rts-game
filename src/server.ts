@@ -323,7 +323,7 @@ function startGame (room: IServerGameRoom): void {
     })
 
     player.socket.once('lose_game', () => {
-      logWebsocket(`lose_game [${player.socket.id}]`)
+      logWebsocket(`lose_game [${player.socket.id}] ${player.color}`)
       endGame(room, `The ${player.color} team has been defeated.`, player)
     })
 

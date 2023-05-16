@@ -513,13 +513,14 @@ export class MultiplayerScene extends Container implements IScene {
     })
 
     this.addChild(this.game)
+    this.addChild(this.settingsModal)
     this.content.visible = false
     this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
   }
 
   mountedHandler (): void {
     this.game.removeFromParent()
-    this.addChild(this.settingsModal)
+    this.settingsModal.removeFromParent()
     this.handleResize({ viewWidth: SceneManager.width, viewHeight: SceneManager.height })
     this.connect()
   }

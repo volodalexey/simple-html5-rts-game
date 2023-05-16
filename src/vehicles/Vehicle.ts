@@ -389,11 +389,11 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
         let forceMagnitude
         switch (collObject.collisionType) {
           case ECollisionType.hard:
-            forceMagnitude = 1.5 + Math.random()
+            forceMagnitude = 2
             this.hardCollision = true
             break
           case ECollisionType.soft:
-            forceMagnitude = 0.5 + Math.random()
+            forceMagnitude = 1
             break
           case ECollisionType.attraction:
             forceMagnitude = -0.5

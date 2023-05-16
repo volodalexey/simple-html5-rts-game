@@ -569,9 +569,6 @@ export class Game extends Container {
 
   handleUpdate (deltaMS: number): void {
     if (this.gameEnded) {
-      if (this.startModal.visible) {
-        this.startModal.handleUpdate(deltaMS)
-      }
       return
     }
     this.time += deltaMS

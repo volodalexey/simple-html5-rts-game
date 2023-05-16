@@ -1,6 +1,7 @@
 import { Container, Graphics, Text, type Texture, type TextStyleFontWeight, ParticleContainer } from 'pixi.js'
 import { Button, type IButtonOptions } from './Button'
 import { Firework } from '../utils/Particle'
+import { SceneManager } from '../scenes/SceneManager'
 
 export interface IStartModalTextures {
   iconHomeTexture: Texture
@@ -82,6 +83,7 @@ export class StartModal extends Container {
     super()
     this.setup(options)
     this.draw(options)
+    SceneManager.app.ticker.add(this.handleUpdate)
   }
 
   setup (_: IStartModalOptions): void {
@@ -251,7 +253,7 @@ export class StartModal extends Container {
     }
   }
 
-  handleUpdate (deltaMS: number): void {
+  handleUpdate = (deltaMS: number): void => {
     if (this.visible) {
       this.particles.children.forEach((fire) => {
         (fire as Firework).handleUpdate()
