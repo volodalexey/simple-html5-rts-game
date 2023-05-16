@@ -198,7 +198,6 @@ export class Game extends Container {
   }
 
   handleItemPointerTap ({ selectedCommandName, underPointerItem }: { selectedCommandName?: ECommandName, underPointerItem: BaseActiveItem }): void {
-    const items: BaseActiveItem[] = []
     let order: IOrder | undefined
     switch (selectedCommandName) {
       case ECommandName.moveFollow:
@@ -223,11 +222,8 @@ export class Game extends Container {
           const item = this.selectedItems[i]
           if (item.team === this.team && underPointerItem !== item &&
           item.commands.includes(selectedCommandName)) {
-            items.push(item as BaseActiveItem)
+            item.setOrder(order, true)
           }
-        }
-        if (items.length > 0) {
-          this.processOrder({ items, order })
         }
       } else {
         this.clearSelection()
@@ -245,11 +241,8 @@ export class Game extends Container {
           const item = this.selectedItems[i]
           if (item.team === this.team && underPointerItem !== item &&
             item.commands.includes(selectedCommandName)) {
-            items.push(item as BaseActiveItem)
+            item.setOrder(order as IOrder, true)
           }
-        }
-        if (items.length > 0) {
-          this.processOrder({ items, order })
         }
       } else {
         this.clearSelection()
@@ -259,7 +252,6 @@ export class Game extends Container {
   }
 
   handleTerrainPointerTap ({ selectedCommandName, point }: { selectedCommandName?: ECommandName, point: Point }): void {
-    const items: BaseActiveItem[] = []
     let order: IOrder | undefined
     if (selectedCommandName == null) {
       selectedCommandName = ECommandName.moveFollow
@@ -298,15 +290,11 @@ export class Game extends Container {
         if (selectedCommandName === ECommandName.patrol) {
           // process patrol order individually
           const thisGrid = item.getGridXY({ center: true })
-          this.processOrder({ items: [item as BaseActiveItem], order: { type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } } })
+          item.setOrder({ type: 'patrol', fromPoint: thisGrid, toPoint: { gridX, gridY } }, true)
         } else {
-          items.push(item as BaseActiveItem)
+          item.setOrder(order as IOrder, true)
         }
       }
-    }
-    // then command them to move to the clicked location
-    if (items.length > 0) {
-      this.processOrder({ items, order })
     }
   }
 
@@ -977,7 +965,7 @@ export class Game extends Container {
   }
 
   // Receive order from singleplayer or multiplayer object and send it to units
-  processOrder ({
+  processOrders ({
     uids,
     items,
     order,
@@ -1021,17 +1009,6 @@ export class Game extends Container {
     }
     for (const item of items) {
       if (order != null || unitOrder != null) {
-        if (item.team === this.team) {
-          if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
-            this.audio.playYes(item.itemName)
-          } else if (['attack', 'move-and-attack'].includes(item.order.type)) {
-            this.audio.playAttack(item.itemName)
-          } else if (item.order.type === 'try-build') {
-            this.audio.playYes(item.itemName)
-          } else if (item.order.type === 'try-deploy') {
-            this.audio.playYes(item.itemName)
-          }
-        }
         const setOrder = (order ?? unitOrder) as IOrder
         if (toObject != null && ['attack', 'guard', 'follow', 'fire'].includes(item.order.type)) {
           (setOrder as IToOrder).to = toObject

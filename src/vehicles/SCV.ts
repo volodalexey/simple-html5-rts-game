@@ -155,8 +155,8 @@ export class SCV extends Vehicle {
     return readyToBuild
   }
 
-  override processOrders (): boolean {
-    if (super.processOrders()) {
+  override processOrder (): boolean {
+    if (super.processOrder()) {
       return true
     }
     switch (this.order.type) {

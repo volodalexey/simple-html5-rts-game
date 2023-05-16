@@ -95,7 +95,7 @@ export class Building extends SelectableLifeableSquareItem implements IBuildable
   }
 
   handleUpdate (deltaMS: number): void {
-    this.processOrders()
+    this.processOrder()
     this.updateAnimation()
     this.calcZIndex()
   }

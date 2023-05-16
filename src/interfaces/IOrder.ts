@@ -32,6 +32,7 @@ export type IOrder = IMoveOrder | IMoveAndAttack
 interface IMoveOrder {
   type: 'move'
   toPoint: IGridPointData
+  processed?: boolean
 }
 
 export type IToOrder = IFireOrder | IAttackOrder | IGuardOrder | IFollowOrder
@@ -39,24 +40,28 @@ export type IToOrder = IFireOrder | IAttackOrder | IGuardOrder | IFollowOrder
 export interface IFireOrder {
   type: 'fire'
   to: BaseActiveItem
+  processed?: boolean
 }
 
 export interface IAttackOrder {
   type: 'attack'
   to: BaseActiveItem
   nextOrder?: IOrder
+  processed?: boolean
 }
 
 export interface IGuardOrder {
   type: 'guard'
   to: BaseActiveItem
   nextOrder?: IOrder
+  processed?: boolean
 }
 
 export interface IFollowOrder {
   type: 'follow'
   to: BaseActiveItem
   nextOrder?: IOrder
+  processed?: boolean
 }
 
 export interface IGridPointData extends IGridPoint {
@@ -67,26 +72,31 @@ interface IPatrolOrder {
   type: 'patrol'
   fromPoint: IGridPointData
   toPoint: IGridPointData
+  processed?: boolean
 }
 
 interface IStandOrder {
   type: 'stand'
+  processed?: boolean
 }
 
 interface IHuntOrder {
   type: 'hunt'
+  processed?: boolean
 }
 
 interface ITryDeployOrder {
   type: 'try-deploy'
   toPoint: IGridPointData
   buildingUid?: number
+  processed?: boolean
 }
 
 interface IEndDeployOrder {
   type: 'end-deploy'
   toPoint: IGridPointData
   buildingUid?: number
+  processed?: boolean
 }
 
 interface ITryBuildOrder {
@@ -94,6 +104,7 @@ interface ITryBuildOrder {
   toPoint: IGridPointData
   name: BuildName
   buildingUid?: number
+  processed?: boolean
 }
 
 interface IEndBuildOrder {
@@ -101,6 +112,7 @@ interface IEndBuildOrder {
   toPoint: IGridPointData
   name: BuildName
   buildingUid?: number
+  processed?: boolean
 }
 
 interface ITryConstructUnitOrder {
@@ -108,6 +120,7 @@ interface ITryConstructUnitOrder {
   name: UnitName
   unitOrder?: IOrder
   unitUid?: number
+  processed?: boolean
 }
 
 interface IStartConstructUnitOrder {
@@ -115,6 +128,7 @@ interface IStartConstructUnitOrder {
   name: UnitName
   unitOrder?: IOrder
   unitUid?: number
+  processed?: boolean
 }
 
 interface IEndConstructUnitOrder {
@@ -123,10 +137,12 @@ interface IEndConstructUnitOrder {
   toPoint: IGridPointData
   unitOrder?: IOrder
   unitUid?: number
+  processed?: boolean
 }
 
 interface IMoveAndAttack {
   type: 'move-and-attack'
   toPoint: IGridPointData
   nextOrder?: IOrder
+  processed?: boolean
 }

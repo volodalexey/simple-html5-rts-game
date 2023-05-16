@@ -71,8 +71,11 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
     return targets[0]
   }
 
-  processOrders (): boolean {
-    if (this.order.type !== 'patrol' && super.processOrders()) {
+  processOrder (): boolean {
+    if (this.order.type !== 'patrol' && super.processOrder()) {
+      return true
+    }
+    if (this.order.processed === true) {
       return true
     }
     const { tileMap, turnSpeedAdjustmentFactor } = this.game

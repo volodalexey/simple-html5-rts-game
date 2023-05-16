@@ -147,8 +147,8 @@ export class Harvester extends Vehicle {
     }
   }
 
-  override processOrders (): boolean {
-    if (super.processOrders()) {
+  override processOrder (): boolean {
+    if (super.processOrder()) {
       return true
     }
     switch (this.order.type) {

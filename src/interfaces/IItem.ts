@@ -48,7 +48,7 @@ export interface IItem {
   itemName: EItemName
   commands: ECommandName[]
   readonly order: IOrder
-  setOrder: (order: IOrder) => void
+  setOrder: (order: IOrder, playSound?: boolean) => void
   setOrderImmediate: (order: IOrder) => void
   collisionGraphics: Graphics
   collisionOptions: {
@@ -67,5 +67,5 @@ export interface IItem {
   getCollisionPosition: (options: { center?: boolean, air?: boolean }) => { x: number, y: number }
   getCollisionBounds: () => IBound
   getGridCollisionBounds: () => IGridBound
-  processOrders: () => boolean
+  processOrder: () => boolean
 }

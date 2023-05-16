@@ -182,7 +182,7 @@ export class OilDerrick extends Building {
       }
       this.elapsedTime += deltaMS
     }
-    this.processOrders()
+    this.processOrder()
     this.updateAnimation()
     this.calcZIndex()
   }

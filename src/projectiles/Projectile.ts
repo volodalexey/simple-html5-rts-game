@@ -180,7 +180,10 @@ export class Projectile extends Item implements IMoveable {
     return this.currentAnimation === this.explodeAnimation
   }
 
-  processOrders (): boolean {
+  processOrder (): boolean {
+    if (this.order.processed === true) {
+      return true
+    }
     switch (this.order.type) {
       case 'fire': {
         // Move towards destination and stop when close by or if travelled past range
@@ -206,7 +209,7 @@ export class Projectile extends Item implements IMoveable {
   }
 
   handleUpdate (deltaMS: number): void {
-    this.processOrders()
+    this.processOrder()
   }
 
   _moveTo (destination: BaseActiveItem): void {

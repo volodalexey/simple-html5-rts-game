@@ -243,7 +243,10 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
     this.currentShadowAnimation.visible = true
   }
 
-  processOrders (): boolean {
+  processOrder (): boolean {
+    if (this.order.processed === true) {
+      return true
+    }
     const { tileMap } = this.game
     const thisGrid = this.getGridXY({ center: true })
     switch (this.order.type) {
@@ -315,7 +318,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
 
   handleUpdate (deltaMS: number): void {
     super.handleUpdate(deltaMS)
-    this.processOrders()
+    this.processOrder()
     if (this.elapsedSwitchFrames >= this.switchFrames) {
       this.updateAnimation(true)
       this.elapsedSwitchFrames = 0

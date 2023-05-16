@@ -238,7 +238,7 @@ export class CampaignScene extends Container implements IScene {
                   character: EMessageCharacter.driver,
                   message: 'Thank you. We thought we would never get out of here alive.'
                 })
-                this.game.processOrder({ uids: [-3, -4], order: { type: 'follow', to: hero } })
+                this.game.processOrders({ uids: [-3, -4], order: { type: 'follow', to: hero } })
               }
             }
           },
@@ -351,8 +351,8 @@ export class CampaignScene extends Container implements IScene {
             action: () => {
               // Construct a couple of bad guys to hunt the player every time enemy has enough money
               if (this.game.cash[Team.green] > 100 && this.game.tileMap.getTeamMoveableItems(Team.green).length < 10) {
-                this.game.processOrder({ uids: [-12], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
-                this.game.processOrder({ uids: [-13], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-12], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-13], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               }
             }
           },
@@ -484,7 +484,7 @@ export class CampaignScene extends Container implements IScene {
               tileMap.addItem(new Transport({
                 game: this.game, initX: tileMap.gridSize * 57, initY: tileMap.gridSize * 3, commands: [], team: Team.blue, uid: -6
               }))
-              this.game.processOrder({ uids: [-5], orderType: 'guard', toUid: -6 })
+              this.game.processOrders({ uids: [-5], orderType: 'guard', toUid: -6 })
               this.game.showMessage({
                 character: EMessageCharacter.driver,
                 message: 'Commander!! The colony has sent some extra supplies. We are coming in from the North East sector through rebel territory. We could use a little protection.'
@@ -520,7 +520,7 @@ export class CampaignScene extends Container implements IScene {
             time: 48000,
             action: () => {
               // Start moving the transport
-              this.game.processOrder({ uids: [-6], order: { type: 'move', toPoint: { gridX: 1.5, gridY: 38.5 } } })
+              this.game.processOrders({ uids: [-6], order: { type: 'move', toPoint: { gridX: 1.5, gridY: 38.5 } } })
               this.game.showMessage({
                 character: EMessageCharacter.driver,
                 message: 'Thanks! Appreciate the backup. All right. Off we go.'
@@ -589,26 +589,26 @@ export class CampaignScene extends Container implements IScene {
               // Make sure enemy has atleast two wraiths and two heavy tanks, and use the remaining starports to build choppers and scouts
               if (wraithCount === 0) {
                 // No wraiths alive. Ask both starports to make wraiths
-                this.game.processOrder({ uids: [-23, -24], order: { type: 'try-construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-23, -24], order: { type: 'try-construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
               } else if (wraithCount === 1) {
                 // One wraith alive. Ask starports to make one wraith and one chopper
-                this.game.processOrder({ uids: [-23], order: { type: 'try-construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
-                this.game.processOrder({ uids: [-24], order: { type: 'try-construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-23], order: { type: 'try-construct-unit', name: EItemName.Wraith, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-24], order: { type: 'try-construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
               } else {
                 // Two wraiths alive. Ask both starports to make choppers
-                this.game.processOrder({ uids: [-23, -24], order: { type: 'try-construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-23, -24], order: { type: 'try-construct-unit', name: EItemName.Chopper, unitOrder: { type: 'hunt' } } })
               }
 
               if (heavyTankCount === 0) {
                 // No heavy-tanks alive. Ask both starports to make heavy-tanks
-                this.game.processOrder({ uids: [-21, -22], order: { type: 'try-construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-21, -22], order: { type: 'try-construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
               } else if (heavyTankCount === 1) {
                 // One heavy-tank alive. Ask starports to make one heavy-tank and one scout-tank
-                this.game.processOrder({ uids: [-21], order: { type: 'try-construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
-                this.game.processOrder({ uids: [-22], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-21], order: { type: 'try-construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-22], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               } else {
                 // Two heavy-tanks alive. Ask both starports to make scout-tanks
-                this.game.processOrder({ uids: [-21, -22], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
+                this.game.processOrders({ uids: [-21, -22], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'hunt' } } })
               }
               // Ask any units on the field to attack
               const uids = []
@@ -618,7 +618,7 @@ export class CampaignScene extends Container implements IScene {
                   uids.push(item.uid)
                 }
               };
-              this.game.processOrder({ uids, order: { type: 'hunt' } })
+              this.game.processOrders({ uids, order: { type: 'hunt' } })
             }
           },
           {
@@ -741,7 +741,7 @@ export class CampaignScene extends Container implements IScene {
                 })
                 this.game.cash[Team.blue] += 40
                 this.game.cash[Team.green] += 160
-                this.game.processOrder({ uids: [-2], order: { type: 'try-construct-unit', name: EItemName.Harvester, unitOrder: { type: 'try-deploy', toPoint: { gridX: 51, gridY: 2 } } } })
+                this.game.processOrders({ uids: [-2], order: { type: 'try-construct-unit', name: EItemName.Harvester, unitOrder: { type: 'try-deploy', toPoint: { gridX: 51, gridY: 2 } } } })
               }
             }
           },
@@ -766,7 +766,7 @@ export class CampaignScene extends Container implements IScene {
                   message: "SCV can build a turret to resist the enemy's attack.\nSelect SCV and build a turret on the right side of the main base"
                 })
                 this.game.cash[Team.green] += 240
-                this.game.processOrder({ uids: [-2], order: { type: 'try-construct-unit', name: EItemName.SCV, unitOrder: { type: 'try-build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } } })
+                this.game.processOrders({ uids: [-2], order: { type: 'try-construct-unit', name: EItemName.SCV, unitOrder: { type: 'try-build', name: EItemName.Starport, toPoint: { gridX: 53, gridY: 6 } } } })
               }
             }
           },
@@ -789,7 +789,7 @@ export class CampaignScene extends Container implements IScene {
                   message: 'The enemy is attacking!'
                 })
                 this.game.cash[Team.green] += 50
-                this.game.processOrder({ uids: [enemyStarport.uid], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'attack', to: turret }, unitUid: -3 } })
+                this.game.processOrders({ uids: [enemyStarport.uid], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'attack', to: turret }, unitUid: -3 } })
               } else {
                 this.endMission({ success: false })
               }
@@ -895,7 +895,7 @@ export class CampaignScene extends Container implements IScene {
               const enemyStarport = this.game.tileMap.staticItems.find(item => item.itemName === EItemName.Starport && item.team === Team.green)
               if (enemyStarport != null) {
                 this.game.cash[Team.green] += 50
-                this.game.processOrder({ uids: [enemyStarport.uid], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 58, gridY: 10 }, toPoint: { gridX: 51, gridY: 10 } }, unitUid: -4 } })
+                this.game.processOrders({ uids: [enemyStarport.uid], order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'patrol', fromPoint: { gridX: 58, gridY: 10 }, toPoint: { gridX: 51, gridY: 10 } }, unitUid: -4 } })
               }
             }
           },

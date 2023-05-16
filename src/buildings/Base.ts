@@ -205,11 +205,13 @@ export class Base extends Building {
     }
   }
 
-  override processOrders (): boolean {
+  override processOrder (): boolean {
     // damaged building cannot construct
     if (!this.isHealthy()) {
-      this.setOrder({ type: 'stand' })
-      return false
+      return true
+    }
+    if (this.order.processed === true) {
+      return true
     }
     switch (this.order.type) {
       case 'try-construct-unit': {

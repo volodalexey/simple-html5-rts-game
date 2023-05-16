@@ -202,10 +202,13 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
     }
   }
 
-  override processOrders (): boolean {
+  override processOrder (): boolean {
     // damaged turret cannot attack
     if (!this.isHealthy()) {
-      return false
+      return true
+    }
+    if (this.order.processed === true) {
+      return true
     }
     switch (this.order.type) {
       case 'stand': {
@@ -287,7 +290,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
     if (this.reloadTimeLeft > 0) {
       this.reloadTimeLeft -= this.game.reloadAdjustmentFactor
     }
-    this.processOrders()
+    this.processOrder()
     this.updateAnimation()
     this.updateReload()
     this.zIndex = this.y + this.height

@@ -56,15 +56,39 @@ export class Item extends Container implements IItem {
     return this._order
   }
 
-  setOrder (order: IOrder): void {
-    if (typeof this.game.serializeOrders === 'function' && this.game.team === this.team) {
-      this.game.processOrder({ items: [this as unknown as BaseActiveItem], order })
+  playSound (order: IOrder): void {
+    if (this.team === this.game.team) {
+      if (['move', 'follow', 'guard', 'patrol'].includes(order.type)) {
+        this.game.audio.playYes(this.itemName)
+      } else if (['attack', 'move-and-attack'].includes(order.type)) {
+        this.game.audio.playAttack(this.itemName)
+      } else if (order.type === 'try-build') {
+        this.game.audio.playYes(this.itemName)
+      } else if (order.type === 'try-deploy') {
+        this.game.audio.playYes(this.itemName)
+      }
+    }
+  }
+
+  setOrder (order: IOrder, playSound = false): void {
+    if (playSound) {
+      this.playSound(order)
+    }
+    if (typeof this.game.serializeOrders === 'function') {
+      this.order.processed = true
+      if (this.game.team === this.team) {
+        this.game.processOrders({ items: [this as unknown as BaseActiveItem], order })
+      }
+      // skip order from another team, because this will be received from websocket
     } else {
       this._order = order
     }
   }
 
-  setOrderImmediate (order: IOrder): void {
+  setOrderImmediate (order: IOrder, playSound = false): void {
+    if (playSound) {
+      this.playSound(order)
+    }
     this._order = order
   }
 
@@ -155,7 +179,10 @@ export class Item extends Container implements IItem {
     }
   }
 
-  processOrders (): boolean {
+  processOrder (): boolean {
+    if (this.order.processed === true) {
+      return true
+    }
     return false
   }
 

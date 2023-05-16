@@ -196,7 +196,6 @@ export class MultiplayerScene extends Container implements IScene {
   }
 
   public lastReceivedTick = 0
-  public debugTick = 0
   public currentTick = 0
   public playerId = ''
   public ordersByTick: Array<{ tick: number, orders: ISendOrder[] }> = []
@@ -384,14 +383,11 @@ export class MultiplayerScene extends Container implements IScene {
     // execute the commands and move on to the next tick
     // otherwise wait for server to catch up
     if (this.currentTick <= this.lastReceivedTick) {
-      // if (this.debugTick > 0 && this.debugTick === this.currentTick) {
-      //   debugger
-      // }
       const ordersIdx = this.ordersByTick.findIndex(({ tick }) => tick === this.currentTick)
       const tickOrders = this.ordersByTick[ordersIdx]
       if (tickOrders != null && Array.isArray(tickOrders.orders) && tickOrders.orders.length > 0) {
         for (const { uids, order } of tickOrders.orders) {
-          this.game.processOrder({
+          this.game.processOrders({
             uids,
             order: castToClientOrder(order, (uid: number) => {
               return this.game.tileMap.getItemByUid(uid) ?? {} as unknown as BaseActiveItem
@@ -502,9 +498,6 @@ export class MultiplayerScene extends Container implements IScene {
         logWebsocket(`game_tick ${tick} ${printObject(orders)}`)
       }
       this.lastReceivedTick = tick
-      if (Array.isArray(orders) && orders.length > 0) {
-        this.debugTick = tick
-      }
       this.ordersByTick.push({ tick, orders })
     })
     this.socket.once('end_game', ({ wonPlayerId, reason }) => {
