@@ -1,5 +1,5 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
-import { Team } from '../utils/common'
+import { Team } from '../utils/helpers'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
 import { EItemName } from '../interfaces/IItem'
 import { logCash } from '../utils/logger'

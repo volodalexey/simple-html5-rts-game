@@ -1,7 +1,7 @@
 import { type Application, Container } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
 import { type Game } from '../Game'
-import { Team } from '../utils/common'
+import { Team } from '../utils/helpers'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
 import { EItemName } from '../interfaces/IItem'

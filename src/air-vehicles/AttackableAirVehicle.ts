@@ -1,6 +1,6 @@
 import { ECommandName } from '../interfaces/ICommand'
 import { ReloadBar } from '../components/ReloadBar'
-import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../utils/common'
+import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../utils/helpers'
 import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType, type ProjectileName } from '../interfaces/IItem'
 import { type IAirVehicleOptions, AirVehicle } from './AirVehicle'
@@ -81,14 +81,14 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       case 'stand': {
         const target = this.findTargetInSight()
         if (target != null) {
-          this.order = { type: 'attack', to: target }
+          this.setOrder({ type: 'attack', to: target })
         }
         return true
       }
       case 'hunt': {
         const target = this.findTargetInSight(100)
         if (target != null) {
-          this.order = { type: 'attack', to: target, nextOrder: this.order }
+          this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
         }
         return true
       }
@@ -98,9 +98,9 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
         }
         if (this.order.to.isDead() || !this.isValidTarget(this.order.to)) {
           if (this.order.nextOrder != null) {
-            this.order = this.order.nextOrder
+            this.setOrder(this.order.nextOrder)
           } else {
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
           return true
         }
@@ -132,6 +132,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
                 const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
                 const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
                 const projectile = this.game.createProjectile({
+                  team: this.team,
                   name: this.projectile,
                   initX: bulletX * tileMap.gridSize,
                   initY: bulletY * tileMap.gridSize,
@@ -150,7 +151,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
           if (!moving) {
             // Pathfinding couldn't find a path so stop
             // e.g. enemy is in hard collide state
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
         }
         return true
@@ -158,7 +159,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       case 'patrol': {
         const target = this.findTargetInSight()
         if (target != null) {
-          this.order = { type: 'attack', to: target, nextOrder: this.order }
+          this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           return true
         }
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
@@ -174,9 +175,9 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       case 'guard': {
         if (this.order.to.isDead()) {
           if (this.order.nextOrder != null) {
-            this.order = this.order.nextOrder
+            this.setOrder(this.order.nextOrder)
           } else {
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
           return true
         }
@@ -186,20 +187,20 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
         if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
           const target = this.findTargetInSight()
           if (target != null) {
-            this.order = { type: 'attack', to: target, nextOrder: this.order }
+            this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
             return true
           }
           if (this.order.to.order.type === 'attack') {
-            this.order = {
+            this.setOrder({
               type: 'attack',
               to: this.order.to.order.to,
               nextOrder: this.order
-            }
+            })
           }
         } else {
           const target = this.findTargetInSight()
           if (target != null) {
-            this.order = { type: 'attack', to: target, nextOrder: this.order }
+            this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           } else {
             const toGrid = this.order.to.getGridXY({ center: true })
             this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
@@ -210,20 +211,20 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       case 'move-and-attack': {
         const target = this.findTargetInSight()
         if (target != null) {
-          this.order = { type: 'attack', to: target, nextOrder: this.order }
+          this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           return true
         }
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.collisionRadius / tileMap.gridSize, 2)) {
           // Stop when within one radius of the destination
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
           return true
         }
         const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
         const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
         // Pathfinding couldn't find a path so stop
         if (!moving) {
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
           return true
         }
         return true

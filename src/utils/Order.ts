@@ -1,12 +1,12 @@
 import { Graphics, Sprite } from 'pixi.js'
-import { Team, type SelectableItem, type BaseActiveItem } from './common'
+import { Team, type SelectableItem, type BaseActiveItem } from './helpers'
 import { type IGridPointData, type IOrder } from '../interfaces/IOrder'
 import { type TileMap } from '../components/TileMap'
 import { type BuildName, EItemName, type UnitName, type EItemType } from '../interfaces/IItem'
 import { GroundTurret } from '../buildings/GroundTurret'
 import { Starport } from '../buildings/Starport'
 import { OilDerrick } from '../buildings/OilDerrick'
-import { type IServerGridPointData, type IServerOrder } from '../socket.types'
+import { type IServerGridPointData, type IServerOrder } from '../common'
 
 export class Order extends Graphics {
   public item!: SelectableItem

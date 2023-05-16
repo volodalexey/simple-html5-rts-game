@@ -1,7 +1,7 @@
 import { Container, Graphics } from 'pixi.js'
 import { EItemName, EItemType, type IItem } from '../interfaces/IItem'
 import { type Game } from '../Game'
-import { generateUid } from '../utils/common'
+import { type Team, generateUid, type BaseActiveItem } from '../utils/helpers'
 import { type ECommandName } from '../interfaces/ICommand'
 import { type IOrder } from '../interfaces/IOrder'
 import { logItemBounds } from '../utils/logger'
@@ -11,6 +11,7 @@ import { type IBound } from '../interfaces/IBound'
 export interface IItemOptions {
   game: Game
   uid?: number
+  team: Team
   initX: number
   initY: number
   commands?: ECommandName[]
@@ -20,12 +21,13 @@ export interface IItemOptions {
 export class Item extends Container implements IItem {
   public game: Game
   public uid: number
+  public team: Team
   public sightRadius = 0
   public collisionRadius = 0
   public type = EItemType.none
   public itemName = EItemName.None
   public commands: ECommandName[] = []
-  public order: IOrder
+  private _order: IOrder = { type: 'stand' }
   public collisionGraphics = new Graphics()
   public collisionOptions = {
     width: 0,
@@ -39,12 +41,29 @@ export class Item extends Container implements IItem {
   constructor (options: IItemOptions) {
     super()
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
+    this.team = options.team
     this.game = options.game
-    this.order = options.order ?? { type: 'stand' }
+    this.setOrder(options.order ?? { type: 'stand' })
   }
 
   setup (_: IItemOptions): void {
     this.addChild(this.collisionGraphics)
+  }
+
+  get order (): IOrder {
+    return this._order
+  }
+
+  setOrder (order: IOrder): void {
+    if (typeof this.game.serializeOrders === 'function' && this.game.team === this.team) {
+      this.game.processOrder({ items: [this as unknown as BaseActiveItem] })
+    } else {
+      this._order = order
+    }
+  }
+
+  setOrderImmediate (order: IOrder): void {
+    this._order = order
   }
 
   getGridXY ({ floor = false, center = false } = {}): IGridPoint {

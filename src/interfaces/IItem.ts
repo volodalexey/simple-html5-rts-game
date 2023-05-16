@@ -47,7 +47,9 @@ export interface IItem {
   type: EItemType
   itemName: EItemName
   commands: ECommandName[]
-  order: IOrder
+  readonly order: IOrder
+  setOrder: (order: IOrder) => void
+  setOrderImmediate: (order: IOrder) => void
   collisionGraphics: Graphics
   collisionOptions: {
     width: number

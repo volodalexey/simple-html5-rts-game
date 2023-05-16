@@ -1,4 +1,4 @@
-import { type BaseActiveItem } from '../utils/common'
+import { type BaseActiveItem } from '../utils/helpers'
 import { type IGridPoint } from './IGridPoint'
 import { type UnitName, type EItemType, type BuildName } from './IItem'
 
@@ -31,24 +31,26 @@ interface IMoveOrder {
   toPoint: IGridPointData
 }
 
+export type IToOrder = IFireOrder | IAttackOrder | IGuardOrder | IFollowOrder
+
 export interface IFireOrder {
   type: 'fire'
   to: BaseActiveItem
 }
 
-interface IAttackOrder {
+export interface IAttackOrder {
   type: 'attack'
   to: BaseActiveItem
   nextOrder?: IOrder
 }
 
-interface IGuardOrder {
+export interface IGuardOrder {
   type: 'guard'
   to: BaseActiveItem
   nextOrder?: IOrder
 }
 
-interface IFollowOrder {
+export interface IFollowOrder {
   type: 'follow'
   to: BaseActiveItem
   nextOrder?: IOrder

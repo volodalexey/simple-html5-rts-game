@@ -1,6 +1,5 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
-import { Team } from '../utils/common'
-import { type IOrder } from '../interfaces/IOrder'
+import { Team } from '../utils/helpers'
 import { type IAttackableBuildingTextures, type IAttackableBuildingOptions, AttackableBuilding } from './AttackableBuilding'
 import { EItemName, type ProjectileName } from '../interfaces/IItem'
 import { BuildingAnimation } from './Building'
@@ -101,7 +100,6 @@ export class GroundTurret extends AttackableBuilding {
   public canAttackAir = false
   public turnSpeed = 4
   public projectile: ProjectileName = EItemName.CannonBall
-  public order: IOrder = { type: 'stand' }
 
   static buildableGrid = [
     [1]

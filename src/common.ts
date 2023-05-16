@@ -123,3 +123,24 @@ interface IServerMoveAndAttack {
   toPoint: IServerGridPointData
   nextOrder?: IServerOrder
 }
+
+export function printObject (obj: any): string {
+  const type = typeof obj
+  if (Array.isArray(obj)) {
+    return `[${obj.map((i) => printObject(i)).join(', ')}]`
+  } else if (obj !== null && type === 'object') {
+    return JSON.stringify(obj)
+  } else if (obj === null) {
+    return 'null'
+  } else if (obj === true) {
+    return 'true'
+  } else if (obj === false) {
+    return 'false'
+  } else if (type === 'string') {
+    return obj
+  } else if (type === 'number') {
+    return obj
+  } else {
+    return `${type} ${obj}`
+  }
+}

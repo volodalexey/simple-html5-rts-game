@@ -1,6 +1,6 @@
 import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../utils/Vector'
-import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../utils/common'
+import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../utils/helpers'
 import { EItemType } from '../interfaces/IItem'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { type IGridPointData } from '../interfaces/IOrder'
@@ -86,7 +86,6 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
 
   constructor (options: IAirVehicleOptions) {
     super(options)
-    this.order = options.order ?? { type: 'stand' }
     if (options.direction != null) {
       this.vector.setDirection({ direction: options.direction })
     }
@@ -253,7 +252,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
         // Move towards destination until distance from destination is less than aircraft radius
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
         if (distanceFromDestinationSquared < Math.pow(this.collisionRadius / tileMap.gridSize, 2)) {
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
           return true
         } else {
           if (this.colliding && (distanceFromDestinationSquared) < Math.pow(this.collisionRadius * 5 / tileMap.gridSize, 2)) {
@@ -265,7 +264,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
             }
             // Stop if more than 30 collisions occur
             if (this.collisionCount > 30) {
-              this.order = { type: 'stand' }
+              this.setOrder({ type: 'stand' })
               return true
             }
           }
@@ -273,7 +272,7 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
           const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
           // Pathfinding couldn't find a path so stop
           if (!moving) {
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
             return true
           }
         }
@@ -282,9 +281,9 @@ export class AirVehicle extends TeleportableSelectableLifeableRoundItem implemen
       case 'follow': {
         if (this.order.to.isDead()) {
           if (this.order.nextOrder != null) {
-            this.order = this.order.nextOrder
+            this.setOrder(this.order.nextOrder)
           } else {
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
           return true
         }

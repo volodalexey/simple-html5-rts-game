@@ -1,6 +1,6 @@
 import { ECommandName } from '../interfaces/ICommand'
 import { EMessageCharacter } from '../components/StatusBar'
-import { Team } from '../utils/common'
+import { Team } from '../utils/helpers'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
 import { logCash } from '../utils/logger'
@@ -106,7 +106,7 @@ export class SCV extends Vehicle {
         const cost = this.game.getItemCost(this.order.name)
         if (typeof cost !== 'number') {
           console.warn(`Unable to calc item (name=${this.order.name}) cost`)
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
           return true
         }
         const { tileMap, cash, team: gameTeam } = this.game
@@ -116,7 +116,7 @@ export class SCV extends Vehicle {
             message: `Warning! Insufficient Funds. Need ${cost} credits.`,
             selfRemove: true
           })
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
           return true
         }
         tileMap.rebuildBuildableGrid()
@@ -124,7 +124,7 @@ export class SCV extends Vehicle {
         const buildableGrid = this.game.getBuildableGrid(this.order.name)
         if (buildableGrid == null) {
           console.warn(`Unable to detect buildable grid for name=${this.order.name}`)
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
           return true
         }
         const { toPoint } = this.order
@@ -134,7 +134,7 @@ export class SCV extends Vehicle {
               if (this.team === this.game.team) {
                 this.game.audio.playSCVError()
               }
-              this.order = { type: 'stand' }
+              this.setOrder({ type: 'stand' })
               return true
             }
           }
@@ -174,7 +174,7 @@ export class SCV extends Vehicle {
             tileMap.addItem(building)
             tileMap.rebuildPassableRequired = true
           }
-          this.order = { type: 'stand' }
+          this.setOrder({ type: 'stand' })
         } else {
           const thisGrid = this.getGridXY()
           const distanceFromDestinationSquared = (Math.pow(toPoint.gridX - thisGrid.gridX, 2) + Math.pow(toPoint.gridY - thisGrid.gridY, 2))
@@ -185,7 +185,7 @@ export class SCV extends Vehicle {
             if (this.team === this.game.team) {
               this.game.audio.playSCVError()
             }
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
         }
         return true

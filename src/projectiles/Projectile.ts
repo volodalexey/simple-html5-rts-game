@@ -2,7 +2,7 @@ import { AnimatedSprite, Container, type Texture } from 'pixi.js'
 import { EItemType } from '../interfaces/IItem'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { EVectorDirection, Vector } from '../utils/Vector'
-import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../utils/common'
+import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../utils/helpers'
 import { type IItemOptions, Item } from '../oop/Item'
 
 export interface IProjectileTextures {
@@ -57,7 +57,7 @@ export class Projectile extends Item implements IMoveable {
     super(options)
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
-    this.order = { type: 'fire', to: options.target }
+    this.setOrder({ type: 'fire', to: options.target })
     this.setup(options)
     this.vector.setDirection({ direction: options.direction })
     this.switchAnimation()
@@ -191,7 +191,7 @@ export class Projectile extends Item implements IMoveable {
 
             this.order.to.subLife(this.damage)
             this.switchToExplodeAnimation()
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           } else {
             // Bullet fizzles out without hitting target
             this.removeFromParent()

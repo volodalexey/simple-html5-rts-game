@@ -1,7 +1,7 @@
 import { Container, type FederatedPointerEvent, Graphics, Sprite, type Texture } from 'pixi.js'
 import { logNoFog, logPointerEvent } from '../utils/logger'
 import { type Game } from '../Game'
-import { type BaseActiveItem, Team } from '../utils/common'
+import { type BaseActiveItem, Team } from '../utils/helpers'
 import { EItemType } from '../interfaces/IItem'
 
 export interface IMiniMapOptions {

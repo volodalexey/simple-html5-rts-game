@@ -1,10 +1,8 @@
 import { Graphics } from 'pixi.js'
 import { type ILifeableItemOptions, LifeableItem } from './LifeableItem'
-import { type Team } from '../utils/common'
 import { type ISelectable } from '../interfaces/ISelectable'
 
 export interface ISelectableLifeableItemOptions extends ILifeableItemOptions {
-  team: Team
   selectable?: boolean
 }
 
@@ -25,11 +23,8 @@ class SelectableLifeableItem extends LifeableItem implements ISelectable {
     }
   }
 
-  public team: Team
-
   constructor (options: ISelectableLifeableItemOptions) {
     super(options)
-    this.team = options.team
     if (typeof options.selectable === 'boolean') {
       this.selectable = options.selectable
     }

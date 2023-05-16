@@ -1,7 +1,16 @@
 
 import { createServer } from 'http'
 import { Server, type Socket } from 'socket.io'
-import { type IGameRoom, type IClientToServerEvents, type IInterServerEvents, type IServerToClientEvents, type ISocketData, type IClientGameRoom, type ISendOrder } from './socket.types'
+import {
+  type IGameRoom,
+  type IClientToServerEvents,
+  type IInterServerEvents,
+  type IServerToClientEvents,
+  type ISocketData,
+  type IClientGameRoom,
+  type ISendOrder,
+  printObject
+} from './common'
 import debug from 'debug'
 
 const logServer = debug('rts-srv')
@@ -388,25 +397,4 @@ function sendRoomsList (player: IPlayer): void {
     logWebsocket(`room_list ${printObject(params)}`)
   }
   player.socket.emit('room_list', params)
-}
-
-export function printObject (obj: any): string {
-  const type = typeof obj
-  if (Array.isArray(obj)) {
-    return `[${obj.map((i) => printObject(i)).join(', ')}]`
-  } else if (obj !== null && type === 'object') {
-    return JSON.stringify(obj)
-  } else if (obj === null) {
-    return 'null'
-  } else if (obj === true) {
-    return 'true'
-  } else if (obj === false) {
-    return 'false'
-  } else if (type === 'string') {
-    return obj
-  } else if (type === 'number') {
-    return obj
-  } else {
-    return `${type} ${obj}`
-  }
 }

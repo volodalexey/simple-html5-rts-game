@@ -1,7 +1,7 @@
 import { Container, Graphics, type Texture } from 'pixi.js'
 import { type Game } from '../Game'
 import { CommandsBar } from './CommandsBar'
-import { type SelectableItem } from '../utils/common'
+import { type SelectableItem } from '../utils/helpers'
 import { logSideBar } from '../utils/logger'
 import { Button } from './Button'
 import { SceneManager } from '../scenes/SceneManager'

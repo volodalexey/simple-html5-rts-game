@@ -1,6 +1,6 @@
 import { OilDerrick } from '../buildings/OilDerrick'
 import { ECommandName } from '../interfaces/ICommand'
-import { wrapDirection, Team, angleDiff } from '../utils/common'
+import { wrapDirection, Team, angleDiff } from '../utils/helpers'
 import { EItemName, EItemType } from '../interfaces/IItem'
 import { EVectorDirection } from '../utils/Vector'
 import { Vehicle, type IVehicleOptions, type IVehicleTextures } from './Vehicle'
@@ -116,7 +116,7 @@ export class Harvester extends Vehicle {
               if (this.team === this.game.team) {
                 this.game.audio.playHarvesterError()
               }
-              this.order = { type: 'stand' }
+              this.setOrder({ type: 'stand' })
               return true
             }
           }
@@ -160,7 +160,7 @@ export class Harvester extends Vehicle {
             if (this.team === this.game.team) {
               this.game.audio.playHarvesterError()
             }
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
         }
         return true

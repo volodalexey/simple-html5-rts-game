@@ -1,7 +1,7 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { ReloadBar } from '../components/ReloadBar'
 import { EVectorDirection, Vector } from '../utils/Vector'
-import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../utils/common'
+import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '../utils/helpers'
 import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType, type ProjectileName } from '../interfaces/IItem'
 import { type ITurnable } from '../interfaces/ITurnable'
@@ -211,7 +211,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
       case 'stand': {
         const target = this.findTargetInSight()
         if (target != null) {
-          this.order = { type: 'attack', to: target, nextOrder: this.order }
+          this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
         }
         break
       }
@@ -229,7 +229,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
           if (target != null) {
             this.order.to = target
           } else {
-            this.order = { type: 'stand' }
+            this.setOrder({ type: 'stand' })
           }
         }
         if (this.order.type !== 'attack' || this.order.to == null) {
@@ -261,6 +261,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
                 const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
                 const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
                 const projectile = this.game.createProjectile({
+                  team: this.team,
                   name: this.projectile,
                   initX: bulletX * tileMap.gridSize,
                   initY: bulletY * tileMap.gridSize,
@@ -273,6 +274,8 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
               }
             }
           }
+        } else {
+          this.setOrder({ type: 'stand' })
         }
         break
       }

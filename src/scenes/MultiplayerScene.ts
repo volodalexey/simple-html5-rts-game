@@ -1,8 +1,8 @@
 import { type Socket, io } from 'socket.io-client'
 import { type Application, Container, Graphics, type TextStyleAlign, Assets, type Spritesheet, Text, type TextStyleFontWeight } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
-import { type Game } from '../Game'
-import { type BaseActiveItem, Team } from '../utils/common'
+import { type IGameOptions, type Game } from '../Game'
+import { type BaseActiveItem, Team } from '../utils/helpers'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
 import { EItemName } from '../interfaces/IItem'
@@ -10,7 +10,7 @@ import { logCash, logLayout } from '../utils/logger'
 import { type SettingsModal } from '../components/SettingsModal'
 import { Input } from '../components/Input'
 import { Button, type IButtonOptions } from '../components/Button'
-import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents } from '../socket.types'
+import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents } from '../common'
 import { type IMapSettings, MapSettings } from '../utils/MapSettings'
 import { castToClientOrder, castToServerOrder } from '../utils/Order'
 
@@ -385,7 +385,8 @@ export class MultiplayerScene extends Container implements IScene {
             uids,
             order: castToClientOrder(order, (uid: number) => {
               return this.game.tileMap.getItemByUid(uid) ?? {} as unknown as BaseActiveItem
-            })
+            }),
+            forceProcess: true // force game to process orders, otherwise infinity loop though websocket
           })
         };
       }
@@ -407,9 +408,13 @@ export class MultiplayerScene extends Container implements IScene {
     handleTiggers({ deltaMS, triggers: this.triggers })
   }
 
-  sendOrders (): void {
+  sendOrders (options?: Parameters<NonNullable<IGameOptions['serializeOrders']>>[0]): void {
     this.sentOrdersForTick = true
-    this.socket?.emit('orders', { currentTick: this.currentTick })
+    const params: Parameters<IClientToServerEvents['orders']>[0] = { currentTick: this.currentTick }
+    if (options != null) {
+      params.orders = [{ uids: options.uids, order: castToServerOrder(options.order) }]
+    }
+    this.socket?.emit('orders', params)
   }
 
   start = ({ spawnLocations, players }: Parameters<IServerToClientEvents['init_level']>[0]): void => {
@@ -450,7 +455,7 @@ export class MultiplayerScene extends Container implements IScene {
       team,
       type: 'multiplayer',
       serializeOrders: ({ uids, order }) => {
-        this.socket?.emit('orders', { currentTick: this.currentTick, orders: [{ uids, order: castToServerOrder(order) }] })
+        this.sendOrders({ uids, order })
       }
     });
 

@@ -3,14 +3,14 @@ import { type EMessageCharacter } from './components/StatusBar'
 import { TileMap } from './components/TileMap'
 import { Camera } from './components/Camera'
 import { logDoubleTapEvent, logLayout, logPointerEvent } from './utils/logger'
-import { Team, type SelectableItem, type BaseActiveItem } from './utils/common'
+import { Team, type SelectableItem, type BaseActiveItem } from './utils/helpers'
 import { Base } from './buildings/Base'
 import { Harvester } from './vehicles/Harvester'
 import { HeavyTank } from './vehicles/HeavyTank'
 import { ScoutTank } from './vehicles/ScoutTank'
 import { Transport } from './vehicles/Transport'
 import { EItemName, type EItemNames, EItemType } from './interfaces/IItem'
-import { type OrderTypes, type IOrder } from './interfaces/IOrder'
+import { type OrderTypes, type IOrder, type IToOrder } from './interfaces/IOrder'
 import { type Audio } from './utils/Audio'
 import { Bullet } from './projectiles/Bullet'
 import { CannonBall } from './projectiles/CannonBall'
@@ -981,13 +981,15 @@ export class Game extends Container {
     items,
     order,
     toUid,
-    orderType
+    orderType,
+    forceProcess = false
   }: {
     uids?: number[]
     items?: BaseActiveItem[]
     order?: IOrder
     orderType?: OrderTypes
     toUid?: number
+    forceProcess?: boolean
   }): boolean {
     // In case the target "to" object is in terms of uid, fetch the target object
     let toObject
@@ -1010,7 +1012,7 @@ export class Game extends Container {
       .filter((item): item is BaseActiveItem => Boolean(item))
       .concat(Array.isArray(items) ? items : [])
       .filter((item): item is BaseActiveItem => Boolean(item))
-    if (this.serializeOrders != null) {
+    if (this.serializeOrders != null && !forceProcess) {
       if (order != null) {
         this.serializeOrders({ uids: items.map(i => i.uid), order })
       }
@@ -1018,7 +1020,6 @@ export class Game extends Container {
     }
     for (const item of items) {
       if (order != null || unitOrder != null) {
-        item.order = (order ?? unitOrder) as IOrder
         if (item.team === this.team) {
           if (['move', 'follow', 'guard', 'patrol'].includes(item.order.type)) {
             this.audio.playYes(item.itemName)
@@ -1030,9 +1031,11 @@ export class Game extends Container {
             this.audio.playYes(item.itemName)
           }
         }
-        if (toObject != null && (item.order.type === 'attack' || item.order.type === 'guard')) {
-          item.order.to = toObject
+        const setOrder = (order ?? unitOrder) as IOrder
+        if (toObject != null && ['attack', 'guard', 'follow', 'fire'].includes(item.order.type)) {
+          (setOrder as IToOrder).to = toObject
         }
+        item.setOrderImmediate(setOrder)
       }
     }
     return true
@@ -1201,6 +1204,7 @@ export class Game extends Container {
 
   createProjectile (options: {
     name: EItemName
+    team: Team
     initGridX?: number
     initGridY?: number
     initX?: number

@@ -1,5 +1,5 @@
 import { type ReloadBar } from '../components/ReloadBar'
-import { type BaseActiveItem } from '../utils/common'
+import { type BaseActiveItem } from '../utils/helpers'
 import { type ProjectileName } from './IItem'
 
 export interface IAttackable {

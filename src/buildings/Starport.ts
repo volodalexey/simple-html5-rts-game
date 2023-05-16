@@ -1,5 +1,5 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
-import { Team } from '../utils/common'
+import { Team } from '../utils/helpers'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
 import { EItemName, type UnitName } from '../interfaces/IItem'
 import { EMessageCharacter } from '../components/StatusBar'
@@ -305,7 +305,7 @@ export class Starport extends Building {
         } else {
           console.warn(`Unable to calc item (name=${this.order.name}) cost`)
         }
-        this.order = { type: 'stand' }
+        this.setOrder({ type: 'stand' })
       }
     }
     return false
