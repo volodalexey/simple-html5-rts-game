@@ -43,7 +43,9 @@ export class Item extends Container implements IItem {
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.team = options.team
     this.game = options.game
-    this.setOrder(options.order ?? { type: 'stand' })
+    if (options.order != null) {
+      this.setOrder(options.order)
+    }
   }
 
   setup (_: IItemOptions): void {
@@ -56,7 +58,7 @@ export class Item extends Container implements IItem {
 
   setOrder (order: IOrder): void {
     if (typeof this.game.serializeOrders === 'function' && this.game.team === this.team) {
-      this.game.processOrder({ items: [this as unknown as BaseActiveItem] })
+      this.game.processOrder({ items: [this as unknown as BaseActiveItem], order })
     } else {
       this._order = order
     }

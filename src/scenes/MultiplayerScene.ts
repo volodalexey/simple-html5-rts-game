@@ -6,11 +6,11 @@ import { type BaseActiveItem, Team } from '../utils/helpers'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
 import { EItemName } from '../interfaces/IItem'
-import { logCash, logLayout } from '../utils/logger'
+import { logCash, logLayout, logWebsocket } from '../utils/logger'
 import { type SettingsModal } from '../components/SettingsModal'
 import { Input } from '../components/Input'
 import { Button, type IButtonOptions } from '../components/Button'
-import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents } from '../common'
+import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents, printObject } from '../common'
 import { type IMapSettings, MapSettings } from '../utils/MapSettings'
 import { castToClientOrder, castToServerOrder } from '../utils/Order'
 
@@ -198,7 +198,7 @@ export class MultiplayerScene extends Container implements IScene {
   public lastReceivedTick = 0
   public currentTick = 0
   public playerId = ''
-  public ordersByTick: Record<string, ISendOrder[]> = {}
+  public ordersByTick: Array<{ tick: number, orders: ISendOrder[] }> = []
   public sentOrdersForTick = false
   constructor (options: IMultiplayerSceneOptions) {
     super()
@@ -298,7 +298,11 @@ export class MultiplayerScene extends Container implements IScene {
       iconTexture: textures['icon-next.png'],
       onClick: () => {
         if (this.selectedRoom != null) {
-          this.socket?.once('init_level', this.start)
+          this.socket?.once('init_level', (options) => {
+            logWebsocket(`init_level ${printObject(options)}`)
+            this.start(options)
+          })
+          logWebsocket(`join_room ${this.selectedRoom.roomId}`)
           this.socket?.emit('join_room', { roomId: this.selectedRoom.roomId })
         }
       }
@@ -309,6 +313,7 @@ export class MultiplayerScene extends Container implements IScene {
       onClick: () => {
         if (this.selectedRoom != null) {
           this.joinedRoom = undefined
+          logWebsocket(`leave_room ${this.selectedRoom.roomId}`)
           this.socket?.emit('leave_room', { roomId: this.selectedRoom.roomId })
           this.updateButtons()
         }
@@ -378,7 +383,8 @@ export class MultiplayerScene extends Container implements IScene {
     // execute the commands and move on to the next tick
     // otherwise wait for server to catch up
     if (this.currentTick <= this.lastReceivedTick) {
-      const orders = this.ordersByTick[this.currentTick]
+      const ordersIdx = this.ordersByTick.findIndex(({ tick }) => tick === this.currentTick)
+      const orders = this.ordersByTick[ordersIdx]
       if (Array.isArray(orders)) {
         for (const { uids, order } of orders) {
           this.game.processOrder({
@@ -389,6 +395,9 @@ export class MultiplayerScene extends Container implements IScene {
             forceProcess: true // force game to process orders, otherwise infinity loop though websocket
           })
         };
+      }
+      if (ordersIdx > -1) {
+        this.ordersByTick.splice(ordersIdx, 1) // remove proessed orders
       }
 
       this.game.handleUpdate(deltaMS)
@@ -413,6 +422,9 @@ export class MultiplayerScene extends Container implements IScene {
     const params: Parameters<IClientToServerEvents['orders']>[0] = { currentTick: this.currentTick }
     if (options != null) {
       params.orders = [{ uids: options.uids, order: castToServerOrder(options.order) }]
+    }
+    if (logWebsocket.enabled) {
+      logWebsocket(`orders ${printObject(params)}`)
     }
     this.socket?.emit('orders', params)
   }
@@ -441,8 +453,8 @@ export class MultiplayerScene extends Container implements IScene {
           return this.game.tileMap.staticItems.filter(item => item.team === this.game.team).length === 0
         },
         action: () => {
+          logWebsocket('lose_game')
           this.socket?.emit('lose_game')
-          // this.endMultiplayer({ success: false })
         }
       } satisfies IConditionalTrigger
     ].map(triggerDescription => createTrigger(triggerDescription))
@@ -479,15 +491,21 @@ export class MultiplayerScene extends Container implements IScene {
       playSound: false
     })
 
+    logWebsocket('initialized_level')
     this.socket.emit('initialized_level')
     this.socket.on('game_tick', ({ tick, orders }) => {
+      if (logWebsocket.enabled) {
+        logWebsocket(`game_tick ${tick} ${printObject(orders)}`)
+      }
       this.lastReceivedTick = tick
-      this.ordersByTick[tick] = orders
+      this.ordersByTick.push({ tick, orders })
     })
     this.socket.once('end_game', ({ wonPlayerId, reason }) => {
+      logWebsocket(`end_game ${wonPlayerId} ${reason}`)
       this.endMultiplayer({ success: this.playerId === wonPlayerId, reason })
     })
     this.socket.once('chat_message', ({ playerId, message }) => {
+      logWebsocket(`chat_message ${playerId} ${message}`)
       this.game.showMessage({
         character: EMessageCharacter.driver,
         message
@@ -531,20 +549,34 @@ export class MultiplayerScene extends Container implements IScene {
     this.closeSocket()
     this.headerText.text = 'Connecting...'
     this.socket = io(this.input.text.text)
-    this.socket.once('connect', this.onSocketConnect)
+    this.socket.once('connect', () => {
+      logWebsocket('Socket Connect')
+      this.onSocketConnect()
+    })
     this.socket.on('latency_ping', () => {
+      logWebsocket('latency_pong')
       this.socket?.emit('latency_pong')
     })
     this.socket.on('room_list', ({ list, playerId }) => {
+      if (logWebsocket.enabled) {
+        logWebsocket(`room_list ${playerId} ${printObject(list)}`)
+      }
       this.playerId = playerId
       this.renderRoomsList(list)
     })
     this.socket.on('joined_room', ({ room }) => {
+      logWebsocket(`joined_room ${printObject(room)}`)
       this.joinedRoom = room
       this.updateButtons()
     })
-    this.socket.io.once('error', this.onSocketError)
-    this.socket.io.once('close', this.onSocketClose)
+    this.socket.io.once('error', (err) => {
+      logWebsocket('Socket Error')
+      this.onSocketError(err)
+    })
+    this.socket.io.once('close', () => {
+      logWebsocket('Socket Close')
+      this.onSocketClose()
+    })
   }
 
   onSocketConnect = (): void => {
