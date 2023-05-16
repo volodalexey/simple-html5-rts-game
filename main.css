@@ -22,3 +22,18 @@ canvas {
   color: red;
   font-size: 2rem;
 }
+
+.dom-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  position: absolute;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #485b6c;
+  border: 1px solid #454545;
+  outline: none;
+  box-sizing: border-box;
+  box-shadow: none;
+}
