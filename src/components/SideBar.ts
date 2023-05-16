@@ -296,4 +296,13 @@ export class SideBar extends Container {
     this.setHideableContentPosition()
     this.calcHideableContentPosition({ forceClose: true })
   }
+
+  clearAll (): void {
+    this.commandsBar.clearCommandTiles()
+    this.closed = true
+    this.opened = false
+    this.toClose = false
+    this.toOpen = false
+    this.setHideableContentPosition()
+  }
 }

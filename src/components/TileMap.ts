@@ -23,7 +23,7 @@ export interface ITileMapOptions {
   initY?: number
 }
 
-type GridArray = Array<Array<1 | 0>>
+export type GridArray = Array<Array<1 | 0>>
 
 class ActiveItems extends Container<BaseActiveItem> {}
 class Orders extends Container<Order> {}

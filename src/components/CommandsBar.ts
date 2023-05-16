@@ -268,7 +268,7 @@ export class CommandsBar extends Container {
           this.deselectTiles(ECommandName.constructSCV)
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructSCV)) {
-              selectedItem.setOrder({ type: 'construct-unit', name: EItemName.SCV })
+              selectedItem.setOrder({ type: 'try-construct-unit', name: EItemName.SCV })
             }
           })
         }
@@ -277,7 +277,7 @@ export class CommandsBar extends Container {
           this.deselectTiles(ECommandName.constructHarvester)
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructHarvester)) {
-              selectedItem.setOrder({ type: 'construct-unit', name: EItemName.Harvester })
+              selectedItem.setOrder({ type: 'try-construct-unit', name: EItemName.Harvester })
             }
           })
         }
@@ -286,7 +286,7 @@ export class CommandsBar extends Container {
           this.deselectTiles(ECommandName.constructScoutTank)
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructScoutTank)) {
-              selectedItem.setOrder({ type: 'construct-unit', name: EItemName.ScoutTank })
+              selectedItem.setOrder({ type: 'try-construct-unit', name: EItemName.ScoutTank })
             }
           })
         }
@@ -295,7 +295,7 @@ export class CommandsBar extends Container {
           this.deselectTiles(ECommandName.constructHeavyTank)
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructHeavyTank)) {
-              selectedItem.setOrder({ type: 'construct-unit', name: EItemName.HeavyTank })
+              selectedItem.setOrder({ type: 'try-construct-unit', name: EItemName.HeavyTank })
             }
           })
         }
@@ -304,7 +304,7 @@ export class CommandsBar extends Container {
           this.deselectTiles(ECommandName.constructChopper)
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructChopper)) {
-              selectedItem.setOrder({ type: 'construct-unit', name: EItemName.Chopper })
+              selectedItem.setOrder({ type: 'try-construct-unit', name: EItemName.Chopper })
             }
           })
         }
@@ -313,7 +313,7 @@ export class CommandsBar extends Container {
           this.deselectTiles(ECommandName.constructWraith)
           this.game.selectedItems.forEach(selectedItem => {
             if (selectedItem.commands.includes(ECommandName.constructWraith)) {
-              selectedItem.setOrder({ type: 'construct-unit', name: EItemName.Wraith })
+              selectedItem.setOrder({ type: 'try-construct-unit', name: EItemName.Wraith })
             }
           })
         }

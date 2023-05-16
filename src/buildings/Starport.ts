@@ -1,9 +1,8 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../utils/helpers'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
-import { EItemName, type UnitName } from '../interfaces/IItem'
+import { EItemName } from '../interfaces/IItem'
 import { EMessageCharacter } from '../components/StatusBar'
-import { type IOrder } from '../interfaces/IOrder'
 import { ECommandName } from '../interfaces/ICommand'
 import { logCash } from '../utils/logger'
 
@@ -93,17 +92,6 @@ export class Starport extends Building {
   public closingAnimationSpeed = 0.1
   public closingAnimation!: AnimatedSprite
   public openingAnimation!: AnimatedSprite
-  public constructUnit?: {
-    initX: number
-    initY: number
-    name: UnitName
-    team: Team
-    initCenter?: boolean
-    order?: IOrder
-    teleport?: boolean
-    cost: number
-    uid?: number
-  }
 
   static buildableGrid = [
     [1, 1],
@@ -197,17 +185,7 @@ export class Starport extends Building {
           this.switchAnimation(StarportAnimation.healthy)
         }
       } else if (this.isOpening()) {
-        if (this.openingAnimation.currentFrame === this.openingAnimation.totalFrames - 1) {
-          this.switchAnimation(StarportAnimation.close)
-          if (this.constructUnit != null) {
-            const item = this.game.createItem(this.constructUnit)
-            if (item != null) {
-              this.game.cash[this.team] -= this.constructUnit.cost
-              logCash(`(${this.team}) starport construct (-${this.constructUnit.cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
-              this.game.tileMap.addItem(item)
-            }
-          }
-        }
+        // do nothing
       } else if (this.isClosing() && this.closingAnimation.currentFrame === this.closingAnimation.totalFrames - 1) {
         this.switchAnimation(StarportAnimation.healthy)
       } else {
@@ -246,66 +224,118 @@ export class Starport extends Building {
     this.currentAnimation.visible = true
   }
 
+  calcUnitOnTop (): boolean {
+    const thisBounds = this.getCollisionBounds()
+    const { tileMap } = this.game
+    let unitOnTop = false
+    for (let i = tileMap.moveableItems.length - 1; i >= 0; i--) {
+      const item = tileMap.moveableItems[i]
+      const itemBounds = item.getCollisionBounds()
+      if (itemBounds.left >= thisBounds.left && itemBounds.right <= thisBounds.right &&
+        itemBounds.top >= thisBounds.top && itemBounds.bottom <= thisBounds.bottom) {
+        unitOnTop = true
+        break
+      }
+    }
+    return unitOnTop
+  }
+
+  showOccupiedMessage (): void {
+    if (this.team === this.game.team) {
+      this.game.showMessage({
+        character: EMessageCharacter.system,
+        message: 'Warning! Cannot teleport unit while landing bay is occupied.',
+        selfRemove: true
+      })
+    }
+  }
+
+  showCostMessage (cost: number): void {
+    if (this.team === this.game.team) {
+      this.game.showMessage({
+        character: EMessageCharacter.system,
+        message: `Warning! Insufficient Funds. Need ${cost} credits.`,
+        selfRemove: true
+      })
+    }
+  }
+
   override processOrders (): boolean {
+    // damaged building cannot construct
+    if (!this.isHealthy()) {
+      return false
+    }
     switch (this.order.type) {
-      case 'construct-unit': {
-        // damaged building cannot construct
-        if (!this.isHealthy()) {
-          return false
-        }
+      case 'try-construct-unit': {
         // First make sure there is no unit standing on top of the building
-        const thisBounds = this.getCollisionBounds()
-        const { tileMap, team: gameTeam, cash } = this.game
-        let unitOnTop = false
-        for (let i = tileMap.moveableItems.length - 1; i >= 0; i--) {
-          const item = tileMap.moveableItems[i]
-          const itemBounds = item.getCollisionBounds()
-          if (itemBounds.left >= thisBounds.left && itemBounds.right <= thisBounds.right &&
-            itemBounds.top >= thisBounds.top && itemBounds.bottom <= thisBounds.bottom) {
-            unitOnTop = true
-            break
-          }
+        const unitOnTop = this.calcUnitOnTop()
+        if (unitOnTop) {
+          this.showOccupiedMessage()
+          this.setOrder({ type: 'stand' })
+          return true
         }
 
         const cost = this.game.getItemCost(this.order.name)
-        if (typeof cost === 'number') {
+        if (this.game.cash[this.team] < cost) {
+          this.showCostMessage(cost)
+          this.setOrder({ type: 'stand' })
+          return true
+        }
+
+        this.setOrder({ ...this.order, type: 'start-construct-unit' })
+        this.switchAnimation(StarportAnimation.open)
+        return true
+      }
+      case 'start-construct-unit': {
+        if (this.isOpening() &&
+            this.openingAnimation.currentFrame === this.openingAnimation.totalFrames - 1) {
+          const unitOnTop = this.calcUnitOnTop()
           if (unitOnTop) {
-            if (this.team === gameTeam) {
-              this.game.showMessage({
-                character: EMessageCharacter.system,
-                message: 'Warning! Cannot teleport unit while landing bay is occupied.',
-                selfRemove: true
-              })
-            }
-          } else if (cash[this.team] < cost) {
-            if (this.team === gameTeam) {
-              this.game.showMessage({
-                character: EMessageCharacter.system,
-                message: `Warning! Insufficient Funds. Need ${cost} credits.`,
-                selfRemove: true
-              })
-            }
-          } else {
-            // Position new unit above center of starport
-            const thisPosition = this.getCollisionPosition({ center: true })
-            // Teleport in unit and subtract the cost from player cash
-            this.constructUnit = {
-              initX: thisPosition.x,
-              initY: thisPosition.y,
-              initCenter: true,
-              team: this.team,
-              name: this.order.name,
-              order: this.order.unitOrder,
-              teleport: true,
-              cost,
-              uid: this.order.unitUid
-            }
-            this.switchAnimation(StarportAnimation.open)
+            this.showOccupiedMessage()
+            this.switchAnimation(StarportAnimation.close)
+            this.setOrder({ type: 'stand' })
+            return true
           }
-        } else {
-          console.warn(`Unable to calc item (name=${this.order.name}) cost`)
+          const cost = this.game.getItemCost(this.order.name)
+          if (this.game.cash[this.team] < cost) {
+            this.showCostMessage(cost)
+            this.switchAnimation(StarportAnimation.close)
+            this.setOrder({ type: 'stand' })
+            return true
+          }
+          // Subtract the cost from player cash
+          this.game.cash[this.team] -= cost
+          logCash(`(${this.team}) starport construct (-${cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
+          const thisPosition = this.getGridXY({ center: true })
+          // Position new unit above center of starport
+          this.setOrder({
+            ...this.order,
+            type: 'end-construct-unit',
+            toPoint: {
+              gridX: thisPosition.gridX,
+              gridY: thisPosition.gridY
+            }
+          })
+        }
+        return true
+      }
+      case 'end-construct-unit': {
+        this.switchAnimation(StarportAnimation.close)
+        const item = this.game.createItem({
+          name: this.order.name,
+          team: this.team,
+          initGridX: this.order.toPoint.gridX,
+          initGridY: this.order.toPoint.gridY,
+          initCenter: true,
+          teleport: true,
+          order: this.order.unitOrder,
+          uid: this.order.unitUid
+        })
+        if (item != null) {
+          this.game.tileMap.addItem(item)
         }
         this.setOrder({ type: 'stand' })
+        return true
       }
     }
     return false

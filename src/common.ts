@@ -55,8 +55,9 @@ export type IServerOrder = IServerMoveOrder | IServerMoveAndAttack
 | IServerFireOrder | IServerAttackOrder | IServerPatrolOrder
 | IServerStandOrder
 | IServerHuntOrder | IServerGuardOrder | IServerFollowOrder
-| IServerDeployOrder | IServerBuildOrder
-| IServerConstructUnitOrder
+| IServerTryDeployOrder | IServerEndDeployOrder
+| IServerTryBuildOrder | IServerEndBuildOrder
+| IServerTryConstructUnitOrder | IServerStartConstructUnitOrder | IServerEndConstructUnitOrder
 
 interface IServerMoveOrder {
   type: 'move'
@@ -100,20 +101,50 @@ interface IServerHuntOrder {
   type: 'hunt'
 }
 
-interface IServerDeployOrder {
-  type: 'deploy'
+interface IServerTryDeployOrder {
+  type: 'try-deploy'
   toPoint: IServerGridPointData
+  buildingUid?: number
 }
 
-interface IServerBuildOrder {
-  type: 'build'
+interface IServerEndDeployOrder {
+  type: 'end-deploy'
   toPoint: IServerGridPointData
-  name: string
+  buildingUid?: number
 }
 
-interface IServerConstructUnitOrder {
-  type: 'construct-unit'
+interface IServerTryBuildOrder {
+  type: 'try-build'
+  toPoint: IServerGridPointData
   name: string
+  buildingUid?: number
+}
+
+interface IServerEndBuildOrder {
+  type: 'end-build'
+  toPoint: IServerGridPointData
+  name: string
+  buildingUid?: number
+}
+
+interface IServerTryConstructUnitOrder {
+  type: 'try-construct-unit'
+  name: string
+  unitOrder?: IServerOrder
+  unitUid?: number
+}
+
+interface IServerStartConstructUnitOrder {
+  type: 'start-construct-unit'
+  name: string
+  unitOrder?: IServerOrder
+  unitUid?: number
+}
+
+interface IServerEndConstructUnitOrder {
+  type: 'end-construct-unit'
+  name: string
+  toPoint: IServerGridPointData
   unitOrder?: IServerOrder
   unitUid?: number
 }

@@ -1,9 +1,8 @@
 import { AnimatedSprite, type Texture } from 'pixi.js'
 import { Team } from '../utils/helpers'
 import { Building, type IBuildingOptions, type IBuildingTextures } from './Building'
-import { EItemName, type UnitName } from '../interfaces/IItem'
+import { EItemName } from '../interfaces/IItem'
 import { ECommandName } from '../interfaces/ICommand'
-import { type IOrder } from '../interfaces/IOrder'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type IGridPoint } from '../interfaces/IGridPoint'
 import { logCash } from '../utils/logger'
@@ -95,17 +94,6 @@ export class Base extends Building {
     [1, 1]
   ]
 
-  public constructUnit?: {
-    initGridX: number
-    initGridY: number
-    name: UnitName
-    team: Team
-    initCenter?: boolean
-    order?: IOrder
-    teleport?: boolean
-    cost: number
-  }
-
   constructor (options: IBaseOptions) {
     super({
       ...options,
@@ -134,6 +122,7 @@ export class Base extends Building {
     })
     const { constructingTextures } = textures
     const constructingAnimation = new AnimatedSprite(constructingTextures)
+    constructingAnimation.loop = false
     this.spritesContainer.addChild(constructingAnimation)
     this.constructingAnimation = constructingAnimation
   }
@@ -167,18 +156,7 @@ export class Base extends Building {
   override updateAnimation (): void {
     if (this.isHealthy()) {
       if (this.isConstructing()) {
-        if (this.constructingAnimation.currentFrame === this.constructingAnimation.totalFrames - 1) {
-          this.switchAnimation(BaseAnimation.healthy)
-          if (this.constructUnit != null) {
-            const item = this.game.createItem(this.constructUnit)
-            if (item != null) {
-              // Teleport in unit and subtract the cost from player cash
-              this.game.cash[this.team] -= this.constructUnit.cost
-              logCash(`(${this.team}) base construct (-${this.constructUnit.cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
-              this.game.tileMap.addItem(item)
-            }
-          }
-        }
+        // do nothing
       } else {
         this.switchAnimation(BaseAnimation.healthy)
       }
@@ -187,69 +165,121 @@ export class Base extends Building {
     }
   }
 
+  calcAvailablePlaces (): IGridPoint[] {
+    const { tileMap } = this.game
+    tileMap.rebuildBuildableGrid()
+    const { currentMapBuildableGrid, mapGridWidth, mapGridHeight } = tileMap
+    const { buildableGrid } = this
+    const availablePlaces: IGridPoint[] = []
+    const thisGrid = this.getGridXY()
+    // check only diagonal spaces outside of main buildable grid
+    for (const gridY of [thisGrid.gridY - 1, thisGrid.gridY + buildableGrid.length]) {
+      for (const gridX of [thisGrid.gridX - 1, thisGrid.gridX + buildableGrid[0].length]) {
+        if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
+          continue
+        } else if (currentMapBuildableGrid[gridY][gridX] === 0) {
+          availablePlaces.push({ gridX, gridY })
+        }
+      }
+    }
+    return availablePlaces
+  }
+
+  showOccupiedMessage (): void {
+    if (this.team === this.game.team) {
+      this.game.showMessage({
+        character: EMessageCharacter.system,
+        message: 'Warning! Cannot construct unit while landing bay is occupied.',
+        selfRemove: true
+      })
+    }
+  }
+
+  showCostMessage (cost: number): void {
+    if (this.team === this.game.team) {
+      this.game.showMessage({
+        character: EMessageCharacter.system,
+        message: `Warning! Insufficient Funds. Need ${cost} credits.`,
+        selfRemove: true
+      })
+    }
+  }
+
   override processOrders (): boolean {
+    // damaged building cannot construct
+    if (!this.isHealthy()) {
+      this.setOrder({ type: 'stand' })
+      return false
+    }
     switch (this.order.type) {
-      case 'construct-unit': {
-        // damaged building cannot construct
-        if (!this.isHealthy()) {
-          return false
-        }
+      case 'try-construct-unit': {
         // First make sure there is some space near base
-        const { tileMap, team: gameTeam, cash } = this.game
-        tileMap.rebuildBuildableGrid()
-        const { currentMapBuildableGrid, mapGridWidth, mapGridHeight } = tileMap
-        const { buildableGrid } = this
-        const availablePlaces: IGridPoint[] = []
-        const thisGrid = this.getGridXY()
-        // check only diagonal spaces outside of main buildable grid
-        for (const gridY of [thisGrid.gridY - 1, thisGrid.gridY + buildableGrid.length]) {
-          for (const gridX of [thisGrid.gridX - 1, thisGrid.gridX + buildableGrid[0].length]) {
-            if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
-              continue
-            } else if (currentMapBuildableGrid[gridY][gridX] === 0) {
-              availablePlaces.push({ gridX, gridY })
-            }
-          }
-        }
+        const availablePlaces = this.calcAvailablePlaces()
         if (availablePlaces.length <= 0) {
-          this.game.showMessage({
-            character: EMessageCharacter.system,
-            message: 'Warning! Cannot teleport unit while landing bay is occupied.',
-            selfRemove: true
-          })
+          this.showOccupiedMessage()
           this.setOrder({ type: 'stand' })
           return true
         }
 
         const cost = this.game.getItemCost(this.order.name)
-        if (typeof cost === 'number') {
-          if (cash[this.team] < cost) {
-            if (this.team === gameTeam) {
-              this.game.showMessage({
-                character: EMessageCharacter.system,
-                message: `Warning! Insufficient Funds. Need ${cost} credits.`,
-                selfRemove: true
-              })
-            }
-          } else {
-            // Position new unit above center of starport
-            const availablePlace = availablePlaces[Math.floor(Math.random() * availablePlaces.length)]
-            this.constructUnit = {
-              initGridX: availablePlace.gridX + 0.5,
-              initGridY: availablePlace.gridY + 0.5,
-              initCenter: true,
-              team: this.team,
-              name: this.order.name,
-              order: this.order.unitOrder,
-              teleport: true,
-              cost
-            }
-            this.switchAnimation(BaseAnimation.constructing)
+        if (this.game.cash[this.team] < cost) {
+          this.showCostMessage(cost)
+          this.setOrder({ type: 'stand' })
+          return true
+        }
+        this.setOrder({ ...this.order, type: 'start-construct-unit' })
+        this.switchAnimation(BaseAnimation.constructing)
+        return true
+      }
+      case 'start-construct-unit': {
+        if (this.isConstructing() &&
+            this.constructingAnimation.currentFrame === this.constructingAnimation.totalFrames - 1) {
+          const availablePlaces = this.calcAvailablePlaces()
+          const availablePlace = availablePlaces[Math.floor(Math.random() * availablePlaces.length)]
+          if (availablePlace == null) {
+            this.showOccupiedMessage()
+            this.switchAnimation(BaseAnimation.healthy)
+            this.setOrder({ type: 'stand' })
+            return true
           }
-        } else {
-          console.warn(`Unable to calc item (name=${this.order.name}) cost`)
+          const cost = this.game.getItemCost(this.order.name)
+          if (this.game.cash[this.team] < cost) {
+            this.showCostMessage(cost)
+            this.switchAnimation(BaseAnimation.healthy)
+            this.setOrder({ type: 'stand' })
+            return true
+          }
+          // Subtract the cost from player cash
+          this.game.cash[this.team] -= cost
+          logCash(`(${this.team}) base construct (-${cost}) b=${this.game.cash.blue} g=${this.game.cash.green}`)
+          this.setOrder({
+            ...this.order,
+            type: 'end-construct-unit',
+            toPoint: {
+              gridX: availablePlace.gridX + 0.5,
+              gridY: availablePlace.gridY + 0.5
+            }
+          })
+        }
+        return true
+      }
+      case 'end-construct-unit': {
+        this.switchAnimation(BaseAnimation.healthy)
+        const item = this.game.createItem({
+          name: this.order.name,
+          team: this.team,
+          initGridX: this.order.toPoint.gridX,
+          initGridY: this.order.toPoint.gridY,
+          initCenter: true,
+          teleport: true,
+          order: this.order.unitOrder,
+          uid: this.order.unitUid
+        })
+        if (item != null) {
+          this.game.tileMap.addItem(item)
         }
         this.setOrder({ type: 'stand' })
+        return true
       }
     }
     return false

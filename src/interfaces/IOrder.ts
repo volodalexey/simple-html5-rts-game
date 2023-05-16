@@ -12,7 +12,9 @@ export enum EOrderType {
   guard = 'guard',
   follow = 'follow',
   deploy = 'deploy',
+  tryBuild = 'try-build',
   build = 'build',
+  tryConstructUnit = 'try-construct-unit',
   constructUnit = 'construct-unit',
   moveAndAttack = 'move-and-attack',
 }
@@ -23,8 +25,9 @@ export type IOrder = IMoveOrder | IMoveAndAttack
 | IFireOrder | IAttackOrder | IPatrolOrder
 | IStandOrder
 | IHuntOrder | IGuardOrder | IFollowOrder
-| IDeployOrder | IBuildOrder
-| IConstructUnitOrder
+| ITryDeployOrder | IEndDeployOrder
+| ITryBuildOrder | IEndBuildOrder
+| ITryConstructUnitOrder | IStartConstructUnitOrder | IEndConstructUnitOrder
 
 interface IMoveOrder {
   type: 'move'
@@ -74,20 +77,50 @@ interface IHuntOrder {
   type: 'hunt'
 }
 
-interface IDeployOrder {
-  type: 'deploy'
+interface ITryDeployOrder {
+  type: 'try-deploy'
   toPoint: IGridPointData
+  buildingUid?: number
 }
 
-interface IBuildOrder {
-  type: 'build'
+interface IEndDeployOrder {
+  type: 'end-deploy'
+  toPoint: IGridPointData
+  buildingUid?: number
+}
+
+interface ITryBuildOrder {
+  type: 'try-build'
   toPoint: IGridPointData
   name: BuildName
+  buildingUid?: number
 }
 
-interface IConstructUnitOrder {
-  type: 'construct-unit'
+interface IEndBuildOrder {
+  type: 'end-build'
+  toPoint: IGridPointData
+  name: BuildName
+  buildingUid?: number
+}
+
+interface ITryConstructUnitOrder {
+  type: 'try-construct-unit'
   name: UnitName
+  unitOrder?: IOrder
+  unitUid?: number
+}
+
+interface IStartConstructUnitOrder {
+  type: 'start-construct-unit'
+  name: UnitName
+  unitOrder?: IOrder
+  unitUid?: number
+}
+
+interface IEndConstructUnitOrder {
+  type: 'end-construct-unit'
+  name: UnitName
+  toPoint: IGridPointData
   unitOrder?: IOrder
   unitUid?: number
 }

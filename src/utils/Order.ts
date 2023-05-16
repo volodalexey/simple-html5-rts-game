@@ -32,7 +32,7 @@ export class Order extends Graphics {
         return 0xffff00
       case 'guard':
         return 0x0000ff
-      case 'build': case 'deploy':
+      case 'try-build': case 'try-deploy':
         return 0xff00ff
       default:
         return 0xffffff
@@ -49,7 +49,7 @@ export class Order extends Graphics {
         return 0x00ffff
       case 'guard':
         return 0x0000ff
-      case 'build': case 'deploy':
+      case 'try-build': case 'try-deploy':
         return 0xff00ff
       default:
         return 0xffffff
@@ -69,7 +69,7 @@ export class Order extends Graphics {
     switch (type) {
       case 'attack': case 'guard': case 'follow':
         return 15
-      case 'build': case 'deploy':
+      case 'try-build': case 'try-deploy':
         return 0
       default:
         return 3
@@ -81,7 +81,7 @@ export class Order extends Graphics {
     let from: { x: number, y: number } | undefined
     let to: { x: number, y: number } | undefined
     switch (selectedItem.order.type) {
-      case 'move': case 'move-and-attack': case 'build': case 'deploy': {
+      case 'move': case 'move-and-attack': case 'try-build': case 'try-deploy': {
         from = selectedItemPosition
         to = { x: selectedItem.order.toPoint.gridX * tileMap.gridSize, y: selectedItem.order.toPoint.gridY * tileMap.gridSize }
         break
@@ -147,7 +147,7 @@ export class Order extends Graphics {
   drawOrderSprite ({ selectedItem, tileMap, to }: { selectedItem: SelectableItem, tileMap: TileMap, to: { x: number, y: number } }): void {
     let texture
     let offset = { x: 0, y: 0 }
-    if (selectedItem.order.type === 'build') {
+    if (selectedItem.order.type === 'try-build') {
       if (selectedItem.order.name === EItemName.GroundTurret) {
         texture = selectedItem.team === Team.blue
           ? GroundTurret.blueTextures.downRightTextures[0]
@@ -159,7 +159,7 @@ export class Order extends Graphics {
           : Starport.greenTextures.healthyTextures[0]
         offset = Starport.collisionOptions.offset
       }
-    } else if (selectedItem.order.type === 'deploy') {
+    } else if (selectedItem.order.type === 'try-deploy') {
       texture = selectedItem.team === Team.blue
         ? OilDerrick.blueTextures.healthyTextures[0]
         : OilDerrick.greenTextures.healthyTextures[0]
@@ -183,7 +183,7 @@ export class Order extends Graphics {
 
 export function castToServerOrder (order: IOrder): IServerOrder {
   switch (order.type) {
-    case 'move': case 'patrol': case 'stand': case 'hunt': case 'deploy':
+    case 'move': case 'patrol': case 'stand': case 'hunt': case 'try-deploy': case 'end-deploy':
       return order
     case 'move-and-attack':
       return { type: order.type, toPoint: order.toPoint, nextOrder: order.nextOrder != null ? castToServerOrder(order.nextOrder) : undefined }
@@ -191,10 +191,12 @@ export function castToServerOrder (order: IOrder): IServerOrder {
       return { type: order.type, toUid: order.to.uid, nextOrder: order.nextOrder != null ? castToServerOrder(order.nextOrder) : undefined }
     case 'fire':
       return { type: order.type, toUid: order.to.uid }
-    case 'build':
-      return { type: order.type, name: order.name as string, toPoint: order.toPoint }
-    case 'construct-unit':
+    case 'try-build': case 'end-build':
+      return { type: order.type, name: order.name as string, toPoint: order.toPoint, buildingUid: order.buildingUid }
+    case 'try-construct-unit': case 'start-construct-unit':
       return { type: order.type, name: order.name as string, unitOrder: order.unitOrder != null ? castToServerOrder(order.unitOrder) : undefined, unitUid: order.unitUid }
+    case 'end-construct-unit':
+      return { type: order.type, name: order.name as string, toPoint: order.toPoint, unitOrder: order.unitOrder != null ? castToServerOrder(order.unitOrder) : undefined, unitUid: order.unitUid }
   }
 }
 
@@ -204,7 +206,7 @@ function castToClientGridPointData (point: IServerGridPointData): IGridPointData
 
 export function castToClientOrder (order: IServerOrder, find: (uid: number) => BaseActiveItem): IOrder {
   switch (order.type) {
-    case 'move': case 'deploy':
+    case 'move': case 'try-deploy': case 'end-deploy':
       return { type: order.type, toPoint: castToClientGridPointData(order.toPoint) }
     case 'patrol':
       return { type: order.type, fromPoint: castToClientGridPointData(order.fromPoint), toPoint: castToClientGridPointData(order.toPoint) }
@@ -216,9 +218,11 @@ export function castToClientOrder (order: IServerOrder, find: (uid: number) => B
       return { type: order.type, to: find(order.toUid), nextOrder: order.nextOrder != null ? castToClientOrder(order.nextOrder, find) : undefined }
     case 'fire':
       return { type: order.type, to: find(order.toUid) }
-    case 'build':
-      return { type: order.type, name: order.name as BuildName, toPoint: castToClientGridPointData(order.toPoint) }
-    case 'construct-unit':
+    case 'try-build': case 'end-build':
+      return { type: order.type, name: order.name as BuildName, toPoint: castToClientGridPointData(order.toPoint), buildingUid: order.buildingUid }
+    case 'try-construct-unit': case 'start-construct-unit':
       return { type: order.type, name: order.name as UnitName, unitOrder: order.unitOrder != null ? castToClientOrder(order.unitOrder, find) : undefined, unitUid: order.unitUid }
+    case 'end-construct-unit':
+      return { type: order.type, name: order.name as UnitName, toPoint: castToClientGridPointData(order.toPoint), unitOrder: order.unitOrder != null ? castToClientOrder(order.unitOrder, find) : undefined, unitUid: order.unitUid }
   }
 }

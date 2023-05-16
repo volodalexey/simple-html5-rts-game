@@ -275,16 +275,16 @@ export class Game extends Container {
         order = { type: 'move-and-attack', toPoint: { gridX, gridY } }
         break
       case ECommandName.buildTurret:
-        order = { type: 'build', name: EItemName.GroundTurret, toPoint: { gridX, gridY } }
+        order = { type: 'try-build', name: EItemName.GroundTurret, toPoint: { gridX, gridY } }
         this.sideBar.commandsBar.deselectTiles()
         break
       case ECommandName.buildStarport:
-        order = { type: 'build', name: EItemName.Starport, toPoint: { gridX, gridY } }
+        order = { type: 'try-build', name: EItemName.Starport, toPoint: { gridX, gridY } }
         this.sideBar.commandsBar.deselectTiles()
         break
       case ECommandName.deploy: {
         const minGridX = initialMapDeployableGrid[Math.floor(gridY)][Math.floor(gridX) - 1] === 0 ? Math.floor(gridX) - 1 + 0.5 : gridX
-        order = { type: 'deploy', toPoint: { gridX: minGridX, gridY } }
+        order = { type: 'try-deploy', toPoint: { gridX: minGridX, gridY } }
         this.sideBar.commandsBar.deselectTiles()
         break
       }
@@ -531,7 +531,8 @@ export class Game extends Container {
     this.ai = undefined
     this.gameEnded = false
     this.time = 0
-    this.clearSelection(true)
+    this.clearSelection()
+    this.sideBar.clearAll()
     this.dragSelect.clear()
     this.runLevel({ mapImageSrc, mapSettingsSrc })
     const { gridSize } = this.tileMap
@@ -1025,9 +1026,9 @@ export class Game extends Container {
             this.audio.playYes(item.itemName)
           } else if (['attack', 'move-and-attack'].includes(item.order.type)) {
             this.audio.playAttack(item.itemName)
-          } else if (item.order.type === 'build') {
+          } else if (item.order.type === 'try-build') {
             this.audio.playYes(item.itemName)
-          } else if (item.order.type === 'deploy') {
+          } else if (item.order.type === 'try-deploy') {
             this.audio.playYes(item.itemName)
           }
         }
@@ -1052,7 +1053,7 @@ export class Game extends Container {
     this.topBar.statusBar.appendMessage({ character, message, time: this.time, selfRemove, height: TopBar.options.initHeight })
   }
 
-  getItemCost (name: EItemName): number | undefined {
+  getItemCost (name: EItemName): number {
     switch (name) {
       case EItemName.Starport:
         return Starport.cost
@@ -1072,6 +1073,9 @@ export class Game extends Container {
         return Chopper.cost
       case EItemName.Wraith:
         return Wraith.cost
+      default:
+        console.warn(`Unable to calc item (name=${name}) cost`)
+        return 0
     }
   }
 
@@ -1088,12 +1092,15 @@ export class Game extends Container {
     }
   }
 
-  getBuildableGrid (name: EItemName): number[][] | undefined {
+  getBuildableGrid (name: EItemName): number[][] {
     switch (name) {
       case EItemName.GroundTurret:
         return GroundTurret.buildableGrid
       case EItemName.Starport:
         return Starport.buildableGrid
+      default:
+        console.warn(`Unable to detect buildable grid for name=${name}`)
+        return [[]]
     }
   }
 
@@ -1112,6 +1119,7 @@ export class Game extends Container {
     commands?: ECommandName[]
     order?: IOrder
     teleport?: boolean
+    deploy?: boolean
   }): Base | OilDerrick | Starport | GroundTurret
     | SCV | Transport | Harvester | ScoutTank | HeavyTank
     | Chopper | Wraith
