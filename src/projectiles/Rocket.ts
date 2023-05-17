@@ -11,8 +11,9 @@ export class Rocket extends Projectile {
   static textures: IProjectileTextures
   static reloadTime = 40
 
-  public speed = 25
-  public distanceTolive = 25
+  public speed = 20
+  public increaseSpeed = 1
+  public distanceTolive = 30
   public damage = 20
   public turnSpeed = 2
 

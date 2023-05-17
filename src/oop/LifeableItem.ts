@@ -47,7 +47,7 @@ export class LifeableItem extends Item implements ILifeable {
   }
 
   isHealthy (): boolean {
-    return this.life >= this.hitPoints * 0.4
+    return this.life >= this.hitPoints * 0.1
   }
 
   isDead (): boolean {

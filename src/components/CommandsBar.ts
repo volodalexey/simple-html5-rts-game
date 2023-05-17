@@ -134,10 +134,10 @@ export class CommandsBar extends Container {
       [ECommandName.constructScoutTank]: {
         iconTexture: textures.iconConstructScoutTankTexture,
         text: `Scout Tank\n${ScoutTank.cost}`,
-        iconWidth: 40,
-        iconHeight: 40,
-        iconPaddingTop: 8,
-        iconPaddingLeft: 8
+        iconWidth: 30,
+        iconHeight: 30,
+        iconPaddingTop: 13,
+        iconPaddingLeft: 13
       },
       [ECommandName.constructHeavyTank]: {
         iconTexture: textures.iconConstructHeavyTankTexture,

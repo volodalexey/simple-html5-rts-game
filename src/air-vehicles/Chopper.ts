@@ -91,8 +91,8 @@ export class Chopper extends AttackableAirVehicle {
   }
 
   public collisionRadius = 14
-  public sightRadius = 12
-  public attackRadius = 6
+  public sightRadius = 14
+  public attackRadius = 10
   public speed = 25
   static cost = 90
   public hitPoints = 50

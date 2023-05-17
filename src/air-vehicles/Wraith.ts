@@ -91,16 +91,16 @@ export class Wraith extends AttackableAirVehicle {
   }
 
   public collisionRadius = 12
-  public sightRadius = 14
-  public attackRadius = 8
+  public sightRadius = 12
+  public attackRadius = 5
   public speed = 40
-  static cost = 60
+  static cost = 150
   public hitPoints = 50
   public turnSpeed = 4
   public turnFactor = 10
   public projectile: ProjectileName = EItemName.Laser
   public canAttack = true
-  public canAttackLand = false
+  public canAttackLand = true
   public canAttackAir = true
 
   constructor (options: IWraithOptions) {

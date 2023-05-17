@@ -99,8 +99,8 @@ export class Game extends Container {
   }
 
   public debug = {
-    enableFog: false,
-    disableSightHide: true
+    enableFog: true,
+    disableSightHide: false
   }
 
   constructor (options: IGameOptions) {
