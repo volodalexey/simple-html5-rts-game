@@ -229,6 +229,7 @@ export class MiniMap extends Container {
 
   drawItems (): void {
     const { activeItemsMini, background2, sightMini } = this
+    const { enableFog } = this.game.debug
     const { activeItems, gridSize } = this.game.tileMap
     activeItemsMini.clear()
     sightMini.clear()
@@ -245,14 +246,14 @@ export class MiniMap extends Container {
       } else if (activeItem.type === EItemType.vehicles || activeItem.type === EItemType.airVehicles) {
         activeItemsMini.drawCircle(itemCenter.x, itemCenter.y, Math.max(activeItem.collisionGraphics.width, activeItem.collisionGraphics.height) / 2)
       }
-      if (!logNoFog.enabled && activeItem.team === this.game.team) {
+      if ((!logNoFog.enabled && enableFog) && activeItem.team === this.game.team) {
         sightMini.beginFill(0xffffff)
         sightMini.drawCircle(itemCenter.x, itemCenter.y, activeItem.sightRadius * gridSize)
         sightMini.endFill()
       }
       activeItemsMini.endFill()
     }
-    if (!logNoFog.enabled) {
+    if (!logNoFog.enabled && enableFog) {
       background2.mask = sightMini
     }
   }

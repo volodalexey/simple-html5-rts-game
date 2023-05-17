@@ -1,7 +1,7 @@
 import { type Socket, io } from 'socket.io-client'
 import { type Application, Container, Graphics, type TextStyleAlign, Assets, type Spritesheet, Text, type TextStyleFontWeight } from 'pixi.js'
 import { SceneManager, type IScene } from './SceneManager'
-import { type IGameOptions, type Game } from '../Game'
+import { type Game } from '../Game'
 import { type BaseActiveItem, Team } from '../utils/helpers'
 import { EMessageCharacter } from '../components/StatusBar'
 import { type Trigger, createTrigger, ETriggerType, type IConditionalTrigger, handleTiggers } from '../utils/Trigger'
@@ -10,7 +10,7 @@ import { logCash, logLayout, logWebsocket } from '../utils/logger'
 import { type SettingsModal } from '../components/SettingsModal'
 import { Input } from '../components/Input'
 import { Button, type IButtonOptions } from '../components/Button'
-import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents, printObject } from '../common'
+import { type ISendOrder, type IClientGameRoom, type IClientToServerEvents, type IServerToClientEvents, printObject, type IServerOrder } from '../common'
 import { type IMapSettings, MapSettings } from '../utils/MapSettings'
 import { castToClientOrder, castToServerOrder } from '../utils/Order'
 
@@ -198,8 +198,8 @@ export class MultiplayerScene extends Container implements IScene {
   public lastReceivedTick = 0
   public currentTick = 0
   public playerId = ''
-  public ordersByTick: Array<{ tick: number, orders: ISendOrder[] }> = []
-  public sentOrdersForTick = false
+  public clientOrders = new Map<number, IServerOrder>()
+  public serverOrders: Array<{ tick: number, orders: ISendOrder[] }> = []
   constructor (options: IMultiplayerSceneOptions) {
     super()
     this.game = options.game
@@ -389,8 +389,8 @@ export class MultiplayerScene extends Container implements IScene {
     // execute the commands and move on to the next tick
     // otherwise wait for server to catch up
     if (this.currentTick <= this.lastReceivedTick) {
-      const ordersIdx = this.ordersByTick.findIndex(({ tick }) => tick === this.currentTick)
-      const tickOrders = this.ordersByTick[ordersIdx]
+      const ordersIdx = this.serverOrders.findIndex(({ tick }) => tick === this.currentTick)
+      const tickOrders = this.serverOrders[ordersIdx]
       if (tickOrders != null && Array.isArray(tickOrders.orders) && tickOrders.orders.length > 0) {
         for (const { uids, order } of tickOrders.orders) {
           this.game.processOrders({
@@ -403,17 +403,15 @@ export class MultiplayerScene extends Container implements IScene {
         };
       }
       if (ordersIdx > -1) {
-        this.ordersByTick.splice(ordersIdx, 1) // remove proessed orders
+        this.serverOrders.splice(ordersIdx, 1) // remove proessed orders
       }
 
       this.game.handleUpdate(deltaMS)
       // In case no command was sent for this current tick, send an empty command to the server
       // So that the server knows that everything is working smoothly
-      if (!this.sentOrdersForTick) {
-        this.sendOrders()
-      }
+      this.sendOrders()
+      this.clientOrders = new Map<number, IServerOrder>()
       this.currentTick++
-      this.sentOrdersForTick = false
     }
 
     if (this.game.gameEnded) {
@@ -423,16 +421,17 @@ export class MultiplayerScene extends Container implements IScene {
     handleTiggers({ deltaMS, triggers: this.triggers })
   }
 
-  sendOrders (options?: Parameters<NonNullable<IGameOptions['serializeOrders']>>[0]): void {
-    this.sentOrdersForTick = true
-    const params: Parameters<IClientToServerEvents['orders']>[0] = { currentTick: this.currentTick }
-    if (options != null) {
-      params.orders = [{ uids: options.uids, order: castToServerOrder(options.order) }]
+  sendOrders (): void {
+    const params: Parameters<IClientToServerEvents['tick_orders']>[0] = { currentTick: this.currentTick }
+    if (this.clientOrders.size > 0) {
+      params.orders = [...this.clientOrders.entries()].map(([uid, order]) => {
+        return { uids: [uid], order }
+      })
     }
     if (logWebsocket.enabled) {
-      logWebsocket(`orders ${printObject(params)}`)
+      logWebsocket(`tick_orders ${printObject(params)}`)
     }
-    this.socket?.emit('orders', params)
+    this.socket?.emit('tick_orders', params)
   }
 
   start = ({ spawnLocations, players }: Parameters<IServerToClientEvents['init_level']>[0]): void => {
@@ -473,7 +472,11 @@ export class MultiplayerScene extends Container implements IScene {
       team,
       type: 'multiplayer',
       serializeOrders: ({ uids, order }) => {
-        this.sendOrders({ uids, order })
+        uids.forEach(uid => {
+          // in case of player managed to make multiple orders for the same item
+          // only the last one order will be send
+          this.clientOrders.set(uid, castToServerOrder(order))
+        })
       }
     });
 
@@ -504,7 +507,7 @@ export class MultiplayerScene extends Container implements IScene {
         logWebsocket(`game_tick ${tick} ${printObject(orders)}`)
       }
       this.lastReceivedTick = tick
-      this.ordersByTick.push({ tick, orders })
+      this.serverOrders.push({ tick, orders })
     })
     this.socket.once('end_game', ({ wonPlayerId, reason }) => {
       logWebsocket(`end_game ${wonPlayerId} ${reason}`)
@@ -672,5 +675,9 @@ export class MultiplayerScene extends Container implements IScene {
         roomButton.setSelected(false)
       }
     }
+  }
+
+  unmountedHandler (): void {
+    this.closeSocket()
   }
 }

@@ -98,6 +98,11 @@ export class Game extends Container {
     globalY: FederatedPointerEvent['globalY']
   }
 
+  public debug = {
+    enableFog: false,
+    disableSightHide: true
+  }
+
   constructor (options: IGameOptions) {
     super()
     this.viewWidth = options.viewWidth

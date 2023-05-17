@@ -108,7 +108,7 @@ export class TileMap extends Container {
     const settings: IMapSettings = Assets.get(mapSettingsSrc)
 
     this.background.texture = background
-    if (!logNoFog.enabled) {
+    if (!logNoFog.enabled && this.game.debug.enableFog) {
       this.background2.texture = background
       this.background3.texture = background
       this.background2.alpha = 0.5
@@ -591,7 +591,7 @@ export class TileMap extends Container {
         }
         activeItem.renderable = true
         const itemCenter = activeItem.getCollisionPosition({ center: true })
-        if (!logNoFog.enabled) {
+        if (!logNoFog.enabled && this.game.debug.enableFog) {
           sight.beginFill(0xffffff)
           sight.drawCircle(itemCenter.x, itemCenter.y, activeItem.sightRadius * gridSize)
           sight.endFill()
@@ -599,7 +599,7 @@ export class TileMap extends Container {
           sightBlurred.drawCircle(itemCenter.x, itemCenter.y, activeItem.sightRadius * gridSize * blurFactor)
           sightBlurred.endFill()
         }
-        if (logNoSightHide.enabled) {
+        if (logNoSightHide.enabled || this.game.debug.disableSightHide) {
           continue
         }
         for (let j = 0; j < activeItems.children.length; j++) {
@@ -616,7 +616,7 @@ export class TileMap extends Container {
         }
       }
     }
-    if (!logNoFog.enabled) {
+    if (!logNoFog.enabled && this.game.debug.enableFog) {
       background.mask = sightBlurred
       activeItems.mask = sightBlurred
       projectiles.mask = sightBlurred

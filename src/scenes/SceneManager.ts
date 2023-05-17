@@ -4,6 +4,7 @@ import { logApp } from '../utils/logger'
 export interface IScene extends DisplayObject {
   handleUpdate: (deltaMS: number) => void
   mountedHandler?: () => void
+  unmountedHandler?: () => void
   handleResize: (options: {
     viewWidth: number
     viewHeight: number
@@ -68,6 +69,9 @@ export abstract class SceneManager {
       throw new Error('Unable to detect new scene')
     }
     SceneManager.app.stage.removeChild(SceneManager.currentScene)
+    if (typeof SceneManager.currentScene.unmountedHandler === 'function') {
+      SceneManager.currentScene.unmountedHandler()
+    }
     // SceneManager.currentScene.destroy()
 
     SceneManager.currentScene = newScene

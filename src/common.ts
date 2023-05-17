@@ -28,7 +28,7 @@ export interface IClientToServerEvents {
   join_room: (options: { roomId: number }) => void
   leave_room: (options: { roomId: number }) => void
   initialized_level: () => void
-  orders: (options: { currentTick: number, orders?: ISendOrder[] }) => void
+  tick_orders: (options: { currentTick: number, orders?: ISendOrder[] }) => void
   lose_game: () => void
   chat_message: (options: { playerId: string, message: string }) => void
 }

@@ -303,10 +303,10 @@ function startGame (room: IServerGameRoom): void {
     } else {
       // One of the players is causing the game to lag. Handle appropriately
       if (room.lastTickConfirmed.blue < room.currentTick) {
-        logGame(`Room ${room.roomId} Blue is lagging on Tick: ${room.currentTick} by ${room.currentTick - room.lastTickConfirmed.blue}`)
+        logGame(`Room ${room.roomId} Blue is lagging on Tick: ${room.currentTick} by ${room.currentTick - room.lastTickConfirmed.blue} blue=${room.lastTickConfirmed.blue}`)
       }
       if (room.lastTickConfirmed.green < room.currentTick) {
-        logGame(`Room ${room.roomId} Green is lagging on Tick: ${room.currentTick} by ${room.currentTick - room.lastTickConfirmed.green}`)
+        logGame(`Room ${room.roomId} Green is lagging on Tick: ${room.currentTick} by ${room.currentTick - room.lastTickConfirmed.green} green=${room.lastTickConfirmed.green}`)
       }
     }
   }
@@ -314,7 +314,7 @@ function startGame (room: IServerGameRoom): void {
   room.timeout = setTimeout(serverTick, TIMEOUT)
 
   for (const player of room.players) {
-    player.socket.on('orders', ({ currentTick, orders }) => {
+    player.socket.on('tick_orders', ({ currentTick, orders }) => {
       if (logWebsocket.enabled) {
         logWebsocket(`orders [${player.socket.id}] ${currentTick} ${printObject(orders)}`)
       }
