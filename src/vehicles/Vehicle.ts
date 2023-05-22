@@ -2,13 +2,13 @@ import { AnimatedSprite, Container, Graphics, type Texture } from 'pixi.js'
 import { Vector, EVectorDirection } from '../utils/Vector'
 import { findAngle, angleDiff, wrapDirection, findAngleGrid } from '../utils/helpers'
 import { EItemType } from '../interfaces/IItem'
-import { AStar } from '../utils/AStar'
 import { type IMoveable } from '../interfaces/IMoveable'
 import { type IGridPointData } from '../interfaces/IOrder'
 import { LifeBar } from '../components/LifeBar'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { ECommandName } from '../interfaces/ICommand'
 import { TeleportableSelectableLifeableRoundItem, type ITeleportableSelectableLifeableRoundItemOptions } from '../oop/TeleportableSelectableLifeableRoundItem'
+import { Pathfinder } from '../utils/EasyStar'
 
 export interface IVehicleTextures {
   upTextures: Texture[]
@@ -351,7 +351,8 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
       })
     } else {
       // Use A* algorithm to try and find a path to the destination
-      path = AStar.calc({ grid, start, end, f: 'Euclidean' })
+      // path = AStar.calc({ grid, start, end, f: 'Euclidean' })
+      path = Pathfinder.calc({ grid, start, end })
       if (path.length > 1) {
         newDirection = findAngle({
           from: { x: path[1].x + 0.5, y: path[1].y + 0.5 },

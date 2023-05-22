@@ -16,14 +16,13 @@ import { GroundTurret } from '../buildings/GroundTurret'
 import { Starport } from '../buildings/Starport'
 import { OilDerrick } from '../buildings/OilDerrick'
 import { SceneManager } from '../scenes/SceneManager'
+import { type IGrid } from '../interfaces/IGrid'
 
 export interface ITileMapOptions {
   game: Game
   initX?: number
   initY?: number
 }
-
-export type GridArray = Array<Array<1 | 0>>
 
 class ActiveItems extends Container<BaseActiveItem> {}
 class Orders extends Container<Order> {}
@@ -39,12 +38,12 @@ export class TileMap extends Container {
   public mapGridWidth !: number
   public mapGridHeight !: number
   public rebuildPassableRequired = false
-  private _initialMapTerrainGrid: GridArray = []
-  private _currentMapPassableGrid: GridArray = []
-  private _currentMapBuildableGrid: GridArray = []
-  private _initialMapDeployableGrid: GridArray = []
-  private _currentMapDeployableGrid: GridArray = []
-  private readonly _currentCopyMapPassableGrid: GridArray = []
+  private _initialMapTerrainGrid: IGrid = []
+  private _currentMapPassableGrid: IGrid = []
+  private _currentMapBuildableGrid: IGrid = []
+  private _initialMapDeployableGrid: IGrid = []
+  private _currentMapDeployableGrid: IGrid = []
+  private readonly _currentCopyMapPassableGrid: IGrid = []
   public hitboxes = new Hitboxes()
   public activeItems = new ActiveItems()
   public orders = new Orders()
@@ -375,7 +374,7 @@ export class TileMap extends Container {
     return this.staticItems.find(detect)
   }
 
-  get currentMapPassableGrid (): GridArray {
+  get currentMapPassableGrid (): IGrid {
     if (this.rebuildPassableRequired) {
       this.rebuildPassableGrid()
       this.rebuildPassableRequired = false
@@ -383,19 +382,19 @@ export class TileMap extends Container {
     return this._currentMapPassableGrid
   }
 
-  get currentMapBuildableGrid (): GridArray {
+  get currentMapBuildableGrid (): IGrid {
     return this._currentMapBuildableGrid
   }
 
-  get initialMapDeployableGrid (): GridArray {
+  get initialMapDeployableGrid (): IGrid {
     return this._initialMapDeployableGrid
   }
 
-  get currentMapDeployableGrid (): GridArray {
+  get currentMapDeployableGrid (): IGrid {
     return this._currentMapDeployableGrid
   }
 
-  get currentCopyMapPassableGrid (): GridArray {
+  get currentCopyMapPassableGrid (): IGrid {
     const { currentMapPassableGrid } = this
     this._currentCopyMapPassableGrid.length = currentMapPassableGrid.length
     for (let i = 0; i < currentMapPassableGrid.length; i++) {
