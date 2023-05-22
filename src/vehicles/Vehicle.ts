@@ -257,7 +257,7 @@ export class Vehicle extends TeleportableSelectableLifeableRoundItem implements 
       this.updateAnimation(this.moveTurning || this.elapsedSwitchFrames === 0)
     }
     this.elapsedSwitchFrames += 1
-    this.zIndex = this.y + this.height
+    this.zIndex = this.y + this.height // TODO to slow height
   }
 
   checkCollisionObjects (grid: Array<Array<0 | 1>>, distanceFromDestination: number): Array<{

@@ -104,7 +104,8 @@ export class Item extends Container implements IItem {
   }
 
   setPositionByXY ({ x, y, center = false }: { x: number, y: number, center?: boolean }): void {
-    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
+    const { width: colWidth, height: colHeight } = this.collisionOptions
+    const { x: colX, y: colY } = this.collisionGraphics
     const diffX = 0 - (colX + (center ? colWidth / 2 : 0))
     const diffY = 0 - (colY + (center ? colHeight / 2 : 0))
     this.position.set(x + diffX, y + diffY)
@@ -128,7 +129,8 @@ export class Item extends Container implements IItem {
   }
 
   getCollisionPosition ({ center = false } = {}): { x: number, y: number } {
-    const { x: colX, y: colY, width: colWidth, height: colHeight } = this.collisionGraphics
+    const { width: colWidth, height: colHeight } = this.collisionOptions
+    const { x: colX, y: colY } = this.collisionGraphics
     const ret = {
       x: this.x + colX,
       y: this.y + colY
@@ -142,10 +144,11 @@ export class Item extends Container implements IItem {
 
   getCollisionBounds (): IBound {
     const collisionPosition = this.getCollisionPosition()
+    const { width: colWidth, height: colHeight } = this.collisionOptions
     return {
       top: collisionPosition.y,
-      right: collisionPosition.x + this.collisionGraphics.width,
-      bottom: collisionPosition.y + this.collisionGraphics.height,
+      right: collisionPosition.x + colWidth,
+      bottom: collisionPosition.y + colHeight,
       left: collisionPosition.x
     }
   }
