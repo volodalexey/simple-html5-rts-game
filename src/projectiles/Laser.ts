@@ -9,7 +9,7 @@ Exclude<keyof IProjectileOptions, 'textures'>
 export class Laser extends Projectile {
   public itemName = EItemName.Laser
   static textures: IProjectileTextures
-  static reloadTime = 30
+  static reloadTime = 50
 
   public speed = 60
   public distanceTolive = 20

@@ -21,5 +21,5 @@ export interface IAttackable {
   canAttackLand: boolean
   canAttackAir: boolean
   isValidTarget: (item: BaseActiveItem) => boolean
-  findTargetInSight: (addSight?: number) => void
+  findTargetInRadius: (options?: { addSight?: number, radius?: number }) => void
 }

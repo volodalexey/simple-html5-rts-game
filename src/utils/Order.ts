@@ -185,7 +185,7 @@ export function castToServerOrder (order: IOrder): IServerOrder {
   switch (order.type) {
     case 'move': case 'patrol': case 'stand': case 'hunt': case 'try-deploy': case 'end-deploy':
       return order
-    case 'move-and-attack':
+    case 'move-and-attack': case 'approach-and-attack':
       return { type: order.type, toPoint: order.toPoint, nextOrder: order.nextOrder != null ? castToServerOrder(order.nextOrder) : undefined }
     case 'attack': case 'guard': case 'follow':
       return { type: order.type, toUid: order.to.uid, nextOrder: order.nextOrder != null ? castToServerOrder(order.nextOrder) : undefined }
@@ -212,7 +212,7 @@ export function castToClientOrder (order: IServerOrder, find: (uid: number) => B
       return { type: order.type, fromPoint: castToClientGridPointData(order.fromPoint), toPoint: castToClientGridPointData(order.toPoint) }
     case 'stand': case 'hunt':
       return order
-    case 'move-and-attack':
+    case 'move-and-attack': case 'approach-and-attack':
       return { type: order.type, toPoint: castToClientGridPointData(order.toPoint), nextOrder: order.nextOrder != null ? castToClientOrder(order.nextOrder, find) : undefined }
     case 'attack': case 'guard': case 'follow':
       return { type: order.type, to: find(order.toUid), nextOrder: order.nextOrder != null ? castToClientOrder(order.nextOrder, find) : undefined }

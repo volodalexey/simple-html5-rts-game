@@ -47,7 +47,7 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
       )
   }
 
-  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
+  findTargetInRadius ({ addSight = 0, radius = this.sightRadius }: { addSight?: number, radius?: number } = {}): BaseActiveItem | undefined {
     const thisGrid = this.getGridXY({ center: true })
     const targetsByDistance: Record<string, BaseActiveItem[]> = {}
     const items = this.game.tileMap.activeItems.children
@@ -56,7 +56,7 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
       if (this.isValidTarget(item)) {
         const itemGrid = item.getGridXY({ center: true })
         const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sightRadius + addSight, 2)) {
+        if (distance < Math.pow(radius + addSight, 2)) {
           if (!Array.isArray(targetsByDistance[distance])) {
             targetsByDistance[distance] = []
           }
@@ -82,14 +82,14 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
     const thisGrid = this.getGridXY({ center: true })
     switch (this.order.type) {
       case 'stand': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target })
         }
         return true
       }
       case 'hunt': {
-        const target = this.findTargetInSight(100)
+        const target = this.findTargetInRadius({ addSight: 100 })
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
         }
@@ -150,17 +150,66 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
           }
         } else {
           const distanceFromDestinationSquared = Math.pow(distanceFromDestination, 0.5)
-          const moving = this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
+          let moving = this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
+          if (!moving && this.order.to.type === EItemType.airVehicles) {
+            const { mapGridWidth, mapGridHeight } = this.game.tileMap
+            // can not reach target that is floating above unreachable point
+            // pick random point closest to target
+            const targetPoint = { gridX: Math.floor(toGrid.gridX) + 0.5, gridY: Math.floor(toGrid.gridY) + 0.5 }
+            const points = [
+              // near square
+              { gridX: targetPoint.gridX, gridY: targetPoint.gridY - 1 },
+              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY - 1 },
+              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY },
+              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY + 1 },
+              { gridX: targetPoint.gridX, gridY: targetPoint.gridY + 1 },
+              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY + 1 },
+              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY },
+              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY - 1 },
+              // far square
+              { gridX: targetPoint.gridX, gridY: targetPoint.gridY - 2 },
+              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY - 2 },
+              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY - 2 },
+              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY - 1 },
+              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY },
+              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY + 1 },
+              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY + 2 },
+              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY + 2 },
+              { gridX: targetPoint.gridX, gridY: targetPoint.gridY + 2 },
+              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY + 2 },
+              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY + 2 },
+              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY + 1 },
+              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY },
+              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY - 1 },
+              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY - 2 },
+              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY - 2 }
+            ].filter(({ gridX, gridY }) => {
+              if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
+                return false
+              }
+              return true
+            })
+            const point = points[Math.floor(Math.random() * points.length)]
+            moving = this._moveTo({ type: this.order.to.type, ...point }, distanceFromDestinationSquared)
+            if (moving) {
+              this.setOrder({ type: 'approach-and-attack', toPoint: point, nextOrder: this.order.nextOrder })
+              return true
+            }
+          }
           if (!moving) {
             // Pathfinding couldn't find a path so stop
             // e.g. enemy is in hard collide state
-            this.setOrder({ type: 'stand' })
+            if (this.order.nextOrder != null && this.order.nextOrder.type === 'hunt') {
+              this.setOrder({ type: 'hunt' })
+            } else {
+              this.setOrder({ type: 'stand' })
+            }
           }
         }
         return true
       }
       case 'patrol': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           return true
@@ -188,7 +237,7 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
         if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
-          const target = this.findTargetInSight()
+          const target = this.findTargetInRadius()
           if (target != null) {
             this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
             return true
@@ -201,7 +250,7 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
             })
           }
         } else {
-          const target = this.findTargetInSight()
+          const target = this.findTargetInRadius()
           if (target != null) {
             this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           } else {
@@ -212,9 +261,30 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
         return true
       }
       case 'move-and-attack': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
+          return true
+        }
+        const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))
+        if (distanceFromDestinationSquared < Math.pow(this.collisionRadius / tileMap.gridSize, 2)) {
+          // Stop when within one radius of the destination
+          this.setOrder({ type: 'stand' })
+          return true
+        }
+        const distanceFromDestination = Math.pow(distanceFromDestinationSquared, 0.5)
+        const moving = this._moveTo(this.order.toPoint, distanceFromDestination)
+        // Pathfinding couldn't find a path so stop
+        if (!moving) {
+          this.setOrder({ type: 'stand' })
+          return true
+        }
+        return true
+      }
+      case 'approach-and-attack': {
+        const target = this.findTargetInRadius({ radius: this.attackRadius })
+        if (target != null) {
+          this.setOrder({ type: 'attack', to: target, nextOrder: this.order.nextOrder })
           return true
         }
         const distanceFromDestinationSquared = (Math.pow(this.order.toPoint.gridX - thisGrid.gridX, 2) + Math.pow(this.order.toPoint.gridY - thisGrid.gridY, 2))

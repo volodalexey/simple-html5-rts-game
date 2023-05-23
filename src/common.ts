@@ -51,7 +51,7 @@ export interface IServerGridPointData extends IServerGridPoint {
   type?: string
 }
 
-export type IServerOrder = IServerMoveOrder | IServerMoveAndAttack
+export type IServerOrder = IServerMoveOrder | IServerMoveAndAttack | IServerApproachAndAttack
 | IServerFireOrder | IServerAttackOrder | IServerPatrolOrder
 | IServerStandOrder
 | IServerHuntOrder | IServerGuardOrder | IServerFollowOrder
@@ -151,6 +151,12 @@ interface IServerEndConstructUnitOrder {
 
 interface IServerMoveAndAttack {
   type: 'move-and-attack'
+  toPoint: IServerGridPointData
+  nextOrder?: IServerOrder
+}
+
+interface IServerApproachAndAttack {
+  type: 'approach-and-attack'
   toPoint: IServerGridPointData
   nextOrder?: IServerOrder
 }

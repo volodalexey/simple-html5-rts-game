@@ -47,7 +47,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       )
   }
 
-  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
+  findTargetInRadius ({ addSight = 0, radius = this.sightRadius }: { addSight?: number, radius?: number } = {}): BaseActiveItem | undefined {
     const thisGrid = this.getGridXY({ center: true })
     const targetsByDistance: Record<string, BaseActiveItem[]> = {}
     const items = this.game.tileMap.activeItems.children
@@ -56,7 +56,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
       if (this.isValidTarget(item)) {
         const itemGrid = item.getGridXY({ center: true })
         const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sightRadius + addSight, 2)) {
+        if (distance < Math.pow(radius + addSight, 2)) {
           if (!Array.isArray(targetsByDistance[distance])) {
             targetsByDistance[distance] = []
           }
@@ -82,14 +82,14 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
     const thisGrid = this.getGridXY({ center: true })
     switch (this.order.type) {
       case 'stand': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target })
         }
         return true
       }
       case 'hunt': {
-        const target = this.findTargetInSight(100)
+        const target = this.findTargetInRadius({ addSight: 100 })
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
         }
@@ -160,7 +160,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
         return true
       }
       case 'patrol': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           return true
@@ -188,7 +188,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
         const distanceFromDestinationSquared = (Math.pow(toGrid.gridX - thisGrid.gridX, 2) + Math.pow(toGrid.gridY - thisGrid.gridY, 2))
         // When approaching the target of the guard, if there is an enemy in sight, attack him
         if (distanceFromDestinationSquared < Math.pow(this.followRadius, 2)) {
-          const target = this.findTargetInSight()
+          const target = this.findTargetInRadius()
           if (target != null) {
             this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
             return true
@@ -201,7 +201,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
             })
           }
         } else {
-          const target = this.findTargetInSight()
+          const target = this.findTargetInRadius()
           if (target != null) {
             this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           } else {
@@ -212,7 +212,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
         return true
       }
       case 'move-and-attack': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
           return true

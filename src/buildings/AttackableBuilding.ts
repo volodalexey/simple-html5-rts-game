@@ -164,7 +164,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
       )
   }
 
-  findTargetInSight (addSight = 0): BaseActiveItem | undefined {
+  findTargetInRadius ({ addSight = 0, radius = this.sightRadius }: { addSight?: number, radius?: number } = {}): BaseActiveItem | undefined {
     const thisGrid = this.getGridXY({ center: true })
     const targetsByDistance: Record<string, BaseActiveItem[]> = {}
     const items = this.game.tileMap.activeItems.children
@@ -173,7 +173,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
       if (this.isValidTarget(item)) {
         const itemGrid = item.getGridXY({ center: true })
         const distance = Math.pow(itemGrid.gridX - thisGrid.gridX, 2) + Math.pow(itemGrid.gridY - thisGrid.gridY, 2)
-        if (distance < Math.pow(this.sightRadius + addSight, 2)) {
+        if (distance < Math.pow(radius + addSight, 2)) {
           if (!Array.isArray(targetsByDistance[distance])) {
             targetsByDistance[distance] = []
           }
@@ -212,7 +212,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
     }
     switch (this.order.type) {
       case 'stand': {
-        const target = this.findTargetInSight()
+        const target = this.findTargetInRadius()
         if (target != null) {
           this.setOrder({ type: 'attack', to: target, nextOrder: this.order })
         }
@@ -228,7 +228,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
         if (this.order.to.isDead() || !this.isValidTarget(this.order.to) ||
           distanceFromDestination > Math.pow(this.sightRadius, 2)
         ) {
-          const target = this.findTargetInSight()
+          const target = this.findTargetInRadius()
           if (target != null) {
             this.order.to = target
           } else {

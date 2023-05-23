@@ -17,11 +17,12 @@ export enum EOrderType {
   tryConstructUnit = 'try-construct-unit',
   constructUnit = 'construct-unit',
   moveAndAttack = 'move-and-attack',
+  approachAndAttack = 'approach-and-attack',
 }
 
 export type OrderTypes = `${EOrderType}`
 
-export type IOrder = IMoveOrder | IMoveAndAttack
+export type IOrder = IMoveOrder | IMoveAndAttack | IApproachAndAttack
 | IFireOrder | IAttackOrder | IPatrolOrder
 | IStandOrder
 | IHuntOrder | IGuardOrder | IFollowOrder
@@ -142,6 +143,13 @@ interface IEndConstructUnitOrder {
 
 interface IMoveAndAttack {
   type: 'move-and-attack'
+  toPoint: IGridPointData
+  nextOrder?: IOrder
+  processed?: boolean
+}
+
+interface IApproachAndAttack {
+  type: 'approach-and-attack'
   toPoint: IGridPointData
   nextOrder?: IOrder
   processed?: boolean
