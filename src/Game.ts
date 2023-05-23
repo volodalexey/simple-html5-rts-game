@@ -1190,6 +1190,7 @@ export class Game extends Container {
   }
 
   createProjectile (options: {
+    parentUid: number
     name: EItemName
     team: Team
     initGridX?: number

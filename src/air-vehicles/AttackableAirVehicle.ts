@@ -135,6 +135,7 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
                 const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
                 const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
                 const projectile = this.game.createProjectile({
+                  parentUid: this.uid,
                   team: this.team,
                   name: this.projectile,
                   initX: bulletX * tileMap.gridSize,
@@ -149,6 +150,12 @@ export class AttackableAirVehicle extends AirVehicle implements IAttackable {
             }
           }
         } else {
+          // if someone is close to attack
+          const target = this.findTargetInRadius({ radius: this.attackRadius })
+          if (target != null) {
+            this.setOrder({ type: 'attack', to: target, nextOrder: this.order.nextOrder })
+            return true
+          }
           const distanceFromDestinationSquared = Math.pow(distanceFromDestination, 0.5)
           const moving = this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
           if (!moving) {

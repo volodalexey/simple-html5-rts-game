@@ -4,6 +4,8 @@ import { findAngleGrid, type BaseActiveItem, angleDiff, wrapDirection } from '..
 import { type IAttackable } from '../interfaces/IAttackable'
 import { EItemType, type ProjectileName } from '../interfaces/IItem'
 import { type IVehicleOptions, Vehicle } from './Vehicle'
+import { Pathfinder } from '../utils/Pathfinder'
+import { type IGridPoint } from '../interfaces/IGridPoint'
 
 export interface IAttackableVehicleOptions extends IVehicleOptions {}
 
@@ -71,6 +73,60 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
     return targets[0]
   }
 
+  findNearestPoint ({ startPoint, targetPoint, attempts = 1 }: { startPoint: IGridPoint, targetPoint: IGridPoint, attempts?: number }): IGridPoint | null {
+    const startGridX = Math.floor(startPoint.gridX)
+    const startGridY = Math.floor(startPoint.gridY)
+    // can not reach target that is floating above unreachable point
+    // pick random point closest to target
+    const { mapGridWidth, mapGridHeight } = this.game.tileMap
+    const gridX = Math.floor(targetPoint.gridX)
+    const gridY = Math.floor(targetPoint.gridY)
+    const points = [
+      // near square
+      { gridX, gridY: gridY - 1 },
+      { gridX: gridX + 1, gridY: gridY - 1 },
+      { gridX: gridX + 1, gridY },
+      { gridX: gridX + 1, gridY: gridY + 1 },
+      { gridX, gridY: gridY + 1 },
+      { gridX: gridX - 1, gridY: gridY + 1 },
+      { gridX: gridX - 1, gridY },
+      { gridX: gridX - 1, gridY: gridY - 1 },
+      // far square
+      { gridX, gridY: gridY - 2 },
+      { gridX: gridX + 1, gridY: gridY - 2 },
+      { gridX: gridX + 2, gridY: gridY - 2 },
+      { gridX: gridX + 2, gridY: gridY - 1 },
+      { gridX: gridX + 2, gridY },
+      { gridX: gridX + 2, gridY: gridY + 1 },
+      { gridX: gridX + 2, gridY: gridY + 2 },
+      { gridX: gridX + 1, gridY: gridY + 2 },
+      { gridX, gridY: gridY + 2 },
+      { gridX: gridX - 1, gridY: gridY + 2 },
+      { gridX: gridX - 2, gridY: gridY + 2 },
+      { gridX: gridX - 2, gridY: gridY + 1 },
+      { gridX: gridX - 2, gridY },
+      { gridX: gridX - 2, gridY: gridY - 1 },
+      { gridX: gridX - 2, gridY: gridY - 2 },
+      { gridX: gridX - 1, gridY: gridY - 2 }
+    ].filter(({ gridX, gridY }) => {
+      if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
+        return false
+      }
+      return true
+    })
+    while (attempts > 0 && points.length > 0) {
+      const point = points[Math.floor(Math.random() * points.length)]
+      points.splice(points.indexOf(point), 1)
+      const grid = this.game.tileMap.currentCopyMapPassableGrid
+      const path = Pathfinder.calc({ grid, start: { gridX: startGridX, gridY: startGridY }, end: point })
+      if (path != null && path.length > 0) {
+        return { gridX: path[path.length - 1].x + 0.5, gridY: path[path.length - 1].y + 0.5 }
+      }
+      attempts--
+    }
+    return null
+  }
+
   processOrder (): boolean {
     if (this.order.type !== 'patrol' && super.processOrder()) {
       return true
@@ -135,6 +191,7 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
                 const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
                 const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
                 const projectile = this.game.createProjectile({
+                  parentUid: this.uid,
                   team: this.team,
                   name: this.projectile,
                   initX: bulletX * tileMap.gridSize,
@@ -149,50 +206,18 @@ export class AttackableVehicle extends Vehicle implements IAttackable {
             }
           }
         } else {
+          // if someone is close to attack
+          const target = this.findTargetInRadius({ radius: this.attackRadius })
+          if (target != null) {
+            this.setOrder({ type: 'attack', to: target, nextOrder: this.order.nextOrder })
+            return true
+          }
           const distanceFromDestinationSquared = Math.pow(distanceFromDestination, 0.5)
-          let moving = this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
+          const moving = this._moveTo({ type: this.order.to.type, ...toGrid }, distanceFromDestinationSquared)
           if (!moving && this.order.to.type === EItemType.airVehicles) {
-            const { mapGridWidth, mapGridHeight } = this.game.tileMap
-            // can not reach target that is floating above unreachable point
-            // pick random point closest to target
-            const targetPoint = { gridX: Math.floor(toGrid.gridX) + 0.5, gridY: Math.floor(toGrid.gridY) + 0.5 }
-            const points = [
-              // near square
-              { gridX: targetPoint.gridX, gridY: targetPoint.gridY - 1 },
-              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY - 1 },
-              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY },
-              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY + 1 },
-              { gridX: targetPoint.gridX, gridY: targetPoint.gridY + 1 },
-              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY + 1 },
-              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY },
-              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY - 1 },
-              // far square
-              { gridX: targetPoint.gridX, gridY: targetPoint.gridY - 2 },
-              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY - 2 },
-              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY - 2 },
-              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY - 1 },
-              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY },
-              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY + 1 },
-              { gridX: targetPoint.gridX + 2, gridY: targetPoint.gridY + 2 },
-              { gridX: targetPoint.gridX + 1, gridY: targetPoint.gridY + 2 },
-              { gridX: targetPoint.gridX, gridY: targetPoint.gridY + 2 },
-              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY + 2 },
-              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY + 2 },
-              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY + 1 },
-              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY },
-              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY - 1 },
-              { gridX: targetPoint.gridX - 2, gridY: targetPoint.gridY - 2 },
-              { gridX: targetPoint.gridX - 1, gridY: targetPoint.gridY - 2 }
-            ].filter(({ gridX, gridY }) => {
-              if (gridX < 0 || gridX >= mapGridWidth || gridY < 0 || gridY >= mapGridHeight) {
-                return false
-              }
-              return true
-            })
-            const point = points[Math.floor(Math.random() * points.length)]
-            moving = this._moveTo({ type: this.order.to.type, ...point }, distanceFromDestinationSquared)
-            if (moving) {
-              this.setOrder({ type: 'approach-and-attack', toPoint: point, nextOrder: this.order.nextOrder })
+            const nearestPoint = this.findNearestPoint({ startPoint: thisGrid, targetPoint: toGrid })
+            if (nearestPoint != null) {
+              this.setOrder({ type: 'approach-and-attack', toPoint: nearestPoint, nextOrder: this.order.nextOrder })
               return true
             }
           }

@@ -264,6 +264,7 @@ export class AttackableBuilding extends Building implements ITurnable, IAttackab
                 const bulletX = thisGrid.gridX - (this.collisionRadius * Math.sin(angleRadians) / tileMap.gridSize)
                 const bulletY = thisGrid.gridY - (this.collisionRadius * Math.cos(angleRadians) / tileMap.gridSize)
                 const projectile = this.game.createProjectile({
+                  parentUid: this.uid,
                   team: this.team,
                   name: this.projectile,
                   initX: bulletX * tileMap.gridSize,

@@ -4,6 +4,8 @@ import { type IMoveable } from '../interfaces/IMoveable'
 import { EVectorDirection, Vector } from '../utils/Vector'
 import { type BaseActiveItem, angleDiff, wrapDirection, checkCollision, findAngleGrid, generateUid } from '../utils/helpers'
 import { type IItemOptions, Item } from '../oop/Item'
+import { type IAttackable } from '../interfaces/IAttackable'
+import { type AttackableVehicle } from '../vehicles/AttackableVehicle'
 
 export interface IProjectileTextures {
   upTextures: Texture[]
@@ -18,12 +20,14 @@ export interface IProjectileTextures {
 }
 
 export interface IProjectileOptions extends IItemOptions {
+  parentUid: number
   textures: IProjectileTextures
   direction: EVectorDirection
   target: BaseActiveItem
 }
 
 export class Projectile extends Item implements IMoveable {
+  public parentUid!: number
   public commands = []
   static reloadTime = 0
 
@@ -56,6 +60,7 @@ export class Projectile extends Item implements IMoveable {
 
   constructor (options: IProjectileOptions) {
     super(options)
+    this.parentUid = options.parentUid
     this.uid = typeof options.uid === 'number' ? options.uid : generateUid()
     this.game = options.game
     this.setOrderImmediate({ type: 'fire', to: options.target })
@@ -194,6 +199,25 @@ export class Projectile extends Item implements IMoveable {
             this.playHitSound()
 
             this.order.to.subLife(this.damage)
+            if (this.order.to.order.type === 'stand' || this.order.to.order.type === 'move-and-attack' || this.order.to.order.type === 'patrol') {
+              const targetItem = this.order.to
+              const parentItem = this.game.tileMap.getItemByUid(this.parentUid)
+              if (parentItem != null &&
+                typeof (this.order.to as unknown as IAttackable).isValidTarget === 'function' &&
+                (this.order.to as unknown as IAttackable).isValidTarget(parentItem)) {
+                // strikes back
+                if (parentItem.type === EItemType.airVehicles && targetItem.type === EItemType.vehicles) {
+                  const startPoint = targetItem.getGridXY({ center: true })
+                  const targetPoint = parentItem.getGridXY({ center: true })
+                  const nearestPoint = (targetItem as AttackableVehicle).findNearestPoint({ startPoint, targetPoint, attempts: 20 })
+                  if (nearestPoint != null) {
+                    targetItem.setOrder({ type: 'approach-and-attack', toPoint: nearestPoint })
+                  }
+                } else {
+                  targetItem.setOrder({ type: 'attack', to: parentItem })
+                }
+              }
+            }
             this.switchToExplodeAnimation()
             this.setOrder({ type: 'stand' })
           } else {
