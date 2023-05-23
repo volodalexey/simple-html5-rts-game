@@ -59,6 +59,7 @@ export class TileMap extends Container {
   public maxYPivot = 0
   public minScale = 0
   public maxScale = 0
+  public settings!: IMapSettings
 
   static options = {
     maxScaleRatio: 5
@@ -104,7 +105,8 @@ export class TileMap extends Container {
     viewHeight: number
   }): void {
     const background: Texture = Assets.get(mapImageSrc)
-    const settings: IMapSettings = Assets.get(mapSettingsSrc)
+    this.settings = Assets.get(mapSettingsSrc)
+    const { settings } = this
 
     this.background.texture = background
     if (!logNoFog.enabled && this.game.debug.enableFog) {
