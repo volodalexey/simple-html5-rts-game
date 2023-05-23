@@ -91,7 +91,7 @@ export class VersusCPUScene extends Container implements IScene {
       // { name: EItemName.ScoutTank, initGridX: 3, initGridY: 1, team: Team.blue },
       // { name: EItemName.HeavyTank, initGridX: 5, initGridY: 1, team: Team.blue },
       // { name: EItemName.ScoutTank, initGridX: 7, initGridY: 1, team: Team.blue },
-      // { name: EItemName.HeavyTank, initGridX: 9, initGridY: 1, team: Team.blue },
+      // { name: EItemName.SCV, initGridX: 9, initGridY: 1, team: Team.blue },
       // { name: EItemName.ScoutTank, initGridX: 1, initGridY: 3, team: Team.blue },
       // { name: EItemName.HeavyTank, initGridX: 3, initGridY: 3, team: Team.blue },
       // { name: EItemName.ScoutTank, initGridX: 5, initGridY: 3, team: Team.blue },

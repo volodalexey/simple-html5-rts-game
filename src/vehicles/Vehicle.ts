@@ -8,7 +8,7 @@ import { LifeBar } from '../components/LifeBar'
 import { type ITurnable } from '../interfaces/ITurnable'
 import { ECommandName } from '../interfaces/ICommand'
 import { TeleportableSelectableLifeableRoundItem, type ITeleportableSelectableLifeableRoundItemOptions } from '../oop/TeleportableSelectableLifeableRoundItem'
-import { Pathfinder } from '../utils/EasyStar'
+import { Pathfinder } from '../utils/Pathfinder'
 
 export interface IVehicleTextures {
   upTextures: Texture[]

@@ -22,6 +22,7 @@ export class Pathfinder {
     Pathfinder.easystar.setGrid(grid)
     Pathfinder.easystar.enableSync()
     Pathfinder.easystar.enableDiagonals()
+    Pathfinder.easystar.disableCornerCutting()
     Pathfinder.easystar.setAcceptableTiles([0])
 
     Pathfinder.easystar.findPath(start.gridX, start.gridY, end.gridX, end.gridY, (path) => {
