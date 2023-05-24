@@ -366,13 +366,9 @@ export class AI {
       this.game.processOrders({ items: starport.one(), order: { type: 'try-construct-unit', name: EItemName.HeavyTank, unitUid: -324, unitOrder: { type: 'patrol', fromPoint: { gridX: 54, gridY: 12 }, toPoint: { gridX: 54, gridY: 14 } } } })
       logAI(`calcAttackableOrders(${cash}) 4`)
       return true
-    } else if (heavyTank.count === 1 && cash >= HeavyTank.cost) {
-      this.game.processOrders({ items: starport.other(), order: { type: 'try-construct-unit', name: EItemName.HeavyTank, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 50, gridY: 14 } } } })
-      logAI(`calcAttackableOrders(${cash}) 5`)
-      return true
-    } else if (scoutTank.count < 2 && cash >= ScoutTank.cost) {
+    } else if (scoutTank.count === 0 && cash >= ScoutTank.cost) {
       this.game.processOrders({ items: starport.other(true), order: { type: 'try-construct-unit', name: EItemName.ScoutTank, unitOrder: { type: 'move-and-attack', toPoint: { gridX: 51, gridY: 15 } } } })
-      logAI(`calcAttackableOrders(${cash}) 6`)
+      logAI(`calcAttackableOrders(${cash}) 5`)
       return true
     }
     return false
@@ -438,20 +434,15 @@ export class AI {
       cash
     } = this
     const seed1 = Math.random()
-    if (scoutTank.count >= 3 && heavyTank.count >= 2 && cash > 200 && seed1 >= 0.4) {
+    if (scoutTank.count >= 2 && heavyTank.count >= 2 && cash > 200 && seed1 >= 0.6) {
       this.game.processOrders({ items: scoutTank.items, order: { type: 'hunt' } })
       this.game.processOrders({ items: heavyTank.items, order: { type: 'hunt' } })
       logAI(`calcWaveOrders(${cash}) 1`)
       return true
-    } else if (chopper.count >= 2 && wraith.count >= 2 && cash > 200 && groundTurret.count >= 1 && seed1 >= 0.6) {
+    } else if (chopper.count >= 2 && wraith.count >= 2 && cash > 250 && groundTurret.count >= 1 && seed1 >= 0.8) {
       this.game.processOrders({ items: chopper.items, order: { type: 'hunt' } })
       this.game.processOrders({ items: wraith.items, order: { type: 'hunt' } })
       logAI(`calcWaveOrders(${cash}) 2`)
-      return true
-    } else if (chopper.count > 0 && wraith.count >= 6 && seed1 >= 0.6) {
-      this.game.processOrders({ items: chopper.items, order: { type: 'hunt' } })
-      this.game.processOrders({ items: wraith.items, order: { type: 'hunt' } })
-      logAI(`calcWaveOrders(${cash}) 3`)
       return true
     }
     return false

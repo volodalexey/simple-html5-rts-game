@@ -89,7 +89,7 @@ export class GroundTurret extends AttackableBuilding {
 
   public collisionRadius = 10
   public sightRadius = 11
-  public attackRadius = 10
+  public attackRadius = 9
   static cost = 150
   public hitPoints = 200
   public life = this.hitPoints
@@ -97,9 +97,9 @@ export class GroundTurret extends AttackableBuilding {
   public teleportAnimation!: AnimatedSprite
   public canAttack = true
   public canAttackLand = true
-  public canAttackAir = false
+  public canAttackAir = true
   public turnSpeed = 4
-  public projectile: ProjectileName = EItemName.CannonBall
+  public projectile: ProjectileName = EItemName.Bullet
 
   static buildableGrid = [
     [1]
