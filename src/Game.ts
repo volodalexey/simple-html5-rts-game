@@ -430,8 +430,8 @@ export class Game extends Container {
       const distanceOld = Math.hypot(fromY - toOldY, fromX - toOldX)
       const distance = Math.hypot(fromY - toNewY, fromX - toNewX)
       const scaleFactor = distance / distanceOld * Game.options.pinchScaleFactor
-      const middleX = Math.min(fromX, toNewX) + (fromX - toNewX) * 0.5
-      const middleY = Math.min(fromY, toNewY) + (fromY - toNewY) * 0.5
+      const middleX = Math.min(fromX, toNewX) + (Math.max(fromX, toNewX) - Math.min(fromX, toNewX)) * 0.5
+      const middleY = Math.min(fromY, toNewY) + (Math.max(fromY, toNewY) - Math.min(fromY, toNewY)) * 0.5
       const globalMiddle = this.toGlobal({ x: middleX, y: middleY })
       const tileMapMiddle = this.tileMap.toLocal(globalMiddle)
       this.tileMap.zoom({ scaleFactor: scaleFactor < 1 ? 1 / scaleFactor * -1 : scaleFactor, sX: tileMapMiddle.x, sY: tileMapMiddle.y })

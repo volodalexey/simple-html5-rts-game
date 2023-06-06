@@ -16,6 +16,8 @@ import gunAudio from '../assets/audio/gun.mp3'
 import heatseeker1Audio from '../assets/audio/heatseeker1.mp3'
 import heatseeker2Audio from '../assets/audio/heatseeker2.mp3'
 import rocketHit0Audio from '../assets/audio/rocket-hit-0.mp3'
+import rocketHit1Audio from '../assets/audio/rocket-hit-1.mp3'
+import rocketHit2Audio from '../assets/audio/rocket-hit-2.mp3'
 import laser1Audio from '../assets/audio/laser1.mp3'
 import laser2Audio from '../assets/audio/laser2.mp3'
 import laserHit0Audio from '../assets/audio/laser-hit-0.mp3'
@@ -216,6 +218,14 @@ export class Audio {
 
   public rocketHit0 = new Howl({
     src: rocketHit0Audio
+  })
+
+  public rocketHit1 = new Howl({
+    src: rocketHit1Audio
+  })
+
+  public rocketHit2 = new Howl({
+    src: rocketHit2Audio
   })
 
   public laser1 = new Howl({
@@ -451,7 +461,7 @@ export class Audio {
       case 'rocket':
         return [this.heatseeker1, this.heatseeker2]
       case 'rocket-hit':
-        return [this.rocketHit0]
+        return [this.rocketHit0, this.rocketHit1, this.rocketHit2]
       case 'laser':
         return [this.laser1, this.laser2]
       case 'laser-hit':
